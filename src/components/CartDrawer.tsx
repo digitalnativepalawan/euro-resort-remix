@@ -452,7 +452,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
 
             <div className="px-4 overflow-y-auto flex-1">
               {cart.items.length === 0 ? (
-                <p className="font-body text-cream-dim text-center py-8">Your order is empty</p>
+                <p className="font-body text-cream-dim text-center py-8">{t('cart.orderEmpty')}</p>
               ) : (
                 <>
                   <div className="flex flex-col gap-3">
