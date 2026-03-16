@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -51,6 +52,7 @@ const formatScheduledTime = (date: Date): string => {
 };
 
 const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrdersViewProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -229,7 +231,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
     qc.invalidateQueries({ queryKey: ['orders-staff'] });
     qc.invalidateQueries({ queryKey: ['orders-kitchen'] });
     qc.invalidateQueries({ queryKey: ['orders-bar'] });
-    toast.success(`${department === 'kitchen' ? 'Kitchen' : 'Bar'} → ${DEPT_STATUS_LABELS[nextDeptStatus]}`);
+    toast.success(`${department === 'kitchen' ? t('kitchen.label') : t('bar.label')} → ${DEPT_STATUS_LABELS[nextDeptStatus]}`);
   };
 
   const handleLogout = () => {
@@ -237,7 +239,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
     navigate('/');
   };
 
-  const deptLabel = department === 'kitchen' ? '🍳 Kitchen' : '🍹 Bar';
+  const deptLabel = department === 'kitchen' ? `🍳 ${t('kitchen.label')}` : `🍹 ${t('bar.label')}`;
 
   // Render a single order card
   const renderOrderCard = (order: any, isScheduledCard: boolean) => {
@@ -273,7 +275,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               <Clock className="w-4 h-4 text-blue-400 shrink-0" />
               <div className="flex-1">
                 <span className="font-display text-sm text-blue-400 tracking-wider font-bold">
-                  🕒 {formatScheduledTime(scheduledFor)}
+                  🕒 {t('kitchen.serveAt', { time: formatScheduledTime(scheduledFor) })}
                 </span>
                 <span className="font-body text-xs text-blue-400/70 ml-2">
                   · {formatDistanceToNow(scheduledFor, { addSuffix: true })}
@@ -283,7 +285,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
             <div className="flex items-center gap-2 bg-amber-500/10 rounded px-3 py-1.5 border border-amber-400/30">
               <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="font-body text-xs text-amber-400">
-                ⏰ Prepare at {formatScheduledTime(prepTime)} · {formatDistanceToNow(prepTime, { addSuffix: true })}
+                ⏰ {t('kitchen.prepareAt', { time: formatScheduledTime(prepTime) })} · {formatDistanceToNow(prepTime, { addSuffix: true })}
               </span>
             </div>
           </div>
@@ -293,7 +295,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
         {!isScheduledCard && isPending && (
           <div className="flex items-center gap-2 mb-3 bg-gold/20 rounded px-3 py-1.5 border border-gold/40">
             <AlertTriangle className="w-4 h-4 text-gold blink-dot" />
-            <span className="font-display text-sm text-gold tracking-widest font-bold uppercase">New Order</span>
+            <span className="font-display text-sm text-gold tracking-widest font-bold uppercase">{t('kitchen.newOrder')}</span>
           </div>
         )}
 
@@ -302,7 +304,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
           <div className="flex items-center gap-2 mb-3 bg-blue-500/20 rounded px-3 py-1.5 border border-blue-400/40">
             <Clock className="w-4 h-4 text-blue-400" />
             <span className="font-display text-sm text-blue-400 tracking-widest font-bold uppercase">
-              Serve at {formatScheduledTime(new Date(order.scheduled_for))}
+              {t('kitchen.serveAt', { time: formatScheduledTime(new Date(order.scheduled_for)) })}
             </span>
           </div>
         )}
@@ -316,7 +318,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               <p className="font-body text-xs text-foreground/70 mt-0.5">{order.guest_name}</p>
             )}
             <p className="font-body text-xs text-cream-dim mt-0.5">
-              Ordered {formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}
+              {t('kitchen.ordered', { time: formatDistanceToNow(new Date(order.created_at), { addSuffix: true }) })}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -360,12 +362,12 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               onClick={() => advanceDeptStatus(order, 'preparing')}
               className="font-body text-xs gap-1.5 bg-gold text-primary-foreground hover:bg-gold/90 font-bold"
             >
-              <ChefHat className="w-4 h-4" /> Start Preparing
+              <ChefHat className="w-4 h-4" /> {t('kitchen.startPreparing')}
             </Button>
           )}
           {canAct && deptStatus === 'pending' && isScheduledCard && prepTime && (
             <span className="font-body text-xs text-muted-foreground italic">
-              Not yet — prep at {formatScheduledTime(prepTime)}
+              {t('kitchen.notYetPrepAt', { time: formatScheduledTime(prepTime!) })}
             </span>
           )}
           {canAct && deptStatus === 'preparing' && (
@@ -374,7 +376,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               variant="outline"
               className="font-body text-xs gap-1.5"
             >
-              <Truck className="w-4 h-4" /> Mark Ready
+              <Truck className="w-4 h-4" /> {t('kitchen.markReady')}
             </Button>
           )}
         </div>
@@ -428,7 +430,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
       {/* Orders */}
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
         {filtered.length === 0 && (
-          <p className="font-body text-sm text-cream-dim text-center py-12">No {DEPT_STATUS_LABELS[activeTab].toLowerCase()} orders for {department}</p>
+          <p className="font-body text-sm text-cream-dim text-center py-12">{t('kitchen.noOrdersForDept', { status: DEPT_STATUS_LABELS[activeTab].toLowerCase(), department: department === 'kitchen' ? t('kitchen.label') : t('bar.label') })}</p>
         )}
 
         {/* Pending tab: split into Due Now and Scheduled */}
@@ -440,7 +442,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
                 {scheduledOrders.length > 0 && (
                   <div className="flex items-center gap-2 pt-1 pb-1">
                     <Zap className="w-4 h-4 text-gold" />
-                    <span className="font-display text-xs tracking-widest text-gold uppercase font-bold">Due Now / ASAP</span>
+                    <span className="font-display text-xs tracking-widest text-gold uppercase font-bold">{t('kitchen.dueNow')}</span>
                     <span className="font-body text-xs text-cream-dim">({nowOrders.length})</span>
                   </div>
                 )}
@@ -453,7 +455,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               <>
                 <div className="flex items-center gap-2 pt-3 pb-1">
                   <Clock className="w-4 h-4 text-blue-400" />
-                  <span className="font-display text-xs tracking-widest text-blue-400 uppercase font-bold">Scheduled for Later</span>
+                  <span className="font-display text-xs tracking-widest text-blue-400 uppercase font-bold">{t('kitchen.scheduledForLater')}</span>
                   <span className="font-body text-xs text-cream-dim">({scheduledOrders.length})</span>
                 </div>
                 {scheduledOrders.map(order => renderOrderCard(order, true))}
