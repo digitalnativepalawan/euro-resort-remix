@@ -319,9 +319,9 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
           <div className="flex gap-2">
             <Button size="sm" onClick={addTask} className="font-display text-xs tracking-wider flex-1"
               disabled={!title.trim() || (!employeeId && assignees.length === 0)}>
-              {assignees.length > 1 || selectAll ? `Send to ${selectAll ? activeEmployees.length : assignees.length} staff` : 'Save'}
+              {assignees.length > 1 || selectAll ? t('tasks.sendToStaff', { count: selectAll ? activeEmployees.length : assignees.length }) : t('common.save')}
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setShowForm(false)} className="font-display text-xs tracking-wider flex-1">Cancel</Button>
+            <Button size="sm" variant="outline" onClick={() => setShowForm(false)} className="font-display text-xs tracking-wider flex-1">{t('common.cancel')}</Button>
           </div>
         </div>
       )}
