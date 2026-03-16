@@ -659,7 +659,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         {/* Register revenue (excluding room charges) */}
         <div className="text-center space-y-1">
           <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">{t('cashier.registerRevenueToday')}</p>
-          <p className="font-display text-3xl text-gold tabular-nums">₱{summary.registerRevenue.toLocaleString()}</p>
+          <p className="font-display text-3xl text-gold tabular-nums">{formatPrice(summary.registerRevenue)}</p>
           <p className="font-body text-xs text-muted-foreground">{t('cashier.settledOrders', { count: summary.orderCount - summary.roomChargeCount })}</p>
         </div>
 
