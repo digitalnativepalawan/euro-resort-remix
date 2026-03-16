@@ -521,7 +521,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   {/* Order type selection for guests who haven't pre-selected */}
                   {!isGuestOrder && needsOrderType && orderTypes.length > 0 && (
                     <div className="mt-4 pt-3 border-t border-border">
-                      <p className="font-display text-sm text-foreground tracking-wider mb-3">Where's your order?</p>
+                      <p className="font-display text-sm text-foreground tracking-wider mb-3">{t('cart.whereIsYourOrder')}</p>
                       <div className="grid grid-cols-2 gap-2 mb-3">
                         {orderTypes.map(ot => (
                           <button
