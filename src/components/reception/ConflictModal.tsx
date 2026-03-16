@@ -17,6 +17,7 @@ interface ConflictModalProps {
 }
 
 const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlternative, onOverride, canOverride }: ConflictModalProps) => {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="max-w-md">
