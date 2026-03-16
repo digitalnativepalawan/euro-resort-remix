@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { Download, Upload, Pencil, Trash2, Clock, Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type Employee = { id: string; name: string; hourly_rate: number };
 type TimeEntry = {
@@ -29,6 +30,7 @@ const diffHours = (clockIn: string, clockOut: string | null): number => {
 };
 
 const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -83,17 +85,17 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
     const breakdown = Object.entries(byEmp).map(([empId, hours]) => {
       const emp = empMap[empId];
       const rate = emp?.hourly_rate || 0;
-      return { name: emp?.name || 'Unknown', rate, hours: Math.round(hours * 100) / 100, pay: Math.round(hours * rate * 100) / 100 };
+      return { name: emp?.name || t('common.unknown'), rate, hours: Math.round(hours * 100) / 100, pay: Math.round(hours * rate * 100) / 100 };
     });
     const totalHours = breakdown.reduce((s, b) => s + b.hours, 0);
     const totalPay = breakdown.reduce((s, b) => s + b.pay, 0);
     return { totalHours: Math.round(totalHours * 100) / 100, totalPay: Math.round(totalPay * 100) / 100, breakdown };
-  }, [calcStart, calcEnd, entries, empMap]);
+  }, [calcStart, calcEnd, entries, empMap, t]);
 
   const clockOut = async (id: string) => {
     await supabase.from('time_entries').update({ clock_out: new Date().toISOString() }).eq('id', id);
     qc.invalidateQueries({ queryKey: ['time-entries'] });
-    toast.success('Clocked out');
+    toast.success(t('timesheet.clockedOut'));
   };
 
   const startEdit = (e: TimeEntry) => {
@@ -117,7 +119,7 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
     }).eq('id', editingId);
     setEditingId(null);
     qc.invalidateQueries({ queryKey: ['time-entries'] });
-    toast.success('Entry updated');
+    toast.success(t('timesheet.entryUpdated'));
   };
 
   const confirmDelete = async () => {
@@ -125,7 +127,7 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
     await supabase.from('time_entries').delete().eq('id', deleteId);
     setDeleteId(null);
     qc.invalidateQueries({ queryKey: ['time-entries'] });
-    toast.success('Entry deleted');
+    toast.success(t('timesheet.entryDeleted'));
   };
 
   const downloadCSV = () => {
@@ -176,51 +178,49 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
       if (!empId) { errors++; continue; }
       const entryDate = dateStr;
       const clockIn = new Date(`${dateStr}T${clockInStr || '08:00'}:00`).toISOString();
-      const clockOut = clockOutStr ? new Date(`${dateStr}T${clockOutStr}:00`).toISOString() : null;
-      const { error } = await supabase.from('time_entries').insert({ employee_id: empId, entry_date: entryDate, clock_in: clockIn, clock_out: clockOut });
+      const clockOutVal = clockOutStr ? new Date(`${dateStr}T${clockOutStr}:00`).toISOString() : null;
+      const { error } = await supabase.from('time_entries').insert({ employee_id: empId, entry_date: entryDate, clock_in: clockIn, clock_out: clockOutVal });
       if (error) errors++; else inserted++;
     }
     qc.invalidateQueries({ queryKey: ['time-entries'] });
-    toast.success(`Imported ${inserted} entries${errors > 0 ? `, ${errors} errors` : ''}`);
+    toast.success(errors > 0 ? t('timesheet.importedWithErrors', { inserted, errors }) : t('timesheet.importedEntries', { inserted }));
     if (fileRef.current) fileRef.current.value = '';
   };
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="font-display text-lg tracking-wider text-foreground flex-grow">Timesheet Management</h2>
+        <h2 className="font-display text-lg tracking-wider text-foreground flex-grow">{t('timesheet.title')}</h2>
         <Input type="date" value={filterStart} onChange={e => setFilterStart(e.target.value)}
           className="bg-secondary border-border text-foreground font-body text-xs h-9 w-32" />
         <Input type="date" value={filterEnd} onChange={e => setFilterEnd(e.target.value)}
           className="bg-secondary border-border text-foreground font-body text-xs h-9 w-32" />
         <Button size="sm" variant="outline" className="font-display text-xs h-9" onClick={downloadCSV}>
-          <Download className="h-3 w-3 mr-1" /> CSV
+          <Download className="h-3 w-3 mr-1" /> {t('timesheet.csv')}
         </Button>
         {!readOnly && (
           <>
             <Button size="sm" variant="outline" className="font-display text-xs h-9" onClick={() => fileRef.current?.click()}>
-              <Upload className="h-3 w-3 mr-1" /> Bulk
+              <Upload className="h-3 w-3 mr-1" /> {t('timesheet.bulk')}
             </Button>
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleBulkUpload} />
           </>
         )}
       </div>
 
-      {/* Calculate Hours & Pay */}
       <Card className="bg-card border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="font-display text-sm tracking-wider">Calculate Hours & Pay</CardTitle>
+          <CardTitle className="font-display text-sm tracking-wider">{t('timesheet.calculateHoursPay')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2 items-end">
             <div>
-              <Label className="font-body text-xs text-muted-foreground">Start Date</Label>
+              <Label className="font-body text-xs text-muted-foreground">{t('timesheet.startDate')}</Label>
               <Input type="date" value={calcStart} onChange={e => setCalcStart(e.target.value)}
                 className="bg-secondary border-border text-foreground font-body text-xs h-9 w-36" />
             </div>
             <div>
-              <Label className="font-body text-xs text-muted-foreground">End Date</Label>
+              <Label className="font-body text-xs text-muted-foreground">{t('timesheet.endDate')}</Label>
               <Input type="date" value={calcEnd} onChange={e => setCalcEnd(e.target.value)}
                 className="bg-secondary border-border text-foreground font-body text-xs h-9 w-36" />
             </div>
@@ -228,8 +228,8 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
           {calcResults && (
             <div className="space-y-2">
               <div className="flex gap-4">
-                <div className="text-sm font-body"><span className="text-muted-foreground">Total Hours:</span> <span className="text-foreground font-semibold">{calcResults.totalHours}</span></div>
-                <div className="text-sm font-body"><span className="text-muted-foreground">Total Pay:</span> <span className="text-foreground font-semibold">₱{calcResults.totalPay.toLocaleString()}</span></div>
+                <div className="text-sm font-body"><span className="text-muted-foreground">{t('timesheet.totalHours')}</span> <span className="text-foreground font-semibold">{calcResults.totalHours}</span></div>
+                <div className="text-sm font-body"><span className="text-muted-foreground">{t('timesheet.totalPay')}</span> <span className="text-foreground font-semibold">₱{calcResults.totalPay.toLocaleString()}</span></div>
               </div>
               {calcResults.breakdown.length > 0 && (
                 <div className="space-y-1">
@@ -246,10 +246,9 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
         </CardContent>
       </Card>
 
-      {/* Time Entries - always stacked cards */}
       <div className="space-y-2">
         {entries.length === 0 && (
-          <p className="font-body text-sm text-muted-foreground text-center py-8">No time entries yet</p>
+          <p className="font-body text-sm text-muted-foreground text-center py-8">{t('timesheet.noTimeEntries')}</p>
         )}
         {entries.map(entry => {
           const emp = empMap[entry.employee_id];
@@ -260,25 +259,25 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
             return (
               <Card key={entry.id} className="bg-card border-border">
                 <CardContent className="p-3 space-y-2">
-                  <div className="font-body text-sm font-semibold text-foreground">{emp?.name || 'Unknown'}</div>
+                  <div className="font-body text-sm font-semibold text-foreground">{emp?.name || t('common.unknown')}</div>
                   <div>
-                    <Label className="font-body text-xs text-muted-foreground">Clock In</Label>
+                    <Label className="font-body text-xs text-muted-foreground">{t('timesheet.clockIn')}</Label>
                     <Input type="datetime-local" value={editForm.clock_in} onChange={e => setEditForm(p => ({ ...p, clock_in: e.target.value }))} className="bg-secondary border-border text-foreground font-body text-xs h-9" />
                   </div>
                   <div>
-                    <Label className="font-body text-xs text-muted-foreground">Clock Out</Label>
+                    <Label className="font-body text-xs text-muted-foreground">{t('timesheet.clockOut')}</Label>
                     <Input type="datetime-local" value={editForm.clock_out} onChange={e => setEditForm(p => ({ ...p, clock_out: e.target.value }))} className="bg-secondary border-border text-foreground font-body text-xs h-9" />
                   </div>
                   <div className="flex items-center gap-3">
                     <label className="flex items-center gap-1.5 font-body text-xs text-muted-foreground">
                       <input type="checkbox" checked={editForm.is_paid} onChange={e => setEditForm(p => ({ ...p, is_paid: e.target.checked }))} />
-                      Paid
+                      {t('payroll.paid')}
                     </label>
-                    <Input placeholder="₱ Amount" value={editForm.paid_amount} onChange={e => setEditForm(p => ({ ...p, paid_amount: e.target.value }))} className="bg-secondary border-border text-foreground font-body text-xs h-9 w-28" />
+                    <Input placeholder="₱" value={editForm.paid_amount} onChange={e => setEditForm(p => ({ ...p, paid_amount: e.target.value }))} className="bg-secondary border-border text-foreground font-body text-xs h-9 w-28" />
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={saveEdit} className="font-display text-xs h-9 flex-1"><Check className="h-3 w-3 mr-1" />Save</Button>
-                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)} className="font-display text-xs h-9 flex-1"><X className="h-3 w-3 mr-1" />Cancel</Button>
+                    <Button size="sm" onClick={saveEdit} className="font-display text-xs h-9 flex-1"><Check className="h-3 w-3 mr-1" />{t('common.save')}</Button>
+                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)} className="font-display text-xs h-9 flex-1"><X className="h-3 w-3 mr-1" />{t('common.cancel')}</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -289,13 +288,13 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
             <Card key={entry.id} className="bg-card border-border">
               <CardContent className="p-3">
                 <div className="flex justify-between items-start mb-1">
-                  <div className="font-body text-sm font-semibold text-foreground">{emp?.name || 'Unknown'}</div>
-                  <Badge variant={entry.is_paid ? 'default' : 'secondary'} className="text-[10px]">{entry.is_paid ? 'Paid' : 'Unpaid'}</Badge>
+                  <div className="font-body text-sm font-semibold text-foreground">{emp?.name || t('common.unknown')}</div>
+                  <Badge variant={entry.is_paid ? 'default' : 'secondary'} className="text-[10px]">{entry.is_paid ? t('payroll.paid') : t('common.unpaid')}</Badge>
                 </div>
                 <div className="font-body text-xs text-muted-foreground mb-0.5">{entry.entry_date}</div>
                 <div className="flex items-center gap-1 font-body text-xs text-foreground mb-0.5">
                   <Clock className="h-3 w-3 text-muted-foreground" />
-                  {fmt12(entry.clock_in)} → {entry.clock_out ? fmt12(entry.clock_out) : <span className="text-accent">Active</span>}
+                  {fmt12(entry.clock_in)} → {entry.clock_out ? fmt12(entry.clock_out) : <span className="text-accent">{t('common.active')}</span>}
                 </div>
                 <div className="font-body text-xs text-muted-foreground">
                   {hours > 0 ? `${hours.toFixed(1)}h` : '-'} {entry.paid_amount ? `· ₱${entry.paid_amount}` : ''}
@@ -321,16 +320,15 @@ const TimesheetDashboard = ({ readOnly = false }: { readOnly?: boolean }) => {
         })}
       </div>
 
-      {/* Delete confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-display text-foreground">Delete Entry?</AlertDialogTitle>
-            <AlertDialogDescription className="font-body text-muted-foreground">This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle className="font-display text-foreground">{t('timesheet.deleteEntry')}</AlertDialogTitle>
+            <AlertDialogDescription className="font-body text-muted-foreground">{t('timesheet.cannotBeUndone')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-display">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground font-display">Delete</AlertDialogAction>
+            <AlertDialogCancel className="font-display">{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground font-display">{t('common.delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

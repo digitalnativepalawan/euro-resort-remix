@@ -8,8 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { Upload, Facebook, Instagram, Globe, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ResortProfileForm = () => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: profile } = useResortProfile();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -17,40 +19,22 @@ const ResortProfileForm = () => {
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
-    resort_name: '',
-    tagline: '',
-    address: '',
-    phone: '',
-    contact_name: '',
-    contact_number: '',
-    email: '',
-    google_map_embed: '',
-    google_map_url: '',
-    facebook_url: '',
-    instagram_url: '',
-    tiktok_url: '',
-    website_url: '',
-    logo_url: '',
-    logo_size: 128,
+    resort_name: '', tagline: '', address: '', phone: '', contact_name: '',
+    contact_number: '', email: '', google_map_embed: '', google_map_url: '',
+    facebook_url: '', instagram_url: '', tiktok_url: '', website_url: '',
+    logo_url: '', logo_size: 128,
   });
 
   useEffect(() => {
     if (profile) {
       setForm({
-        resort_name: profile.resort_name || '',
-        tagline: profile.tagline || '',
-        address: profile.address || '',
-        phone: profile.phone || '',
-        contact_name: profile.contact_name || '',
-        contact_number: profile.contact_number || '',
-        email: profile.email || '',
-        google_map_embed: profile.google_map_embed || '',
-        google_map_url: profile.google_map_url || '',
-        facebook_url: profile.facebook_url || '',
-        instagram_url: profile.instagram_url || '',
-        tiktok_url: profile.tiktok_url || '',
-        website_url: profile.website_url || '',
-        logo_url: profile.logo_url || '',
+        resort_name: profile.resort_name || '', tagline: profile.tagline || '',
+        address: profile.address || '', phone: profile.phone || '',
+        contact_name: profile.contact_name || '', contact_number: profile.contact_number || '',
+        email: profile.email || '', google_map_embed: profile.google_map_embed || '',
+        google_map_url: profile.google_map_url || '', facebook_url: profile.facebook_url || '',
+        instagram_url: profile.instagram_url || '', tiktok_url: profile.tiktok_url || '',
+        website_url: profile.website_url || '', logo_url: profile.logo_url || '',
         logo_size: profile.logo_size || 128,
       });
     }
@@ -70,9 +54,9 @@ const ResortProfileForm = () => {
       if (error) throw error;
       const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path);
       setForm(f => ({ ...f, logo_url: urlData.publicUrl }));
-      toast.success('Logo uploaded');
+      toast.success(t('resort.logoUploaded'));
     } catch {
-      toast.error('Failed to upload logo');
+      toast.error(t('resort.logoUploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -89,9 +73,9 @@ const ResortProfileForm = () => {
         if (error) throw error;
       }
       qc.invalidateQueries({ queryKey: ['resort-profile'] });
-      toast.success('Resort profile saved');
+      toast.success(t('resort.profileSaved'));
     } catch (err: any) {
-      toast.error('Failed to save profile: ' + (err?.message || 'Unknown error'));
+      toast.error(t('resort.profileSaveFailed', { error: err?.message || 'Unknown error' }));
     } finally {
       setSaving(false);
     }
@@ -101,105 +85,85 @@ const ResortProfileForm = () => {
 
   return (
     <section className="space-y-4">
-      <h3 className="font-display text-sm tracking-wider text-foreground">Resort Profile</h3>
+      <h3 className="font-display text-sm tracking-wider text-foreground">{t('resort.resortProfile')}</h3>
 
-      {/* Logo upload */}
       <div className="flex flex-col items-center gap-3">
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-gold/50 transition-colors overflow-hidden"
-        >
+        <button onClick={() => fileRef.current?.click()}
+          className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 hover:border-gold/50 transition-colors overflow-hidden">
           {form.logo_url ? (
             <img src={form.logo_url} alt="Resort logo" className="w-full h-full object-contain p-2" />
           ) : (
             <>
               <Upload className="w-6 h-6 text-cream-dim" />
-              <span className="font-body text-xs text-cream-dim">Upload Logo</span>
+              <span className="font-body text-xs text-cream-dim">{t('resort.uploadLogo')}</span>
             </>
           )}
         </button>
         <input ref={fileRef} type="file" accept="image/png,image/svg+xml,image/webp" className="hidden" onChange={handleLogoUpload} />
-        <p className="font-body text-[10px] text-cream-dim">PNG or SVG with transparent background recommended</p>
-        {uploading && <p className="font-body text-xs text-cream-dim">Uploading...</p>}
+        <p className="font-body text-[10px] text-cream-dim">{t('resort.logoHint')}</p>
+        {uploading && <p className="font-body text-xs text-cream-dim">{t('resort.uploading')}</p>}
         {form.logo_url && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setForm(f => ({ ...f, logo_url: '' }))}
-            className="font-body text-xs"
-          >
-            Delete Logo
+          <Button variant="destructive" size="sm" onClick={() => setForm(f => ({ ...f, logo_url: '' }))} className="font-body text-xs">
+            {t('resort.deleteLogo')}
           </Button>
         )}
       </div>
 
-      {/* Logo size slider */}
       <div>
-        <label className="font-body text-xs text-cream-dim">Logo Size: {form.logo_size}px</label>
-        <Slider
-          value={[form.logo_size]}
-          onValueChange={([v]) => setForm(f => ({ ...f, logo_size: v }))}
-          min={64}
-          max={256}
-          step={8}
-          className="mt-2"
-        />
+        <label className="font-body text-xs text-cream-dim">{t('resort.logoSize', { size: form.logo_size })}</label>
+        <Slider value={[form.logo_size]} onValueChange={([v]) => setForm(f => ({ ...f, logo_size: v }))} min={64} max={256} step={8} className="mt-2" />
       </div>
 
-      {/* Name & tagline */}
       <div>
-        <label className="font-body text-xs text-cream-dim">Resort Name</label>
+        <label className="font-body text-xs text-cream-dim">{t('resort.resortName')}</label>
         <Input value={form.resort_name} onChange={set('resort_name')} placeholder="e.g. Baia Palawan" className={inputClass} />
       </div>
       <div>
-        <label className="font-body text-xs text-cream-dim">Tagline</label>
-        <Input value={form.tagline} onChange={set('tagline')} placeholder="Optional subtitle" className={inputClass} />
+        <label className="font-body text-xs text-cream-dim">{t('resort.tagline')}</label>
+        <Input value={form.tagline} onChange={set('tagline')} className={inputClass} />
       </div>
 
-      {/* Contact info */}
       <div>
-        <label className="font-body text-xs text-cream-dim">Address</label>
-        <Textarea value={form.address} onChange={set('address')} placeholder="Full address" className={`${inputClass} min-h-[60px]`} />
+        <label className="font-body text-xs text-cream-dim">{t('resort.address')}</label>
+        <Textarea value={form.address} onChange={set('address')} className={`${inputClass} min-h-[60px]`} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="font-body text-xs text-cream-dim">Phone</label>
-          <Input value={form.phone} onChange={set('phone')} placeholder="Main number" className={inputClass} />
+          <label className="font-body text-xs text-cream-dim">{t('resort.phone')}</label>
+          <Input value={form.phone} onChange={set('phone')} className={inputClass} />
         </div>
         <div>
-          <label className="font-body text-xs text-cream-dim">Email</label>
-          <Input value={form.email} onChange={set('email')} placeholder="Resort email" className={inputClass} />
+          <label className="font-body text-xs text-cream-dim">{t('resort.email')}</label>
+          <Input value={form.email} onChange={set('email')} className={inputClass} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="font-body text-xs text-cream-dim">Contact Person</label>
-          <Input value={form.contact_name} onChange={set('contact_name')} placeholder="Name" className={inputClass} />
+          <label className="font-body text-xs text-cream-dim">{t('resort.contactPerson')}</label>
+          <Input value={form.contact_name} onChange={set('contact_name')} className={inputClass} />
         </div>
         <div>
-          <label className="font-body text-xs text-cream-dim">Contact Number</label>
-          <Input value={form.contact_number} onChange={set('contact_number')} placeholder="Number" className={inputClass} />
+          <label className="font-body text-xs text-cream-dim">{t('resort.contactNumber')}</label>
+          <Input value={form.contact_number} onChange={set('contact_number')} className={inputClass} />
         </div>
       </div>
 
-      {/* Google Maps */}
       <div className="space-y-2">
         <h4 className="font-display text-xs tracking-wider text-cream-dim flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5" /> Google Maps
+          <MapPin className="w-3.5 h-3.5" /> {t('resort.googleMaps')}
         </h4>
         <div>
-          <label className="font-body text-xs text-cream-dim">Map URL</label>
+          <label className="font-body text-xs text-cream-dim">{t('resort.mapUrl')}</label>
           <Input value={form.google_map_url} onChange={set('google_map_url')} placeholder="https://maps.google.com/..." className={inputClass} />
         </div>
         <div>
-          <label className="font-body text-xs text-cream-dim">Embed Code</label>
+          <label className="font-body text-xs text-cream-dim">{t('resort.embedCode')}</label>
           <Textarea value={form.google_map_embed} onChange={set('google_map_embed')} placeholder="<iframe src=..." className={`${inputClass} min-h-[60px]`} />
         </div>
       </div>
 
-      {/* Social media */}
       <div className="space-y-2">
-        <h4 className="font-display text-xs tracking-wider text-cream-dim">Social Media</h4>
+        <h4 className="font-display text-xs tracking-wider text-cream-dim">{t('resort.socialMedia')}</h4>
         <div className="flex items-center gap-2">
           <Facebook className="w-4 h-4 text-cream-dim shrink-0" />
           <Input value={form.facebook_url} onChange={set('facebook_url')} placeholder="Facebook URL" className={inputClass} />
@@ -221,7 +185,7 @@ const ResortProfileForm = () => {
       </div>
 
       <Button onClick={handleSave} disabled={saving} className="font-display tracking-wider w-full">
-        {saving ? 'Saving...' : 'Save Resort Profile'}
+        {saving ? t('common.saving') : t('resort.saveResortProfile')}
       </Button>
     </section>
   );
