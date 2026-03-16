@@ -483,6 +483,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
 // --- Rentals (Enhanced: duration selection, date, qty, notes, pending) ---
 const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: rates = [] } = useQuery({
     queryKey: ['rentals-guest'],
     queryFn: async () => {
