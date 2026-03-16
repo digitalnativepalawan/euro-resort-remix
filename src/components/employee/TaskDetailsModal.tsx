@@ -18,6 +18,7 @@ interface Props {
 }
 
 const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => {
+  const { t } = useTranslation();
   if (!task) return null;
   const meta: CompletionMeta = task.completion_meta || {};
   const isCompleted = task.status === 'completed';
