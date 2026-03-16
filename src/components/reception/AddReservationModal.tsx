@@ -361,7 +361,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
             )}
 
             <div>
-              <Label className="font-display text-xs tracking-wider">Notes</Label>
+              <Label className="font-display text-xs tracking-wider">{t('calendar.notes')}</Label>
               <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} rows={2} />
             </div>
           </div>
