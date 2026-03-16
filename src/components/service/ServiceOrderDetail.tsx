@@ -161,7 +161,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
                     {dept === 'bar' ? <GlassWater className="w-3.5 h-3.5 text-muted-foreground" /> : <Flame className="w-3.5 h-3.5 text-muted-foreground" />}
                     <span className="font-body text-sm text-foreground">{item.qty}× {item.name}</span>
                   </div>
-                  <span className="font-body text-sm text-muted-foreground tabular-nums">₱{(item.price * item.qty).toLocaleString()}</span>
+                  <span className="font-body text-sm text-muted-foreground tabular-nums">{formatPrice(item.price * item.qty)}</span>
                 </div>
               );
             })}
