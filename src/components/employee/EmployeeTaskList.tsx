@@ -207,7 +207,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
     }).eq('id', editId);
     setEditId(null);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task updated');
+    toast.success(t('tasks.taskUpdated'));
   };
 
   const archiveTask = async (id: string) => {
