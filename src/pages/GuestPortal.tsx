@@ -411,6 +411,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
 // --- Transport (Now pending, no auto-charge) ---
 const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: rates = [] } = useQuery({
     queryKey: ['transport-guest'],
     queryFn: async () => {
