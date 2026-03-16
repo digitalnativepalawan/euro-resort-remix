@@ -668,12 +668,12 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Home className="w-4 h-4 text-blue-400" />
-                <span className="font-display text-xs tracking-wider text-blue-400">ROOM CHARGES</span>
+                <span className="font-display text-xs tracking-wider text-blue-400">{t('cashier.roomCharges')}</span>
               </div>
-              <span className="font-body text-xs text-blue-400">{summary.roomChargeCount} order{summary.roomChargeCount !== 1 ? 's' : ''}</span>
+              <span className="font-body text-xs text-blue-400">{summary.roomChargeCount} {t('common.orders')}</span>
             </div>
             <p className="font-display text-lg text-blue-400 tabular-nums">₱{summary.roomChargeTotal.toLocaleString()}</p>
-            <p className="font-body text-[10px] text-muted-foreground">Charged to guest rooms — settled at checkout</p>
+            <p className="font-body text-[10px] text-muted-foreground">{t('cashier.chargedToGuestRooms')}</p>
           </div>
         )}
 
