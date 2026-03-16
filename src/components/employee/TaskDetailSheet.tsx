@@ -119,7 +119,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
 
           {/* Activity log */}
           <div className="space-y-1.5">
-            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Activity</p>
+            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('tasks.activity')}</p>
             {activities.map((a, i) => (
               <div key={i} className="flex items-center gap-2">
                 <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
