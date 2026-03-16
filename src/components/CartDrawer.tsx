@@ -697,7 +697,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   onClick={() => { setOverrideStock(true); setStockWarning([]); }}
                   className="font-display text-xs tracking-wider w-full mt-1"
                 >
-                  Override & Send Anyway
+                  {t('cart.overrideAndSend')}
                 </Button>
               </div>
             )}
