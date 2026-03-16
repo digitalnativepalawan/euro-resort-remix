@@ -468,7 +468,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
               <Input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
           </div>
-          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedRate.price}</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: {formatPrice(selectedRate.price)}</p>
           <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTransport')}</Button>
           <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
