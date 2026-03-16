@@ -1290,7 +1290,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                   {items.map((i: any, idx: number) => (
                     <div key={idx} className="flex justify-between">
                       <span className="font-body text-sm text-foreground">{i.qty || 1}× {i.name}</span>
-                      <span className="font-body text-xs text-muted-foreground">₱{((i.price || 0) * (i.qty || 1)).toLocaleString()}</span>
+                      <span className="font-body text-xs text-muted-foreground">{formatPrice((i.price || 0) * (i.qty || 1))}</span>
                     </div>
                   ))}
                 </div>
