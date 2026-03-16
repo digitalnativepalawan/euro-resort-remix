@@ -107,7 +107,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
           {/* Completion proof */}
           {isCompleted && (meta.comment || meta.image_url) && (
             <div className="border border-border rounded-lg p-3 space-y-2">
-              <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Completion Note</p>
+              <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('tasks.completionNote')}</p>
               {meta.comment && <p className="font-body text-sm text-foreground">"{meta.comment}"</p>}
               {meta.image_url && (
                 <a href={meta.image_url} target="_blank" rel="noopener noreferrer">
