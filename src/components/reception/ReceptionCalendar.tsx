@@ -215,7 +215,7 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
         {canEdit && (
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={() => { setEditBooking(null); setAddOpen(true); }} className="font-display text-xs tracking-wider">
-              <Plus className="h-3.5 w-3.5 mr-1" /> Reservation
+              <Plus className="h-3.5 w-3.5 mr-1" /> {t('calendar.reservation')}
             </Button>
             <Button
               size="sm"
