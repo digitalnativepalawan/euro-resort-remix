@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import { supabase } from '@/integrations/supabase/client';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
