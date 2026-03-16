@@ -512,6 +512,7 @@ const BillOutPanel = ({
   onBack: () => void;
   onPreviewReceipt: () => void;
 }) => {
+  const { t } = useTranslation();
   const items = (order.items as any[]) || [];
   const subtotal = items.reduce((s: number, i: any) => s + i.price * (i.qty || i.quantity || 1), 0);
   const sc = Number(order.service_charge || 0);
