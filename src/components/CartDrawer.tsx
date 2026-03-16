@@ -25,6 +25,7 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
   selectedTabId: string; setSelectedTabId: (v: string) => void;
 }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: openTabs = [] } = useQuery({
     queryKey: ['open-tabs-picker'],
     queryFn: async () => {
@@ -57,7 +58,7 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
           <SelectContent className="bg-card border-border">
             {openTabs.map((tab: any) => (
               <SelectItem key={tab.id} value={tab.id} className="text-foreground font-body text-xs">
-                {tab.location_type} · {tab.location_detail} — ₱{Number(tab.running_total || 0).toLocaleString()}
+                {tab.location_type} · {tab.location_detail} — {formatPrice(Number(tab.running_total || 0))}
               </SelectItem>
             ))}
           </SelectContent>
@@ -81,6 +82,7 @@ interface CartDrawerProps {
 
 const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, locationDetail: initialLocation, initialGuestName = '' }: CartDrawerProps) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const cart = useCart();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -398,7 +400,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                 </span>
               </div>
               <p className="font-body text-sm text-cream-dim text-center">
-                {t('menu.itemCount', { count: orderSummary.itemCount })} · ₱{orderSummary.grandTotal.toLocaleString()}
+                {t('menu.itemCount', { count: orderSummary.itemCount })} · {formatPrice(orderSummary.grandTotal)}
               </p>
               <p className="font-body text-xs text-cream-dim text-center mt-2">
                 {isGuestOrder ? t('cart.chargedToRoom') : t('cart.addedToOpenTab')}
@@ -475,8 +477,8 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                             </button>
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <span className="font-body text-xs text-cream-dim">₱{item.price.toLocaleString()} ×{item.quantity}</span>
-                            <span className="font-display text-sm text-foreground">₱{(item.price * item.quantity).toLocaleString()}</span>
+                            <span className="font-body text-xs text-cream-dim">{formatPrice(item.price)} ×{item.quantity}</span>
+                            <span className="font-display text-sm text-foreground">{formatPrice(item.price * item.quantity)}</span>
                           </div>
                         </div>
                       </div>
@@ -487,24 +489,24 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   <div className="space-y-1.5">
                     <div className="flex justify-between font-body text-sm">
                       <span className="text-cream-dim">{t('common.subtotal')}</span>
-                      <span className="text-foreground">₱{subtotal.toLocaleString()}</span>
+                      <span className="text-foreground">{formatPrice(subtotal)}</span>
                     </div>
                     {scRate > 0 && (
                       <div className="flex justify-between font-body text-sm">
                         <span className="text-cream-dim">{billingConfig?.service_charge_name || 'Service Charge'} ({scRate}%)</span>
-                        <span className="text-foreground">₱{serviceCharge.toLocaleString()}</span>
+                        <span className="text-foreground">{formatPrice(serviceCharge)}</span>
                       </div>
                     )}
                     {vatRate > 0 && (
                       <div className="flex justify-between font-body text-sm">
                         <span className="text-cream-dim">{billingConfig?.tax_name || 'VAT'} ({vatRate}%)</span>
-                        <span className="text-foreground">₱{vatAmount.toLocaleString()}</span>
+                        <span className="text-foreground">{formatPrice(vatAmount)}</span>
                       </div>
                     )}
                     <Separator className="my-2" />
                     <div className="flex justify-between font-display text-lg tracking-wider">
                       <span className="text-foreground">{t('common.total')}</span>
-                      <span className="text-gold">₱{grandTotal.toLocaleString()}</span>
+                      <span className="text-gold">{formatPrice(grandTotal)}</span>
                     </div>
                   </div>
 

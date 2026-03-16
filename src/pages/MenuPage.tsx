@@ -46,6 +46,7 @@ const MenuPage = () => {
     }
   }, [isGuestOrder, guestSession, navigate]);
 
+  const { formatPrice } = useCurrency();
   const { data: profile } = useResortProfile();
   const brandName = profile?.resort_name || 'Menu';
 
@@ -270,7 +271,7 @@ const MenuPage = () => {
                           )}
                         </div>
                         <span className={`font-display text-sm whitespace-nowrap pt-0.5 ${isSoldOut ? 'text-muted-foreground' : 'text-gold'}`}>
-                          ₱{item.price.toLocaleString()}
+                          {formatPrice(item.price)}
                         </span>
                       </div>
                     </button>
@@ -293,7 +294,7 @@ const MenuPage = () => {
                 </span>
               </div>
               <span className="font-display text-sm tracking-wider">
-                ₱{cart.total().toLocaleString()}
+                {formatPrice(cart.total())}
               </span>
             </button>
           )}
@@ -325,7 +326,7 @@ const MenuPage = () => {
           {selectedItem && (
             <div className="flex flex-col items-center gap-5 pt-2">
               <p className="font-body text-sm text-cream-dim text-center leading-relaxed">{selectedItem.description}</p>
-              <p className="font-display text-2xl text-gold">₱{selectedItem.price.toLocaleString()}</p>
+              <p className="font-display text-2xl text-gold">{formatPrice(selectedItem.price)}</p>
               {!isBrowseOnly && (
                 <>
                   <div className="flex items-center gap-6">
@@ -344,7 +345,7 @@ const MenuPage = () => {
                     </button>
                   </div>
                   <Button onClick={handleAddToCart} className="w-full font-display tracking-wider py-6 text-base">
-                    {t('menu.addToOrder')} — ₱{(selectedItem.price * addQuantity).toLocaleString()}
+                    {t('menu.addToOrder')} — {formatPrice(selectedItem.price * addQuantity)}
                   </Button>
                 </>
               )}

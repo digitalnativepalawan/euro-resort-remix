@@ -322,6 +322,7 @@ const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSes
 // --- Tours (Enhanced: pickup time, notes, pending status) ---
 const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: tours = [] } = useQuery({
     queryKey: ['tours-guest'],
     queryFn: async () => {
@@ -372,7 +373,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
               <p className="font-body text-xs text-muted-foreground">{tour.description}</p>
               <p className="font-body text-xs text-muted-foreground">{tour.duration} · {tour.schedule} · Max {tour.max_pax} pax</p>
             </div>
-            <span className="font-body text-sm text-accent font-medium">₱{tour.price}/pax</span>
+            <span className="font-body text-sm text-accent font-medium">{formatPrice(tour.price)}/pax</span>
           </div>
         </div>
       ))}
@@ -397,7 +398,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
             <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> {t('guest.specialRequests')}</Label>
             <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Vegetarian lunch, need snorkel gear..." className="bg-card text-foreground min-h-[60px]" />
           </div>
-          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedTour.price * (parseInt(pax) || 1)}</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: {formatPrice(selectedTour.price * (parseInt(pax) || 1))}</p>
           <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTourBooking')}</Button>
           <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
@@ -410,6 +411,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
 // --- Transport (Now pending, no auto-charge) ---
 const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: rates = [] } = useQuery({
     queryKey: ['transport-guest'],
     queryFn: async () => {
@@ -431,7 +433,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
       room_id: session.room_id,
       guest_name: session.guest_name,
       request_type: 'Transport',
-      details: `${label} — ₱${selectedRate.price} — ${pickupDate} ${pickupTime}`,
+      details: `${label} — ${formatPrice(selectedRate.price)} — ${pickupDate} ${pickupTime}`,
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
@@ -451,7 +453,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
               <p className="font-body text-sm text-foreground">{r.origin} → {r.destination}</p>
               {r.description && <p className="font-body text-xs text-muted-foreground">{r.description}</p>}
             </div>
-            <span className="font-body text-sm text-accent font-medium">₱{r.price}</span>
+            <span className="font-body text-sm text-accent font-medium">{formatPrice(r.price)}</span>
           </div>
         </div>
       ))}
@@ -468,7 +470,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
               <Input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
           </div>
-          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedRate.price}</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: {formatPrice(selectedRate.price)}</p>
           <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTransport')}</Button>
           <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
@@ -481,6 +483,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
 // --- Rentals (Enhanced: duration selection, date, qty, notes, pending) ---
 const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: rates = [] } = useQuery({
     queryKey: ['rentals-guest'],
     queryFn: async () => {
@@ -505,7 +508,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
   const book = async () => {
     if (!selectedRate) return;
     setSubmitting(true);
-    const detail = `${selectedType} — ${selectedRate.rate_name} × ${qty} — ₱${totalPrice} — Start: ${startDate}${notes.trim() ? ` — Notes: ${notes.trim()}` : ''}`;
+    const detail = `${selectedType} — ${selectedRate.rate_name} × ${qty} — ${formatPrice(totalPrice)} — Start: ${startDate}${notes.trim() ? ` — Notes: ${notes.trim()}` : ''}`;
     await supabase.from('guest_requests').insert({
       booking_id: session.booking_id,
       room_id: session.room_id,
@@ -558,7 +561,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
                         <p className="font-body text-sm text-foreground">{r.rate_name}</p>
                         {r.description && <p className="font-body text-xs text-muted-foreground">{r.description}</p>}
                       </div>
-                      <span className="font-body text-sm text-accent font-medium">₱{r.price}</span>
+                      <span className="font-body text-sm text-accent font-medium">{formatPrice(r.price)}</span>
                     </div>
                   </Label>
                 </div>
@@ -584,7 +587,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-body text-xs text-muted-foreground">{selectedRate.rate_name} × {qty}</span>
-                <span className="font-body text-sm text-foreground font-medium">{t('common.total')}: ₱{totalPrice}</span>
+                <span className="font-body text-sm text-foreground font-medium">{t('common.total')}: {formatPrice(totalPrice)}</span>
               </div>
               <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestRental')}</Button>
               <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirmAvailability')}</p>
@@ -731,6 +734,7 @@ const DEPT_STATUS_LABELS: Record<string, string> = {
 };
 
 const OrdersView = ({ session }: { session: GuestPortalSession }) => {
+  const { formatPrice } = useCurrency();
   const qc = useQueryClient();
 
   const { data: orders = [] } = useQuery({
@@ -844,7 +848,7 @@ const OrdersView = ({ session }: { session: GuestPortalSession }) => {
                         <span className="font-body text-sm text-foreground">{item.qty || item.quantity || 1}× {item.name}</span>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="font-body text-xs text-muted-foreground">₱{((item.price || 0) * (item.qty || item.quantity || 1)).toLocaleString()}</span>
+                        <span className="font-body text-xs text-muted-foreground">{formatPrice((item.price || 0) * (item.qty || item.quantity || 1))}</span>
                         <span className={`font-body text-[10px] px-1.5 py-0.5 rounded ${
                           finalStatus === 'Served' || finalStatus === 'Ready' ? 'text-green-400' :
                           finalStatus === 'Preparing' ? 'text-amber-400' :
@@ -859,7 +863,7 @@ const OrdersView = ({ session }: { session: GuestPortalSession }) => {
               </div>
               <div className="border-t border-border pt-2 flex justify-between">
                 <span className="font-body text-sm text-foreground font-medium">Total</span>
-                <span className="font-body text-sm text-foreground font-medium">₱{(order.total || 0).toLocaleString()}</span>
+                <span className="font-body text-sm text-foreground font-medium">{formatPrice(order.total || 0)}</span>
               </div>
             </div>
           );
@@ -879,6 +883,7 @@ const REQUEST_STATUS_MAP: Record<string, { label: string; color: string }> = {
 };
 
 const RequestsTrackerView = ({ session }: { session: GuestPortalSession }) => {
+  const { formatPrice } = useCurrency();
   const qc = useQueryClient();
 
   const { data: tours = [] } = useQuery({
@@ -946,7 +951,7 @@ const RequestsTrackerView = ({ session }: { session: GuestPortalSession }) => {
                       <span>{t.pax} pax</span>
                       <span>Pickup: {t.pickup_time}</span>
                     </div>
-                    {t.price > 0 && <p className="font-body text-xs text-accent">₱{t.price.toLocaleString()}</p>}
+                    {t.price > 0 && <p className="font-body text-xs text-accent">{formatPrice(t.price)}</p>}
                   </div>
                 );
               })}
@@ -989,6 +994,7 @@ const getBillIcon = (notes: string | null, txType: string) => {
 };
 
 const BillView = ({ session }: { session: GuestPortalSession }) => {
+  const { formatPrice } = useCurrency();
   const qc = useQueryClient();
   const [agreeing, setAgreeing] = useState(false);
   const [contestOpen, setContestOpen] = useState(false);
@@ -1201,7 +1207,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
           <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Stay Details</p>
           <div className="flex justify-between">
             <span className="font-body text-sm text-muted-foreground">Room Rate</span>
-            <span className="font-body text-sm text-foreground">₱{bookingRoomRate.toLocaleString()}/night</span>
+            <span className="font-body text-sm text-foreground">{formatPrice(bookingRoomRate)}/night</span>
           </div>
           <div className="flex justify-between">
             <span className="font-body text-sm text-muted-foreground">Duration</span>
@@ -1209,7 +1215,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
           </div>
           <div className="flex justify-between border-t border-border pt-1">
             <span className="font-body text-sm text-muted-foreground font-medium">Room Total</span>
-            <span className="font-body text-sm text-foreground font-medium">₱{(bookingRoomRate * bookingNights).toLocaleString()}</span>
+            <span className="font-body text-sm text-foreground font-medium">{formatPrice(bookingRoomRate * bookingNights)}</span>
           </div>
         </div>
       )}
@@ -1218,39 +1224,39 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
       <div className="bg-card border border-border rounded-lg p-4">
         <div className="flex justify-between mb-2">
           <span className="font-body text-sm text-muted-foreground">Total Charges</span>
-          <span className="font-body text-sm text-foreground">₱{totalCharges.toLocaleString()}</span>
+          <span className="font-body text-sm text-foreground">{formatPrice(totalCharges)}</span>
         </div>
         {unpaidOrdersTotal > 0 && (
           <>
             <div className="flex justify-between mb-1">
               <span className="font-body text-sm text-muted-foreground">F&B Subtotal</span>
-              <span className="font-body text-sm text-amber-400">₱{unpaidOrdersSubtotal.toLocaleString()}</span>
+              <span className="font-body text-sm text-amber-400">{formatPrice(unpaidOrdersSubtotal)}</span>
             </div>
             <div className="flex justify-between mb-2">
               <span className="font-body text-sm text-muted-foreground">Service Charge (10%)</span>
-              <span className="font-body text-sm text-amber-400">₱{unpaidOrdersSCTotal.toLocaleString()}</span>
+              <span className="font-body text-sm text-amber-400">{formatPrice(unpaidOrdersSCTotal)}</span>
             </div>
           </>
         )}
         {activeToursTotal > 0 && (
           <div className="flex justify-between mb-2">
             <span className="font-body text-sm text-muted-foreground">Tours & Experiences</span>
-            <span className="font-body text-sm text-foreground">₱{activeToursTotal.toLocaleString()}</span>
+            <span className="font-body text-sm text-foreground">{formatPrice(activeToursTotal)}</span>
           </div>
         )}
         {activeRequestsTotal > 0 && (
           <div className="flex justify-between mb-2">
             <span className="font-body text-sm text-muted-foreground">Transport & Rentals</span>
-            <span className="font-body text-sm text-foreground">₱{activeRequestsTotal.toLocaleString()}</span>
+            <span className="font-body text-sm text-foreground">{formatPrice(activeRequestsTotal)}</span>
           </div>
         )}
         <div className="flex justify-between mb-2">
           <span className="font-body text-sm text-muted-foreground">Total Payments</span>
-          <span className="font-body text-sm text-green-400">₱{totalPayments.toLocaleString()}</span>
+          <span className="font-body text-sm text-green-400">{formatPrice(totalPayments)}</span>
         </div>
         <div className="border-t border-border pt-2 flex justify-between">
           <span className="font-body text-sm text-foreground font-medium">Balance</span>
-          <span className={`font-body text-sm font-medium ${balance > 0 ? 'text-amber-400' : 'text-green-400'}`}>₱{balance.toLocaleString()}</span>
+          <span className={`font-body text-sm font-medium ${balance > 0 ? 'text-amber-400' : 'text-green-400'}`}>{formatPrice(balance)}</span>
         </div>
       </div>
 
@@ -1290,7 +1296,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                   {items.map((i: any, idx: number) => (
                     <div key={idx} className="flex justify-between">
                       <span className="font-body text-sm text-foreground">{i.qty || 1}× {i.name}</span>
-                      <span className="font-body text-xs text-muted-foreground">₱{((i.price || 0) * (i.qty || 1)).toLocaleString()}</span>
+                      <span className="font-body text-xs text-muted-foreground">{formatPrice((i.price || 0) * (i.qty || 1))}</span>
                     </div>
                   ))}
                 </div>
@@ -1298,15 +1304,15 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                 <div className="pl-6 border-t border-border/50 pt-1 space-y-0.5">
                   <div className="flex justify-between">
                     <span className="font-body text-[11px] text-muted-foreground">Subtotal</span>
-                    <span className="font-body text-[11px] text-muted-foreground">₱{Number(o.total || 0).toLocaleString()}</span>
+                    <span className="font-body text-[11px] text-muted-foreground">{formatPrice(Number(o.total || 0))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-body text-[11px] text-muted-foreground">Service Charge (10%)</span>
-                    <span className="font-body text-[11px] text-muted-foreground">₱{Number(o.service_charge || 0).toLocaleString()}</span>
+                    <span className="font-body text-[11px] text-muted-foreground">{formatPrice(Number(o.service_charge || 0))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-body text-xs text-foreground font-medium">Total</span>
-                    <span className="font-body text-xs text-amber-400 font-medium">₱{orderTotal.toLocaleString()}</span>
+                    <span className="font-body text-xs text-amber-400 font-medium">{formatPrice(orderTotal)}</span>
                   </div>
                 </div>
                 {o.status === 'Served' && (
@@ -1336,7 +1342,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                 </div>
               </div>
               <div className="text-right">
-                <span className="font-body text-sm text-muted-foreground">₱{(t.price || 0).toLocaleString()}</span>
+                <span className="font-body text-sm text-muted-foreground">{formatPrice(t.price || 0)}</span>
                 <Badge variant="outline" className="ml-2 text-[10px]">Pending</Badge>
               </div>
             </div>
@@ -1372,7 +1378,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                 </div>
               </div>
               <div className="text-right">
-                <span className="font-body text-sm text-foreground">₱{(t.price || 0).toLocaleString()}</span>
+                <span className="font-body text-sm text-foreground">{formatPrice(t.price || 0)}</span>
                 <Badge variant="outline" className="ml-2 text-[10px] bg-emerald-500/20 text-emerald-300 border-emerald-500/30">Done</Badge>
               </div>
             </div>
@@ -1412,7 +1418,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                   </p>
                 </div>
               </div>
-              <span className="font-body text-sm font-medium text-foreground">+₱{Math.abs(t.total_amount || 0).toLocaleString()}</span>
+              <span className="font-body text-sm font-medium text-foreground">+{formatPrice(Math.abs(t.total_amount || 0))}</span>
             </div>
           ))}
         </div>
@@ -1437,7 +1443,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                 </p>
               </div>
             </div>
-            <span className="font-body text-sm font-medium text-green-400">-₱{Math.abs(t.total_amount || 0).toLocaleString()}</span>
+            <span className="font-body text-sm font-medium text-green-400">-{formatPrice(Math.abs(t.total_amount || 0))}</span>
           </div>
         ))}
         {transactions.length === 0 && !hasPending && unpaidOrders.length === 0 && <p className="font-body text-sm text-muted-foreground text-center">No transactions yet.</p>}
