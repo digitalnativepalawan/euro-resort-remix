@@ -250,7 +250,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display tracking-wider">
-              {isEdit ? 'Edit Reservation' : 'New Reservation'}
+              {isEdit ? t('calendar.editReservation') : t('calendar.newReservation')}
             </DialogTitle>
           </DialogHeader>
 
