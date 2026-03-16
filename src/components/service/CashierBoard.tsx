@@ -722,7 +722,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
                 <div key={o.id} className="flex items-center justify-between rounded-lg bg-card/80 border border-border/50 px-3 py-2">
                   <div className="min-w-0">
                     <p className="font-body text-xs text-foreground truncate">{o.location_detail || o.order_type}</p>
-                    <p className="font-body text-[10px] text-muted-foreground">{o.closed_at ? format(new Date(o.closed_at), 'h:mm a') : '—'}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{o.closed_at ? formatTime(o.closed_at) : '—'}</p>
                   </div>
                   <span className="font-display text-sm text-gold tabular-nums">₱{Number(o.total).toLocaleString()}</span>
                 </div>
