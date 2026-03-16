@@ -265,7 +265,7 @@ const CashierBoard = () => {
           {/* Active orders */}
           {buckets.active.length > 0 && (
             <div className="p-3">
-              <h3 className="font-display text-xs tracking-wider text-muted-foreground mb-2 px-1">ACTIVE ORDERS</h3>
+              <h3 className="font-display text-xs tracking-wider text-muted-foreground mb-2 px-1">{t('cashier.activeOrders')}</h3>
               <div className="space-y-2">
                 {buckets.active.map(order => (
                   <OrderRow
