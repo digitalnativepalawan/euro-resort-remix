@@ -23,6 +23,7 @@ const STATUS_DOT: Record<string, string> = {
 };
 
 const CashierBoard = () => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: resortProfile } = useResortProfile();
   const { data: paymentMethods = [] } = usePaymentMethods();
