@@ -151,8 +151,8 @@ const GuestPortal = () => {
           <>
             {/* Welcome header */}
             <div className="bg-card border border-border rounded-lg p-5 mb-6">
-              <p className="font-display text-xl text-foreground">Welcome, {session.guest_name.split(' ')[0]}!</p>
-              <p className="font-body text-sm text-muted-foreground mt-1">{session.room_name} · Check-out: {new Date(session.check_out).toLocaleDateString()}</p>
+              <p className="font-display text-xl text-foreground">{t('guest.welcome', { name: session.guest_name.split(' ')[0] })}</p>
+              <p className="font-body text-sm text-muted-foreground mt-1">{session.room_name} · {t('reception.checkOut')}: {new Date(session.check_out).toLocaleDateString()}</p>
             </div>
 
             <p className="font-display text-sm tracking-wider text-muted-foreground mb-4">What can we help with?</p>
