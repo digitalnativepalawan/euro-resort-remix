@@ -535,7 +535,7 @@ const BillOutPanel = ({
           )}
         </div>
         <Button variant="outline" size="sm" onClick={onPreviewReceipt} className="gap-1.5 font-display text-xs tracking-wider">
-          <Printer className="w-3.5 h-3.5" /> Preview
+          <Printer className="w-3.5 h-3.5" /> {t('common.preview')}
         </Button>
         <Badge variant="outline" className="font-body text-xs">{order.status}</Badge>
       </div>
