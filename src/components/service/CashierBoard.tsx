@@ -383,7 +383,7 @@ const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
                   {roomOrders.length} order{roomOrders.length !== 1 ? 's' : ''}
                 </Badge>
               </div>
-              <span className="font-display text-sm text-gold tabular-nums">₱{totalAmount.toLocaleString()}</span>
+              <span className="font-display text-sm text-gold tabular-nums">{formatPrice(totalAmount)}</span>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-3 pt-1 space-y-1.5">
               {roomOrders.map(order => (
