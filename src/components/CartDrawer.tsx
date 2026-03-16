@@ -345,9 +345,9 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
       const toastLabel = (() => {
         const hk = orderItems.some(i => i.department === 'kitchen' || i.department === 'both');
         const hb = orderItems.some(i => i.department === 'bar' || i.department === 'both');
-        if (hk && hb) return 'Order sent to Kitchen & Bar!';
-        if (hb && !hk) return 'Order sent to Bar!';
-        return 'Order sent to Kitchen!';
+        if (hk && hb) return t('cart.orderSentToKitchenAndBar');
+        if (hb && !hk) return t('cart.orderSentToBar');
+        return t('cart.orderSentToKitchen');
       })();
       toast.success(toastLabel);
 
