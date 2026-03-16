@@ -132,7 +132,7 @@ const GuestPortal = () => {
           </Select>
           <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder={t('guest.yourLastName')} className="bg-secondary border-border text-foreground font-body text-center text-lg h-12" onKeyDown={e => e.key === 'Enter' && handleLogin()} />
           <Button onClick={handleLogin} disabled={loading || !roomName || !lastName.trim()} className="w-full font-display text-sm tracking-wider h-12">
-            {loading ? 'Verifying...' : 'Enter Portal'}
+            {loading ? t('common.verifying') : t('guest.enterPortal')}
           </Button>
           <button onClick={() => navigate('/')} className="w-full font-body text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">Back to Home</button>
         </div>
