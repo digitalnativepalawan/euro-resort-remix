@@ -191,7 +191,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
         completion_meta: {},
       }).eq('id', task.id);
       qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-      toast.success('Task reopened');
+      toast.success(t('tasks.taskReopened'));
     } else {
       // Open completion panel
       setCompletingTaskId(task.id);
