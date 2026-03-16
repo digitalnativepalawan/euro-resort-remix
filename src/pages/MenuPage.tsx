@@ -384,7 +384,7 @@ const MenuPage = () => {
               }`}
             >
               <ClipboardList className="w-5 h-5" />
-              <span className="font-body text-[10px] tracking-wider">Orders</span>
+              <span className="font-body text-[10px] tracking-wider">{t('menu.orders')}</span>
               {activeOrderCount > 0 && (
                 <span className="absolute top-1.5 right-1/4 bg-destructive text-destructive-foreground text-[10px] font-body font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {activeOrderCount}
