@@ -396,7 +396,8 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                 </span>
               </div>
               <p className="font-body text-sm text-cream-dim text-center">
-                {orderSummary.itemCount} item{orderSummary.itemCount !== 1 ? 's' : ''} · ₱{orderSummary.grandTotal.toLocaleString()}
+                {t('menu.itemCount', { count: orderSummary.itemCount })} · ₱{orderSummary.grandTotal.toLocaleString()}
+              </p>
               </p>
               <p className="font-body text-xs text-cream-dim text-center mt-2">
                 {isGuestOrder ? 'Charged to your room' : 'Added to your open tab'}
