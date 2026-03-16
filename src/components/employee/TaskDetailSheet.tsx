@@ -17,6 +17,7 @@ interface Props {
 }
 
 const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, readOnly = false }: Props) => {
+  const { t } = useTranslation();
   const taskId = task?.id ?? null;
   const meta = task?.completion_meta || {};
   const isCompleted = task?.status === 'completed';
