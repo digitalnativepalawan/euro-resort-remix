@@ -289,7 +289,7 @@ const CashierBoard = () => {
             <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
               <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
                 <span className="font-display text-xs tracking-wider text-muted-foreground">
-                  ✓ Completed ({completedOrders.length})
+                  ✓ {t('common.completed')} ({completedOrders.length})
                 </span>
                 {completedOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
               </CollapsibleTrigger>
