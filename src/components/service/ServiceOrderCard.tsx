@@ -154,7 +154,7 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
         {(department === 'reception' ? items : deptItems).slice(0, compact ? 3 : 6).map((item: any, idx: number) => (
           <div key={idx} className="flex justify-between font-body">
             <span className="text-foreground text-sm truncate mr-2">{item.qty}× {item.name}</span>
-            <span className="text-muted-foreground text-sm tabular-nums flex-shrink-0">₱{(item.price * item.qty).toLocaleString()}</span>
+            <span className="text-muted-foreground text-sm tabular-nums flex-shrink-0">{formatPrice(item.price * item.qty)}</span>
           </div>
         ))}
         {(department === 'reception' ? items : deptItems).length > (compact ? 3 : 6) && (
