@@ -67,9 +67,9 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
       if (error) throw error;
       const { data: pub } = supabase.storage.from('receipts').getPublicUrl(path);
       setImageUrl(pub.publicUrl);
-      toast.success('Image uploaded');
+      toast.success(t('tasks.imageUploaded'));
     } catch {
-      toast.error('Upload failed');
+      toast.error(t('tasks.uploadFailed'));
     } finally {
       setUploading(false);
     }
