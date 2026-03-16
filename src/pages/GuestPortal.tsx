@@ -859,7 +859,7 @@ const OrdersView = ({ session }: { session: GuestPortalSession }) => {
               </div>
               <div className="border-t border-border pt-2 flex justify-between">
                 <span className="font-body text-sm text-foreground font-medium">Total</span>
-                <span className="font-body text-sm text-foreground font-medium">₱{(order.total || 0).toLocaleString()}</span>
+                <span className="font-body text-sm text-foreground font-medium">{formatPrice(order.total || 0)}</span>
               </div>
             </div>
           );
