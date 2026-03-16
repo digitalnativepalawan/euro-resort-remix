@@ -113,7 +113,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
   const handleSave = async () => {
     if (!form.unitId || !form.checkIn || !form.checkOut) {
-      toast.error('Room, check-in, and check-out are required');
+      toast.error(t('calendar.roomCheckInCheckOutRequired'));
       return;
     }
     if (form.checkIn >= form.checkOut) {
