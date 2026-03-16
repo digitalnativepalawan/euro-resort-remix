@@ -1302,7 +1302,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-body text-[11px] text-muted-foreground">Service Charge (10%)</span>
-                    <span className="font-body text-[11px] text-muted-foreground">₱{Number(o.service_charge || 0).toLocaleString()}</span>
+                    <span className="font-body text-[11px] text-muted-foreground">{formatPrice(Number(o.service_charge || 0))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-body text-xs text-foreground font-medium">Total</span>
