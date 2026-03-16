@@ -184,6 +184,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
                 <NavItems mobile />
               <div className="flex items-center gap-2 py-1">
                 <LanguageSwitcher />
+                <CurrencySwitcher />
                 <ThemeToggle />
                 <span className="font-body text-xs text-muted-foreground">{t('common.theme')}</span>
               </div>

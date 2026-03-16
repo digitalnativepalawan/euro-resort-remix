@@ -186,6 +186,18 @@ const ResortProfileForm = () => {
         </div>
       </div>
 
+      <div className="space-y-2">
+        <h4 className="font-display text-xs tracking-wider text-cream-dim flex items-center gap-1.5">
+          💱 {t('resort.currency')}
+        </h4>
+        <div>
+          <label className="font-body text-xs text-cream-dim">{t('resort.usdExchangeRate')}</label>
+          <Input value={form.usd_exchange_rate} onChange={e => setForm(f => ({ ...f, usd_exchange_rate: e.target.value }))}
+            type="number" step="0.01" placeholder="1.08" className={inputClass} />
+          <p className="font-body text-[10px] text-cream-dim mt-1">{t('resort.exchangeRateHint')}</p>
+        </div>
+      </div>
+
       <Button onClick={handleSave} disabled={saving} className="font-display tracking-wider w-full">
         {saving ? t('common.saving') : t('resort.saveResortProfile')}
       </Button>
