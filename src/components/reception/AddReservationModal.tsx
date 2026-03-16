@@ -181,7 +181,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
       if (isEdit) {
         await from('resort_ops_bookings').update(payload as any).eq('id', editBooking!.id);
-        toast.success('Reservation updated');
+        toast.success(t('calendar.reservationUpdated'));
       } else {
         await from('resort_ops_bookings').insert(payload as any);
         toast.success('Reservation created');
