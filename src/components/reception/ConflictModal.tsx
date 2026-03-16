@@ -36,7 +36,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
           {conflicts.map(c => (
             <div key={c.id} className="border border-border rounded-lg p-3 bg-secondary space-y-1">
               <p className="font-display text-sm tracking-wider text-foreground">
-                {c.resort_ops_guests?.full_name || 'Unknown Guest'}
+                {c.resort_ops_guests?.full_name || t('calendar.unknownGuest')}
               </p>
               <p className="font-body text-xs text-muted-foreground">
                 {format(parseISO(c.check_in), 'MMM d')} → {format(parseISO(c.check_out), 'MMM d, yyyy')}
