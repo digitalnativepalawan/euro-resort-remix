@@ -164,7 +164,7 @@ const OrderCard = ({ order, onAdvance, resortProfile, onAddItems, onViewTab, onD
       <div className="pt-3 border-t border-border space-y-2">
         {/* Total + payment */}
         <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-display text-sm text-gold">₱{order.total.toLocaleString()}</span>
+          <span className="font-display text-sm text-gold">{formatPrice(order.total)}</span>
           {order.payment_type && (
             <span className="font-body text-xs text-cream-dim">({order.payment_type})</span>
           )}

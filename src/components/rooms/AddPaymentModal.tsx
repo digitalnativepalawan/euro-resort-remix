@@ -72,7 +72,7 @@ const AddPaymentModal = ({ open, onOpenChange, unitId, unitName, guestName, book
         <div className="space-y-4">
           <div className="border border-border rounded-lg p-3 bg-secondary">
             <p className="font-body text-xs text-muted-foreground">Current Balance</p>
-            <p className="font-display text-lg text-foreground">₱{currentBalance.toLocaleString()}</p>
+            <p className="font-display text-lg text-foreground">{formatPrice(currentBalance)}</p>
           </div>
           <div>
             <label className="font-body text-xs text-muted-foreground">Payment Amount</label>
