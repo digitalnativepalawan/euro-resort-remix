@@ -93,7 +93,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
       setShowLink(false);
       qc.invalidateQueries({ queryKey: ['task-comments', taskId] });
     } catch {
-      toast.error('Failed to add comment');
+      toast.error(t('tasks.failedToAddComment'));
     } finally {
       setSubmitting(false);
     }
