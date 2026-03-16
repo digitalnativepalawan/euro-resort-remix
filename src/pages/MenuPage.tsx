@@ -188,7 +188,7 @@ const MenuPage = () => {
             {searchOpen && (
               <div className="max-w-2xl mx-auto px-4 pb-3">
                 <Input
-                  placeholder="Search menu..."
+                  placeholder={t('menu.searchMenu')}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   autoFocus
