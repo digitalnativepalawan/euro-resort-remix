@@ -130,7 +130,7 @@ const GuestPortal = () => {
               {allUnits.map(u => <SelectItem key={u.id} value={u.unit_name} className="text-foreground font-body">{u.unit_name}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Your last name" className="bg-secondary border-border text-foreground font-body text-center text-lg h-12" onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+          <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder={t('guest.yourLastName')} className="bg-secondary border-border text-foreground font-body text-center text-lg h-12" onKeyDown={e => e.key === 'Enter' && handleLogin()} />
           <Button onClick={handleLogin} disabled={loading || !roomName || !lastName.trim()} className="w-full font-display text-sm tracking-wider h-12">
             {loading ? 'Verifying...' : 'Enter Portal'}
           </Button>
