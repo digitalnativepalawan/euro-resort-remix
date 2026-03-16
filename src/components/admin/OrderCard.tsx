@@ -34,6 +34,7 @@ interface OrderCardProps {
 
 const OrderCard = ({ order, onAdvance, resortProfile, onAddItems, onViewTab, onDelete }: OrderCardProps) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const { formatPrice } = useCurrency();
   const [advancing, setAdvancing] = useState(false);
   const canInvoice = order.status === 'Served' || order.status === 'Paid';
 
