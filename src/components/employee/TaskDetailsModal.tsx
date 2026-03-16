@@ -68,7 +68,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
 
               {meta.comment && (
                 <div className="border-t border-border pt-2">
-                  <p className="font-body text-xs text-muted-foreground mb-0.5">Comment</p>
+                  <p className="font-body text-xs text-muted-foreground mb-0.5">{t('tasks.comment')}</p>
                   <p className="font-body text-sm text-foreground">"{meta.comment}"</p>
                 </div>
               )}
