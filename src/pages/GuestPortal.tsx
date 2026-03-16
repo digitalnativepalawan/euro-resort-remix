@@ -479,6 +479,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
 
 // --- Rentals (Enhanced: duration selection, date, qty, notes, pending) ---
 const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: rates = [] } = useQuery({
     queryKey: ['rentals-guest'],
     queryFn: async () => {
@@ -487,7 +488,6 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
     },
   });
 
-  // Group rates by item_type
   const itemTypes = [...new Set(rates.map((r: any) => r.item_type))];
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedRate, setSelectedRate] = useState<any>(null);
@@ -499,19 +499,12 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
   const typeRates = rates.filter((r: any) => r.item_type === selectedType);
   const totalPrice = selectedRate ? selectedRate.price * (parseInt(qty) || 1) : 0;
 
-  const ITEM_ICONS: Record<string, string> = {
-    'Scooter': '🛵',
-    'Bicycle': '🚲',
-    'Kayak': '🛶',
-    'Surfboard': '🏄',
-    'Snorkel': '🤿',
-  };
+  const ITEM_ICONS: Record<string, string> = { 'Scooter': '🛵', 'Bicycle': '🚲', 'Kayak': '🛶', 'Surfboard': '🏄', 'Snorkel': '🤿' };
 
   const book = async () => {
     if (!selectedRate) return;
     setSubmitting(true);
     const detail = `${selectedType} — ${selectedRate.rate_name} × ${qty} — ₱${totalPrice} — Start: ${startDate}${notes.trim() ? ` — Notes: ${notes.trim()}` : ''}`;
-    // Create pending request — NO room charge yet
     await supabase.from('guest_requests').insert({
       booking_id: session.booking_id,
       room_id: session.room_id,
@@ -521,7 +514,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
-    toast.success('Rental request submitted! Staff will confirm shortly.');
+    toast.success(t('guest.rentalRequest'));
     setSelectedType(null);
     setSelectedRate(null);
     setNotes('');
@@ -531,8 +524,8 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Rent Equipment</h2>
-      <p className="font-body text-xs text-muted-foreground">Choose what you'd like to rent. Staff will confirm availability.</p>
+      <h2 className="font-display text-lg text-foreground">{t('guest.rentEquipmentTitle')}</h2>
+      <p className="font-body text-xs text-muted-foreground">{t('guest.chooseWhatToRent')}</p>
 
       {!selectedType ? (
         <div className="grid grid-cols-2 gap-3">
@@ -540,18 +533,18 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
             <button key={type} onClick={() => setSelectedType(type)} className="bg-card border border-border rounded-lg p-5 flex flex-col items-center gap-2 hover:border-accent transition-colors">
               <span className="text-3xl">{ITEM_ICONS[type] || '🏷️'}</span>
               <span className="font-body text-sm text-foreground font-medium">{type}</span>
-              <span className="font-body text-xs text-muted-foreground">{rates.filter((r: any) => r.item_type === type).length} options</span>
+              <span className="font-body text-xs text-muted-foreground">{rates.filter((r: any) => r.item_type === type).length} {t('guest.options')}</span>
             </button>
           ))}
-          {itemTypes.length === 0 && <p className="font-body text-sm text-muted-foreground col-span-2">No rentals available.</p>}
+          {itemTypes.length === 0 && <p className="font-body text-sm text-muted-foreground col-span-2">{t('guest.noRentalsAvailable')}</p>}
         </div>
       ) : (
         <div className="space-y-3">
           <button onClick={() => { setSelectedType(null); setSelectedRate(null); }} className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-body text-xs">
-            <ArrowLeft className="w-3 h-3" /> All equipment
+            <ArrowLeft className="w-3 h-3" /> {t('guest.allEquipment')}
           </button>
 
-          <h3 className="font-body text-sm text-foreground font-medium">{ITEM_ICONS[selectedType] || '🏷️'} {selectedType} — Choose Duration</h3>
+          <h3 className="font-body text-sm text-foreground font-medium">{ITEM_ICONS[selectedType] || '🏷️'} {selectedType} — {t('guest.chooseDuration')}</h3>
 
           <RadioGroup value={selectedRate?.id || ''} onValueChange={id => setSelectedRate(typeRates.find((r: any) => r.id === id))}>
             {typeRates.map((r: any) => (
@@ -576,24 +569,24 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
             <div className="bg-secondary p-4 rounded-lg space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Start Date</Label>
+                  <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {t('guest.startDate')}</Label>
                   <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="bg-card text-foreground h-10" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="font-body text-xs text-muted-foreground">Quantity</Label>
+                  <Label className="font-body text-xs text-muted-foreground">{t('guest.quantity')}</Label>
                   <Input type="number" value={qty} onChange={e => setQty(e.target.value)} min="1" max="5" className="bg-card text-foreground h-10" />
                 </div>
               </div>
               <div className="space-y-1">
-                <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> Preferences</Label>
+                <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> {t('guest.preferences')}</Label>
                 <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Automatic scooter preferred, need helmet..." className="bg-card text-foreground min-h-[60px]" />
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-body text-xs text-muted-foreground">{selectedRate.rate_name} × {qty}</span>
-                <span className="font-body text-sm text-foreground font-medium">Total: ₱{totalPrice}</span>
+                <span className="font-body text-sm text-foreground font-medium">{t('common.total')}: ₱{totalPrice}</span>
               </div>
-              <Button onClick={book} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Request Rental'}</Button>
-              <p className="font-body text-xs text-muted-foreground text-center">Staff will confirm availability and charge to your room</p>
+              <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestRental')}</Button>
+              <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirmAvailability')}</p>
             </div>
           )}
         </div>
