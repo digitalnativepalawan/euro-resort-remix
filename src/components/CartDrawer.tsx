@@ -184,7 +184,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
 
   const handleSendToKitchen = async () => {
     if (!selectedOrderType || !selectedLocation) {
-      toast.error('Please select order type and location');
+      toast.error(t('cart.selectOrderTypeAndLocation'));
       return;
     }
     // Payment type is now set by the cashier at settlement time, not at order placement
