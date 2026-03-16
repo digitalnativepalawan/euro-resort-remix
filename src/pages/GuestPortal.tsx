@@ -372,7 +372,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
               <p className="font-body text-xs text-muted-foreground">{tour.description}</p>
               <p className="font-body text-xs text-muted-foreground">{tour.duration} · {tour.schedule} · Max {tour.max_pax} pax</p>
             </div>
-            <span className="font-body text-sm text-accent font-medium">₱{tour.price}/pax</span>
+            <span className="font-body text-sm text-accent font-medium">{formatPrice(tour.price)}/pax</span>
           </div>
         </div>
       ))}
