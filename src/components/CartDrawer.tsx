@@ -599,7 +599,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                               : 'border-border text-cream-dim'
                           }`}
                         >
-                          ASAP
+                          {t('cart.asap')}
                         </button>
                         <button
                           onClick={() => setScheduleMode('scheduled')}
