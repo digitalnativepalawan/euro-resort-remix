@@ -994,6 +994,7 @@ const getBillIcon = (notes: string | null, txType: string) => {
 };
 
 const BillView = ({ session }: { session: GuestPortalSession }) => {
+  const { formatPrice } = useCurrency();
   const qc = useQueryClient();
   const [agreeing, setAgreeing] = useState(false);
   const [contestOpen, setContestOpen] = useState(false);
