@@ -295,7 +295,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
         {!isScheduledCard && isPending && (
           <div className="flex items-center gap-2 mb-3 bg-gold/20 rounded px-3 py-1.5 border border-gold/40">
             <AlertTriangle className="w-4 h-4 text-gold blink-dot" />
-            <span className="font-display text-sm text-gold tracking-widest font-bold uppercase">New Order</span>
+            <span className="font-display text-sm text-gold tracking-widest font-bold uppercase">{t('kitchen.newOrder')}</span>
           </div>
         )}
 
