@@ -223,7 +223,8 @@ const MenuPage = () => {
           <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6">
             {searchQuery.trim() ? (
               <p className="font-body text-xs text-cream-dim mb-4">
-                {filteredItems.length} result{filteredItems.length !== 1 ? 's' : ''} for "{searchQuery}"
+                {t('menu.resultCount', { count: filteredItems.length })} {t('menu.resultsFor', { query: searchQuery })}
+              </p>
               </p>
             ) : (
               <h2 className="font-display text-xl tracking-wider text-foreground mb-6">{activeCategory}</h2>
