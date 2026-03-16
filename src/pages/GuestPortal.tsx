@@ -1218,7 +1218,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
       <div className="bg-card border border-border rounded-lg p-4">
         <div className="flex justify-between mb-2">
           <span className="font-body text-sm text-muted-foreground">Total Charges</span>
-          <span className="font-body text-sm text-foreground">₱{totalCharges.toLocaleString()}</span>
+          <span className="font-body text-sm text-foreground">{formatPrice(totalCharges)}</span>
         </div>
         {unpaidOrdersTotal > 0 && (
           <>
