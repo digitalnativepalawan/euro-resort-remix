@@ -367,7 +367,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
           )}
           {canAct && deptStatus === 'pending' && isScheduledCard && prepTime && (
             <span className="font-body text-xs text-muted-foreground italic">
-              Not yet — prep at {formatScheduledTime(prepTime)}
+              {t('kitchen.notYetPrepAt', { time: formatScheduledTime(prepTime!) })}
             </span>
           )}
           {canAct && deptStatus === 'preparing' && (
