@@ -673,7 +673,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
               </div>
               <span className="font-body text-xs text-blue-400">{summary.roomChargeCount} {t('common.orders')}</span>
             </div>
-            <p className="font-display text-lg text-blue-400 tabular-nums">₱{summary.roomChargeTotal.toLocaleString()}</p>
+            <p className="font-display text-lg text-blue-400 tabular-nums">{formatPrice(summary.roomChargeTotal)}</p>
             <p className="font-body text-[10px] text-muted-foreground">{t('cashier.chargedToGuestRooms')}</p>
           </div>
         )}
