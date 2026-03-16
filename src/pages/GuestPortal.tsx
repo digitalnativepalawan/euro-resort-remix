@@ -104,8 +104,8 @@ const GuestPortal = () => {
       };
       sessionStorage.setItem(GUEST_PORTAL_KEY, JSON.stringify(portalSession));
       setSession(portalSession);
-      toast.success(`Welcome, ${guestName.split(' ')[0]}!`);
-    } catch { toast.error('Login failed'); }
+      toast.success(t('guest.welcome', { name: guestName.split(' ')[0] }));
+    } catch { toast.error(t('guest.loginFailed')); }
     setLoading(false);
   };
 
