@@ -43,7 +43,7 @@ const TaskCompletionPanel = ({ taskTitle, onConfirm, onCancel }: Props) => {
   return (
     <div className="border border-primary/30 rounded-lg p-3 space-y-2 bg-secondary/50">
       <p className="font-body text-xs text-muted-foreground">
-        Completing: <span className="text-foreground font-medium">{taskTitle}</span>
+        {t('tasks.completingTask')} <span className="text-foreground font-medium">{taskTitle}</span>
       </p>
       <Textarea
         value={comment}
