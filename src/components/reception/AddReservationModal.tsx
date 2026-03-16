@@ -324,8 +324,8 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
             {!isMaintenance && (
               <div>
-                <Label className="font-display text-xs tracking-wider">Guest Name</Label>
-                <Input value={form.guestName} onChange={e => update('guestName', e.target.value)} placeholder="Full name" />
+              <Label className="font-display text-xs tracking-wider">{t('calendar.guestNameLabel')}</Label>
+                <Input value={form.guestName} onChange={e => update('guestName', e.target.value)} placeholder={t('calendar.fullName')} />
               </div>
             )}
 
