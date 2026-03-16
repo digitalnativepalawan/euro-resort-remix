@@ -227,7 +227,7 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
               }}
               className="font-display text-xs tracking-wider text-destructive border-destructive/40 hover:bg-destructive/10"
             >
-              <Wrench className="h-3.5 w-3.5 mr-1" /> Block Room
+              <Wrench className="h-3.5 w-3.5 mr-1" /> {t('calendar.blockRoom')}
             </Button>
           </div>
         )}
