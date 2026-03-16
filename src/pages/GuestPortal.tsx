@@ -155,7 +155,7 @@ const GuestPortal = () => {
               <p className="font-body text-sm text-muted-foreground mt-1">{session.room_name} · {t('reception.checkOut')}: {new Date(session.check_out).toLocaleDateString()}</p>
             </div>
 
-            <p className="font-display text-sm tracking-wider text-muted-foreground mb-4">What can we help with?</p>
+            <p className="font-display text-sm tracking-wider text-muted-foreground mb-4">{t('guest.whatCanWeHelp')}</p>
 
             {/* 5 large concierge tiles — stacked on mobile */}
             <div className="flex flex-col gap-3 mb-6">
