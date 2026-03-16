@@ -124,7 +124,7 @@ const GuestPortal = () => {
         <div className="w-full max-w-xs space-y-3">
           <Select onValueChange={setRoomName} value={roomName}>
             <SelectTrigger className="bg-secondary border-border text-foreground font-body text-center h-12">
-              <SelectValue placeholder="Select your room" />
+              <SelectValue placeholder={t('guest.selectYourRoom')} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
               {allUnits.map(u => <SelectItem key={u.id} value={u.unit_name} className="text-foreground font-body">{u.unit_name}</SelectItem>)}
