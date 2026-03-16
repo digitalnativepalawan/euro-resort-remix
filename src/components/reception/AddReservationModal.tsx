@@ -313,7 +313,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
             )}
 
             <div>
-              <Label className="font-display text-xs tracking-wider">Platform</Label>
+              <Label className="font-display text-xs tracking-wider">{t('calendar.platformLabel')}</Label>
               <Select value={form.platform} onValueChange={v => update('platform', v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
