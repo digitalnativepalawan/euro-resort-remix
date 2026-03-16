@@ -422,7 +422,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                 handleClose(false);
                 if (returnTo) navigate(returnTo);
               }} className="font-display tracking-wider py-6 w-full">
-                {returnTo ? 'Back to Board' : 'Done'}
+                {returnTo ? t('cart.backToBoard') : t('common.done')}
               </Button>
             </DrawerFooter>
           </>
