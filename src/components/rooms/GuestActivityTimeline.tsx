@@ -101,7 +101,7 @@ const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) =>
       id: `tour-${t.id}`,
       type: 'tour',
       title: `Experience: ${t.tour_name}`,
-      subtitle: `${t.pax} pax · ₱${Number(t.price).toLocaleString()} · ${t.status}`,
+      subtitle: `${t.pax} pax · ${formatPrice(Number(t.price))} · ${t.status}`,
       time: t.created_at,
     });
   });
