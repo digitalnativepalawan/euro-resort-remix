@@ -179,7 +179,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
     }).eq('id', task.id);
     setCompletingTaskId(null);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task completed ✔');
+    toast.success(t('tasks.taskCompleted'));
   };
 
   const toggleComplete = async (task: any) => {
