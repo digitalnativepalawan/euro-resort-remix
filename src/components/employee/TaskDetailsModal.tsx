@@ -75,7 +75,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
 
               {meta.image_url && (
                 <div className="border-t border-border pt-2">
-                  <p className="font-body text-xs text-muted-foreground mb-1">Proof</p>
+                  <p className="font-body text-xs text-muted-foreground mb-1">{t('tasks.proof')}</p>
                   <a href={meta.image_url} target="_blank" rel="noopener noreferrer">
                     <img src={meta.image_url} alt="completion proof" className="w-full max-w-[200px] rounded-lg border border-border object-cover" />
                   </a>

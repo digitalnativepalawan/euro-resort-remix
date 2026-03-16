@@ -137,7 +137,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
 
           {/* Comment thread */}
           <div className="space-y-1.5">
-            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Comments</p>
+            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('tasks.comments')}</p>
             <TaskCommentThread taskId={task.id} authorName={authorName} readOnly={readOnly} />
           </div>
         </div>

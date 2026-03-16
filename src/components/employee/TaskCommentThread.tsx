@@ -179,7 +179,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
       {atCommentLimit && (
         <div className="flex items-center gap-1.5 text-muted-foreground py-1">
           <AlertCircle className="w-3.5 h-3.5" />
-          <span className="font-body text-xs">Comment limit reached — contact admin if more updates are needed.</span>
+          <span className="font-body text-xs">{t('tasks.commentLimitReached')}</span>
         </div>
       )}
     </div>

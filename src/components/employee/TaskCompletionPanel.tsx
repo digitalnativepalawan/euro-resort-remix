@@ -69,7 +69,7 @@ const TaskCompletionPanel = ({ taskTitle, onConfirm, onCancel }: Props) => {
             onConfirm(comment, imageUrl);
           }}
           className="font-display text-xs tracking-wider flex-1 gap-1 bg-green-600 hover:bg-green-700 text-white">
-          <CheckCircle2 className="w-4 h-4" /> Confirm Complete
+          <CheckCircle2 className="w-4 h-4" /> {t('tasks.confirmComplete')}
         </Button>
         <Button size="sm" variant="outline" onClick={onCancel} className="font-display text-xs tracking-wider">
           <X className="w-3.5 h-3.5" />
