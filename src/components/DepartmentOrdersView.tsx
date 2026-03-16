@@ -442,7 +442,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
                 {scheduledOrders.length > 0 && (
                   <div className="flex items-center gap-2 pt-1 pb-1">
                     <Zap className="w-4 h-4 text-gold" />
-                    <span className="font-display text-xs tracking-widest text-gold uppercase font-bold">Due Now / ASAP</span>
+                    <span className="font-display text-xs tracking-widest text-gold uppercase font-bold">{t('kitchen.dueNow')}</span>
                     <span className="font-body text-xs text-cream-dim">({nowOrders.length})</span>
                   </div>
                 )}
