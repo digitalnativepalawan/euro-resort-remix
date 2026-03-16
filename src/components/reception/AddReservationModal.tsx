@@ -256,9 +256,9 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
           <div className="space-y-3">
             <div>
-              <Label className="font-display text-xs tracking-wider">Room</Label>
+              <Label className="font-display text-xs tracking-wider">{t('calendar.room')}</Label>
               <Select value={form.unitId} onValueChange={v => update('unitId', v)}>
-                <SelectTrigger><SelectValue placeholder="Select room" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('calendar.selectRoom')} /></SelectTrigger>
                 <SelectContent>
                   {sortedRooms.map(r => {
                     const conflicts = roomConflictMap.get(r.id);
