@@ -127,7 +127,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
     // Block save for non-managers if there are conflicts
     if (liveConflicts.length > 0 && !canManage) {
-      toast.error('This room is already booked for these dates. Please choose another room.');
+      toast.error(t('calendar.roomAlreadyBookedSimple'));
       return;
     }
 
