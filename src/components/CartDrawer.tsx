@@ -475,8 +475,8 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                             </button>
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <span className="font-body text-xs text-cream-dim">₱{item.price.toLocaleString()} ×{item.quantity}</span>
-                            <span className="font-display text-sm text-foreground">₱{(item.price * item.quantity).toLocaleString()}</span>
+                            <span className="font-body text-xs text-cream-dim">{formatPrice(item.price)} ×{item.quantity}</span>
+                            <span className="font-display text-sm text-foreground">{formatPrice(item.price * item.quantity)}</span>
                           </div>
                         </div>
                       </div>
