@@ -112,8 +112,8 @@ const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) =>
       id: `tx-${tx.id}`,
       type: 'billing',
       title: isCharge
-        ? `Charge: ₱${tx.total_amount.toLocaleString()}`
-        : `Payment: ₱${Math.abs(tx.total_amount).toLocaleString()}`,
+        ? `Charge: ${formatPrice(tx.total_amount)}`
+        : `Payment: ${formatPrice(Math.abs(tx.total_amount))}`,
       subtitle: tx.notes || tx.transaction_type?.replace('_', ' ') || '',
       time: tx.created_at,
     });
