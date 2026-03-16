@@ -65,7 +65,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
               <div>
                 <p className="font-display text-sm tracking-wider text-green-600">{t('common.completed')}</p>
                 {meta.completed_by && (
-                  <p className="font-body text-xs text-muted-foreground">By {meta.completed_by}</p>
+                  <p className="font-body text-xs text-muted-foreground">{t('common.by', { name: meta.completed_by })}</p>
                 )}
                 {task.completed_at && (
                   <p className="font-body text-xs text-muted-foreground">
