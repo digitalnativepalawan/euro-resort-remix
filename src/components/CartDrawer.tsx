@@ -400,7 +400,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
               </p>
               </p>
               <p className="font-body text-xs text-cream-dim text-center mt-2">
-                {isGuestOrder ? 'Charged to your room' : 'Added to your open tab'}
+                {isGuestOrder ? t('cart.chargedToRoom') : t('cart.addedToOpenTab')}
               </p>
             </div>
             <DrawerFooter className="pt-0 gap-2">
