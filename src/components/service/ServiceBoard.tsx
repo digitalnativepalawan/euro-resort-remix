@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { deductInventoryForOrder } from '@/lib/inventoryDeduction';
@@ -20,11 +21,18 @@ const COL_COLORS: Record<string, string> = {
   'Bill Out': 'border-t-amber-400',
 };
 
+const COL_LABEL_KEYS: Record<string, string> = {
+  New: 'kitchen.new',
+  Preparing: 'kitchen.preparing',
+  Ready: 'kitchen.ready',
+};
+
 interface ServiceBoardProps {
   department: 'kitchen' | 'bar' | 'reception' | 'cashier';
 }
 
 const ServiceBoard = ({ department }: ServiceBoardProps) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: resortProfile } = useResortProfile();
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -32,7 +40,6 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
   const [detailOrder, setDetailOrder] = useState<any | null>(null);
   const [completedOpen, setCompletedOpen] = useState(false);
 
-  // Read staff permissions from session
   const permissions = useMemo(() => {
     const s = getStaffSession();
     return s?.permissions || ['admin'];
@@ -81,7 +88,6 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
     return () => { supabase.removeChannel(channel); };
   }, [qc, department]);
 
-  // Auto-refresh every 5s
   const { data: orders = [] } = useQuery({
     queryKey: ['service-orders'],
     queryFn: async () => {
@@ -99,7 +105,6 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
     refetchInterval: 5000,
   });
 
-  // Filter for department relevance
   const relevantOrders = useMemo(() => {
     if (department === 'reception' || department === 'cashier') return orders;
     return orders.filter(o => {
@@ -111,7 +116,6 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
     });
   }, [orders, department]);
 
-  // Bucket into columns
   const columns = useMemo(() => {
     const cols: Record<string, any[]> = { New: [], Preparing: [], Ready: [], 'Bill Out': [], Completed: [] };
 
@@ -123,13 +127,12 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
           const isRoomOrder = o.room_id || o.payment_type === 'Charge to Room';
           if (!isRoomOrder) cols.Completed.push(o);
         }
-        else if (o.status === 'Served') cols.Ready.push(o); // All served stay visible until paid
+        else if (o.status === 'Served') cols.Ready.push(o);
         else if (deptStatus === 'pending' && (o.status === 'New' || o.status === 'Preparing')) cols.New.push(o);
         else if (deptStatus === 'preparing') cols.Preparing.push(o);
         else if (deptStatus === 'ready' || o.status === 'Ready') cols.Ready.push(o);
       });
     } else {
-      // Reception: Served and Paid go to Completed
       relevantOrders.forEach(o => {
         if (o.status === 'New') cols.New.push(o);
         else if (o.status === 'Preparing') cols.Preparing.push(o);
@@ -145,7 +148,6 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
 
   const hasNew = columns.New.length > 0;
 
-  // Chime only once when new orders appear (not repeatedly)
   const prevHasNewRef = useRef(false);
   useEffect(() => {
     if (hasNew && !prevHasNewRef.current) {
@@ -200,7 +202,7 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
 
     await supabase.from('orders').update(updateData).eq('id', orderId);
     qc.invalidateQueries({ queryKey: ['service-orders'] });
-    toast.success('Order updated');
+    toast.success(t('kitchen.orderUpdated'));
   };
 
   const totalActive = columns.New.length + columns.Preparing.length + columns.Ready.length + columns['Bill Out'].length;
@@ -211,33 +213,32 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
       {/* Summary strip */}
       <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card/50 flex-shrink-0">
         <span className="font-display text-sm text-foreground tracking-wider">
-          {totalActive} Active
+          {totalActive} {t('common.active')}
         </span>
         {columns.New.length > 0 && (
           <span className="font-body text-xs text-gold font-bold blink-dot">
-            {columns.New.length} NEW
+            {columns.New.length} {t('kitchen.new').toUpperCase()}
           </span>
         )}
         {columns.Ready.length > 0 && (
           <span className="font-body text-xs text-emerald-400 font-bold">
-            {columns.Ready.length} READY
+            {columns.Ready.length} {t('kitchen.ready').toUpperCase()}
           </span>
         )}
         {columns['Bill Out'].length > 0 && (
           <span className="font-body text-xs text-amber-400 font-bold">
-            {columns['Bill Out'].length} BILL OUT
+            {columns['Bill Out'].length} {t('cashier.billOut')}
           </span>
         )}
       </div>
 
-      {/* Kanban columns — horizontal on tablet, vertical on phone */}
+      {/* Kanban columns */}
       <div className="flex-1 overflow-auto">
-        {/* Tablet/Desktop: horizontal kanban */}
         <div className="hidden md:grid gap-3 p-4 md:grid-cols-3">
           {KANBAN_COLS.map(col => (
             <div key={col} className={`flex flex-col border-t-4 ${COL_COLORS[col]} rounded-t-lg bg-secondary/30`}>
               <div className="px-3 py-2 flex items-center justify-between">
-                <h3 className="font-display text-sm tracking-wider text-foreground">{col}</h3>
+                <h3 className="font-display text-sm tracking-wider text-foreground">{t(COL_LABEL_KEYS[col])}</h3>
                 <span className="font-body text-xs text-muted-foreground font-bold bg-muted rounded-full w-6 h-6 flex items-center justify-center">
                   {columns[col].length}
                 </span>
@@ -256,7 +257,7 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
                   />
                 ))}
                 {columns[col].length === 0 && (
-                  <p className="font-body text-xs text-muted-foreground text-center py-8">No orders</p>
+                  <p className="font-body text-xs text-muted-foreground text-center py-8">{t('kitchen.noOrders')}</p>
                 )}
               </div>
             </div>
@@ -269,7 +270,7 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
             <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
               <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
                 <span className="font-display text-sm tracking-wider text-muted-foreground">
-                  ✓ Completed Today ({columns.Completed.length})
+                  ✓ {t('common.completedToday', { count: columns.Completed.length })}
                 </span>
                 {completedOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
               </CollapsibleTrigger>
@@ -297,7 +298,6 @@ const ServiceBoard = ({ department }: ServiceBoardProps) => {
         <MobileTabView columns={columns} department={department} permissions={permissions} onAction={handleAction} onOpenDetail={setDetailOrder} resortProfile={resortProfile} />
       </div>
 
-      {/* Detail drawer */}
       <ServiceOrderDetail
         order={detailOrder}
         open={!!detailOrder}
@@ -320,6 +320,7 @@ const MobileTabView = ({ columns, department, permissions, onAction, onOpenDetai
   onOpenDetail: (order: any) => void;
   resortProfile?: any;
 }) => {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<string>('New');
   const [completedOpen, setCompletedOpen] = useState(false);
 
@@ -338,7 +339,7 @@ const MobileTabView = ({ columns, department, permissions, onAction, onOpenDetai
                 : 'bg-secondary text-muted-foreground border border-border'
             } ${col === 'New' && columns.New.length > 0 && tab !== col ? 'tab-pulse' : ''}`}
           >
-            {col}
+            {t(COL_LABEL_KEYS[col])}
             {columns[col].length > 0 && (
               <span className={`text-[11px] font-body font-bold rounded-full w-6 h-6 flex items-center justify-center ${
                 tab === col ? 'bg-foreground/20 text-foreground' : 'bg-muted text-muted-foreground'
@@ -351,7 +352,7 @@ const MobileTabView = ({ columns, department, permissions, onAction, onOpenDetai
       </div>
       <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-3">
         {columns[tab]?.length === 0 && (
-          <p className="font-body text-sm text-muted-foreground text-center py-12">No {tab.toLowerCase()} orders</p>
+          <p className="font-body text-sm text-muted-foreground text-center py-12">{t('kitchen.noOrdersFor', { status: t(COL_LABEL_KEYS[tab]).toLowerCase() })}</p>
         )}
         {columns[tab]?.map(order => (
           <ServiceOrderCard
@@ -366,13 +367,12 @@ const MobileTabView = ({ columns, department, permissions, onAction, onOpenDetai
         ))}
       </div>
 
-      {/* Collapsible Completed Section — Mobile */}
       {columns.Completed.length > 0 && (
         <div className="px-3 pb-4 flex-shrink-0">
           <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
             <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3">
               <span className="font-display text-xs tracking-wider text-muted-foreground">
-                ✓ Completed ({columns.Completed.length})
+                ✓ {t('common.completed')} ({columns.Completed.length})
               </span>
               {completedOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
             </CollapsibleTrigger>
