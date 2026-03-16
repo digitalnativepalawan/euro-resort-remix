@@ -553,17 +553,17 @@ const BillOutPanel = ({
 
         <div className="border-t border-border/50 pt-3 space-y-1">
           <div className="flex justify-between font-body text-sm">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-muted-foreground">{t('common.subtotal')}</span>
             <span className="tabular-nums">₱{subtotal.toLocaleString()}</span>
           </div>
           {sc > 0 && (
             <div className="flex justify-between font-body text-sm">
-              <span className="text-muted-foreground">Service Charge</span>
+              <span className="text-muted-foreground">{t('receipt.serviceCharge')}</span>
               <span className="tabular-nums">₱{sc.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between font-display text-2xl text-gold pt-2">
-            <span>Total</span>
+            <span>{t('common.total')}</span>
             <span className="tabular-nums">₱{total.toLocaleString()}</span>
           </div>
         </div>
