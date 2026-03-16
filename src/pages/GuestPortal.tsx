@@ -226,12 +226,12 @@ const GuestPortal = () => {
         {/* Experiences hub — combines tours, transport, rentals */}
         {view === 'experiences' && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg text-foreground">Book an Experience</h2>
-            <p className="font-body text-xs text-muted-foreground">Choose from tours, transport, or equipment rental below.</p>
+            <h2 className="font-display text-lg text-foreground">{t('guest.bookAnExperience')}</h2>
+            <p className="font-body text-xs text-muted-foreground">{t('guest.chooseFromOptions')}</p>
             <div className="flex flex-col gap-3">
-              <GuestTile icon={<MapPin className="w-5 h-5" />} label="Island Tours" subtitle="Explore the best of Palawan" onClick={() => setView('tours')} />
-              <GuestTile icon={<Car className="w-5 h-5" />} label="Transport" subtitle="Airport transfers & van hire" onClick={() => setView('transport')} />
-              <GuestTile icon={<Bike className="w-5 h-5" />} label="Rent Equipment" subtitle="Scooters, bikes, kayaks & more" onClick={() => setView('rentals')} />
+              <GuestTile icon={<MapPin className="w-5 h-5" />} label={t('guest.islandTours')} subtitle={t('guest.islandToursSub')} onClick={() => setView('tours')} />
+              <GuestTile icon={<Car className="w-5 h-5" />} label={t('guest.transport')} subtitle={t('guest.transportSub')} onClick={() => setView('transport')} />
+              <GuestTile icon={<Bike className="w-5 h-5" />} label={t('guest.rentEquipment')} subtitle={t('guest.rentEquipmentSub')} onClick={() => setView('rentals')} />
             </div>
           </div>
         )}
