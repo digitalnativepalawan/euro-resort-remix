@@ -29,6 +29,7 @@ interface Props {
 }
 
 const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments = 10, maxImages = 3 }: Props) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [text, setText] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
