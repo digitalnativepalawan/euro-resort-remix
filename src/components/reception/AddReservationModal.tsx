@@ -393,7 +393,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         onSelectAlternative={room => {
           update('unitId', room.id);
           setConflictOpen(false);
-          toast.info(`Switched to ${room.name}`);
+          toast.info(t('calendar.switchedTo', { room: room.name }));
         }}
         onOverride={() => {
           setForceOverride(true);
