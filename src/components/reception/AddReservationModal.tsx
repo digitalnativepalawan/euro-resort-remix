@@ -354,7 +354,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
                 </div>
 
                 <div>
-                  <Label className="font-display text-xs tracking-wider">Room Rate (₱)</Label>
+                  <Label className="font-display text-xs tracking-wider">{t('calendar.roomRate')}</Label>
                   <Input type="number" value={form.roomRate} onChange={e => update('roomRate', e.target.value)} min="0" />
                 </div>
               </>
