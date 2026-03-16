@@ -650,7 +650,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 border-b border-border">
         <p className="font-display text-xs tracking-wider text-muted-foreground">
-          DAILY SUMMARY — {format(new Date(), 'MMM d, yyyy')}
+          {t('cashier.dailySummary', { date: formatDate(new Date()) })}
         </p>
       </div>
 
