@@ -488,6 +488,7 @@
     "bar": "Bar",
     "experiences": "Experiences",
     "orders": "Orders",
+    "maintenance": "Maintenance",
     "newOrder": "New Order",
     "newOrderSub": "Start a new food or drink order"
   },
