@@ -584,7 +584,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-body text-xs text-muted-foreground">{selectedRate.rate_name} × {qty}</span>
-                <span className="font-body text-sm text-foreground font-medium">{t('common.total')}: ₱{totalPrice}</span>
+                <span className="font-body text-sm text-foreground font-medium">{t('common.total')}: {formatPrice(totalPrice)}</span>
               </div>
               <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestRental')}</Button>
               <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirmAvailability')}</p>
