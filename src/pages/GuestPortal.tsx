@@ -205,7 +205,7 @@ const GuestPortal = () => {
               </button>
               <button onClick={() => setView('requests')} className="bg-secondary/50 border border-border rounded-lg py-3 px-3 text-center hover:bg-secondary transition-colors">
                 <CheckCircle2 className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
-                <span className="font-body text-xs text-muted-foreground">My Requests</span>
+                <span className="font-body text-xs text-muted-foreground">{t('guest.myRequests')}</span>
               </button>
               <button onClick={() => setView('bill')} className="bg-secondary/50 border border-border rounded-lg py-3 px-3 text-center hover:bg-secondary transition-colors">
                 <Receipt className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
