@@ -283,7 +283,7 @@ const StaffOrdersView = () => {
                 <div key={item.id} className="flex items-center justify-between py-2 px-1">
                   <div className="flex-1 min-w-0">
                     <span className="font-display text-sm text-foreground block">{item.name}</span>
-                    <span className="font-display text-xs text-gold">₱{item.price.toLocaleString()}</span>
+                    <span className="font-display text-xs text-gold">{formatPrice(item.price)}</span>
                   </div>
                   {inCart ? (
                     <div className="flex items-center gap-2">
