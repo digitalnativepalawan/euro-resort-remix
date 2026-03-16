@@ -66,11 +66,12 @@ const ResortProfileForm = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const payload = { ...form, usd_exchange_rate: parseFloat(form.usd_exchange_rate) || 1.08 };
       if (profile?.id) {
-        const { error } = await supabase.from('resort_profile').update(form).eq('id', profile.id);
+        const { error } = await supabase.from('resort_profile').update(payload).eq('id', profile.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('resort_profile').insert(form);
+        const { error } = await supabase.from('resort_profile').insert(payload);
         if (error) throw error;
       }
       qc.invalidateQueries({ queryKey: ['resort-profile'] });
