@@ -430,7 +430,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
       {/* Orders */}
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
         {filtered.length === 0 && (
-          <p className="font-body text-sm text-cream-dim text-center py-12">No {DEPT_STATUS_LABELS[activeTab].toLowerCase()} orders for {department}</p>
+          <p className="font-body text-sm text-cream-dim text-center py-12">{t('kitchen.noOrdersForDept', { status: DEPT_STATUS_LABELS[activeTab].toLowerCase(), department: department === 'kitchen' ? t('kitchen.label') : t('bar.label') })}</p>
         )}
 
         {/* Pending tab: split into Due Now and Scheduled */}
