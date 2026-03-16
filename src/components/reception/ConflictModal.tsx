@@ -24,7 +24,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display tracking-wider text-destructive">
             <AlertTriangle className="h-5 w-5" />
-            Booking Conflict
+            {t('calendar.bookingConflict')}
           </DialogTitle>
         </DialogHeader>
 
