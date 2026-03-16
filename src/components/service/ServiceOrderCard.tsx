@@ -164,7 +164,7 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
 
       <div className="pt-2.5 border-t border-border/50 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="font-display text-lg text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
+          <span className="font-display text-lg text-gold tabular-nums">{formatPrice(order.total)}</span>
           {primaryAction && onAction && department !== 'cashier' && (
             <Button
               onClick={(e) => handleAction(e, primaryAction!.action)}

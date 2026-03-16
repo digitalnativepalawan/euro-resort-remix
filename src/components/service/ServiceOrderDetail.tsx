@@ -171,7 +171,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
 
           <div className="flex items-center justify-between">
             <span className="font-display text-sm tracking-wider text-muted-foreground">{t('common.total').toUpperCase()}</span>
-            <span className="font-display text-xl text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
+            <span className="font-display text-xl text-gold tabular-nums">{formatPrice(order.total)}</span>
           </div>
 
           {actions.length > 0 && (

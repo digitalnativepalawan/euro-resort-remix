@@ -125,7 +125,7 @@ const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) =>
       id: `order-${o.id}`,
       type: 'order',
       title: `Order · ${itemCount} item${itemCount !== 1 ? 's' : ''}`,
-      subtitle: `₱${Number(o.total).toFixed(0)} · ${o.status}`,
+      subtitle: `${formatPrice(Number(o.total))} · ${o.status}`,
       time: o.created_at,
     });
   });
