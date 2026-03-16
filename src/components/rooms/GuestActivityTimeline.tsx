@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { LogIn, StickyNote, MapPin, DollarSign, UtensilsCrossed, Clock } from 'lucide-react';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface GuestActivityTimelineProps {
   booking: any;
