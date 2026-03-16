@@ -946,7 +946,7 @@ const RequestsTrackerView = ({ session }: { session: GuestPortalSession }) => {
                       <span>{t.pax} pax</span>
                       <span>Pickup: {t.pickup_time}</span>
                     </div>
-                    {t.price > 0 && <p className="font-body text-xs text-accent">₱{t.price.toLocaleString()}</p>}
+                    {t.price > 0 && <p className="font-body text-xs text-accent">{formatPrice(t.price)}</p>}
                   </div>
                 );
               })}
