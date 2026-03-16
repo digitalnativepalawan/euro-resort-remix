@@ -270,7 +270,7 @@ const MenuPage = () => {
                           )}
                         </div>
                         <span className={`font-display text-sm whitespace-nowrap pt-0.5 ${isSoldOut ? 'text-muted-foreground' : 'text-gold'}`}>
-                          ₱{item.price.toLocaleString()}
+                          {formatPrice(item.price)}
                         </span>
                       </div>
                     </button>
