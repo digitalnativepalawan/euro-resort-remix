@@ -130,7 +130,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
             {commentCount > 0 && (
               <div className="flex items-center gap-2">
                 <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                <span className="font-body text-xs text-foreground">{commentCount} comment{commentCount !== 1 ? 's' : ''}</span>
+                <span className="font-body text-xs text-foreground">{t('tasks.commentCount', { count: commentCount })}</span>
               </div>
             )}
           </div>

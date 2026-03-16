@@ -85,7 +85,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
           )}
 
           <p className="font-body text-xs text-muted-foreground">
-            Created: {format(new Date(task.created_at), 'MMM d, h:mm a')}
+            {t('tasks.taskCreated')}: {format(new Date(task.created_at), 'MMM d, h:mm a')}
           </p>
         </div>
       </DialogContent>

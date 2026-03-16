@@ -59,7 +59,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
   }
 
   const deptLabelKey = DEPT_LABEL_KEYS[currentDept] || '';
-  const deptLabel = deptLabelKey ? (deptLabelKey.includes('.') ? t(deptLabelKey) : deptLabelKey) : '';
+  const deptLabel = deptLabelKey ? t(deptLabelKey) : '';
   const deptColor = DEPT_COLORS[currentDept] || '';
 
   const handleLogout = () => {

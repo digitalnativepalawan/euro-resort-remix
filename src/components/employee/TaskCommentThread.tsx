@@ -152,7 +152,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
           {imageUrl && (
             <div className="flex items-center gap-2">
               <img src={imageUrl} alt="attachment" className="h-10 w-10 rounded object-cover border border-border" />
-              <Button size="sm" variant="ghost" className="text-xs text-destructive" onClick={() => setImageUrl('')}>Remove</Button>
+              <Button size="sm" variant="ghost" className="text-xs text-destructive" onClick={() => setImageUrl('')}>{t('common.remove')}</Button>
             </div>
           )}
 

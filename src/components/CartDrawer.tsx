@@ -23,6 +23,7 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
   tabMode: 'new' | 'existing'; setTabMode: (v: 'new' | 'existing') => void;
   selectedTabId: string; setSelectedTabId: (v: string) => void;
 }) => {
+  const { t } = useTranslation();
   const { data: openTabs = [] } = useQuery({
     queryKey: ['open-tabs-picker'],
     queryFn: async () => {
@@ -38,31 +39,31 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
           className={`flex-1 min-h-[36px] py-1.5 border font-display text-xs tracking-wider rounded transition-colors ${
             tabMode === 'new' ? 'border-accent text-accent bg-accent/10' : 'border-border text-muted-foreground'
           }`}>
-           New Tab
+           {t('cart.newTab')}
          </button>
         <button onClick={() => setTabMode('existing')}
           className={`flex-1 min-h-[36px] py-1.5 border font-display text-xs tracking-wider rounded transition-colors ${
             tabMode === 'existing' ? 'border-accent text-accent bg-accent/10' : 'border-border text-muted-foreground'
           }`}>
-          Existing Tab ({openTabs.length})
+          {t('cart.existingTab', { count: openTabs.length })}
         </button>
       </div>
       {tabMode === 'existing' && openTabs.length > 0 && (
         <Select value={selectedTabId} onValueChange={setSelectedTabId}>
           <SelectTrigger className="bg-secondary border-border text-foreground font-body text-xs">
-            <SelectValue placeholder="Select open tab" />
+            <SelectValue placeholder={t('cart.selectOpenTab')} />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
-            {openTabs.map((t: any) => (
-              <SelectItem key={t.id} value={t.id} className="text-foreground font-body text-xs">
-                {t.location_type} · {t.location_detail} — ₱{Number(t.running_total || 0).toLocaleString()}
+            {openTabs.map((tab: any) => (
+              <SelectItem key={tab.id} value={tab.id} className="text-foreground font-body text-xs">
+                {tab.location_type} · {tab.location_detail} — ₱{Number(tab.running_total || 0).toLocaleString()}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       )}
       {tabMode === 'existing' && openTabs.length === 0 && (
-        <p className="font-body text-xs text-muted-foreground text-center py-2">No open tabs found — a new tab will be created.</p>
+        <p className="font-body text-xs text-muted-foreground text-center py-2">{t('cart.noOpenTabs')}</p>
       )}
     </div>
   );

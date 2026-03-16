@@ -294,8 +294,8 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
               <Alert variant="destructive" className="py-2">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription className="text-xs">
-                  <strong>Double booking!</strong>{' '}
-                  {rooms.find(r => r.id === form.unitId)?.name} is booked by{' '}
+                  <strong>{t('calendar.doubleBooking')}</strong>{' '}
+                  {rooms.find(r => r.id === form.unitId)?.name}{' '}
                   {liveConflicts.map((c, i) => {
                     const name = c.resort_ops_guests?.full_name || c.platform;
                     try {
@@ -306,8 +306,8 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
                       return <span key={c.id}>{i > 0 && ', '}<strong>{name}</strong></span>;
                     }
                   })}.
-                  {!canManage && ' Pick another room or change dates.'}
-                  {canManage && ' You can override as manager.'}
+                  {!canManage && ` ${t('calendar.pickAnotherRoom')}`}
+                  {canManage && ` ${t('calendar.canOverride')}`}
                 </AlertDescription>
               </Alert>
             )}
