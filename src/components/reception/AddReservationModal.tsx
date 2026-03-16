@@ -184,7 +184,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         toast.success(t('calendar.reservationUpdated'));
       } else {
         await from('resort_ops_bookings').insert(payload as any);
-        toast.success('Reservation created');
+        toast.success(t('calendar.reservationCreated'));
       }
 
       qc.invalidateQueries({ queryKey: ['rooms-bookings'] });
