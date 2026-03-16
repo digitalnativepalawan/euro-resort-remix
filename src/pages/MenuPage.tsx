@@ -325,7 +325,7 @@ const MenuPage = () => {
           {selectedItem && (
             <div className="flex flex-col items-center gap-5 pt-2">
               <p className="font-body text-sm text-cream-dim text-center leading-relaxed">{selectedItem.description}</p>
-              <p className="font-display text-2xl text-gold">₱{selectedItem.price.toLocaleString()}</p>
+              <p className="font-display text-2xl text-gold">{formatPrice(selectedItem.price)}</p>
               {!isBrowseOnly && (
                 <>
                   <div className="flex items-center gap-6">
