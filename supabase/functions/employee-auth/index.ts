@@ -55,6 +55,32 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { action, employee_id, name, pin, old_pin, new_pin } = body;
 
+    // One-time admin bootstrap: creates admin employee + permission if not exists
+    if (action === 'setup-admin') {
+      if (!name || !pin) {
+        return new Response(JSON.stringify({ error: 'name and pin required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      // Check if an admin employee already exists
+      const { data: existing } = await supabase.from('employees').select('id, name').ilike('name', name);
+      let empId: string;
+      if (existing && existing.length > 0) {
+        empId = existing[0].id;
+      } else {
+        const { data: newEmp, error: insErr } = await supabase.from('employees').insert({ name, display_name: name, active: true }).select('id').single();
+        if (insErr) throw insErr;
+        empId = newEmp.id;
+      }
+      // Set PIN
+      const hash = await hashPin(pin);
+      await supabase.from('employees').update({ password_hash: hash }).eq('id', empId);
+      // Ensure admin permission
+      const { data: existingPerm } = await supabase.from('employee_permissions').select('id').eq('employee_id', empId).eq('permission', 'admin');
+      if (!existingPerm || existingPerm.length === 0) {
+        await supabase.from('employee_permissions').insert({ employee_id: empId, permission: 'admin' });
+      }
+      return new Response(JSON.stringify({ success: true, employee_id: empId }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     if (action === 'set-password') {
       if (!employee_id || !pin) {
         return new Response(JSON.stringify({ error: 'employee_id and pin required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
