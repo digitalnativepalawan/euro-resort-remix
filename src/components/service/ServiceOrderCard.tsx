@@ -34,6 +34,7 @@ interface ServiceOrderCardProps {
 
 const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDetail, compact, resortProfile }: ServiceOrderCardProps) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [busy, setBusy] = useState(false);
   const items = (order.items as any[]) || [];
   const isNew = order.status === 'New';

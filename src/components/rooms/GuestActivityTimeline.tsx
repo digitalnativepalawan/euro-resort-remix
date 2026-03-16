@@ -28,6 +28,7 @@ const iconMap = {
 const from = (t: string) => supabase.from(t as any) as any;
 
 const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) => {
+  const { formatPrice } = useCurrency();
   const { data: notes = [] } = useQuery({
     queryKey: ['timeline-notes', booking?.id],
     enabled: !!booking?.id,

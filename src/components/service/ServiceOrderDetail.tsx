@@ -29,6 +29,7 @@ const STATUS_DOT: Record<string, string> = {
 
 const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department, onAction, resortProfile }: ServiceOrderDetailProps) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [busy, setBusy] = useState<string | null>(null);
 
   if (!order) return null;
