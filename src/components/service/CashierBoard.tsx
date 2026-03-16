@@ -449,7 +449,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
             <p className="font-body text-xs text-muted-foreground truncate">{order.guest_name}</p>
           )}
           {order.staff_name && (
-            <p className="font-body text-[11px] text-muted-foreground/70 truncate">by {order.staff_name}</p>
+            <p className="font-body text-[11px] text-muted-foreground/70 truncate">{t('common.by', { name: order.staff_name })}</p>
           )}
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground flex-shrink-0 ml-2">
