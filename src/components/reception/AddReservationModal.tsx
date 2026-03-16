@@ -117,7 +117,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
       return;
     }
     if (form.checkIn >= form.checkOut) {
-      toast.error('Check-out must be after check-in');
+      toast.error(t('calendar.checkOutAfterCheckIn'));
       return;
     }
     if (form.platform !== 'Maintenance' && !form.guestName.trim()) {
