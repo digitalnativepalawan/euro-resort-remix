@@ -304,7 +304,7 @@ const CashierBoard = () => {
                   />
                 </div>
                 {completedOrders.length === 0 && (
-                  <p className="font-body text-xs text-muted-foreground text-center py-4">No completed orders for this date</p>
+                  <p className="font-body text-xs text-muted-foreground text-center py-4">{t('cashier.noCompletedOrders')}</p>
                 )}
                 {completedOrders.map(order => (
                   <OrderRow
