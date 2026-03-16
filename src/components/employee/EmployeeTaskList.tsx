@@ -268,7 +268,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
               <div className="border border-border rounded-md p-2 max-h-36 overflow-y-auto space-y-1.5 bg-secondary">
                 <label className="flex items-center gap-2 cursor-pointer font-body text-sm font-semibold text-foreground">
                   <Checkbox checked={selectAll} onCheckedChange={(c) => handleSelectAll(!!c)} />
-                  All Staff
+                  {t('tasks.allStaff')}
                 </label>
                 <div className="border-t border-border my-1" />
                 {activeEmployees.map(emp => (
