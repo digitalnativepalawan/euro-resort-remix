@@ -588,7 +588,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     <div className="mt-4 pt-3 border-t border-border">
                       <div className="flex items-center gap-2 mb-3">
                         <Clock className="w-4 h-4 text-cream-dim" />
-                        <p className="font-display text-sm text-foreground tracking-wider">Scheduled Time</p>
+                        <p className="font-display text-sm text-foreground tracking-wider">{t('cart.scheduledTime')}</p>
                       </div>
                       <div className="flex gap-2 mb-3">
                         <button
