@@ -246,7 +246,7 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="sm" onClick={goToday} className="font-display text-[10px] tracking-wider h-7 px-2">
-            Today
+            {t('calendar.today')}
           </Button>
           <Button variant="ghost" size="icon" onClick={() => navigate('next')} className="h-7 w-7">
             <ChevronRight className="h-4 w-4" />
