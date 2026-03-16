@@ -883,6 +883,7 @@ const REQUEST_STATUS_MAP: Record<string, { label: string; color: string }> = {
 };
 
 const RequestsTrackerView = ({ session }: { session: GuestPortalSession }) => {
+  const { formatPrice } = useCurrency();
   const qc = useQueryClient();
 
   const { data: tours = [] } = useQuery({
