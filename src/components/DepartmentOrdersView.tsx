@@ -362,7 +362,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               onClick={() => advanceDeptStatus(order, 'preparing')}
               className="font-body text-xs gap-1.5 bg-gold text-primary-foreground hover:bg-gold/90 font-bold"
             >
-              <ChefHat className="w-4 h-4" /> Start Preparing
+              <ChefHat className="w-4 h-4" /> {t('kitchen.startPreparing')}
             </Button>
           )}
           {canAct && deptStatus === 'pending' && isScheduledCard && prepTime && (
