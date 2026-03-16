@@ -155,6 +155,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
         <div className="hidden sm:flex items-center gap-2">
           <span className="font-body text-xs text-muted-foreground">{displayName}</span>
           <LanguageSwitcher />
+          <CurrencySwitcher />
           <ThemeToggle />
           <Button
             variant="ghost"
