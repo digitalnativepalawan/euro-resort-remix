@@ -56,7 +56,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
 
               {meta.completed_by && (
                 <p className="font-body text-sm text-foreground">
-                  Completed by: <span className="font-semibold">{meta.completed_by}</span>
+                  {t('tasks.completedBy')} <span className="font-semibold">{meta.completed_by}</span>
                 </p>
               )}
 
