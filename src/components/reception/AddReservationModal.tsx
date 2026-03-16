@@ -369,7 +369,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
           <DialogFooter className="gap-2 flex-col sm:flex-row">
             {isEdit && (
               <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)} className="font-display text-xs tracking-wider sm:mr-auto">
-                Delete
+                {t('common.delete')}
               </Button>
             )}
             <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">Cancel</Button>
