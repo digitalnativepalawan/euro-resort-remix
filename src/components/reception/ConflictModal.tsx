@@ -30,7 +30,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
 
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground font-body">
-            This room is already booked for the selected dates:
+            {t('calendar.roomAlreadyBooked')}
           </p>
 
           {conflicts.map(c => (
