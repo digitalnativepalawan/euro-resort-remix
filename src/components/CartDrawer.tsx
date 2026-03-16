@@ -719,7 +719,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   })()}
                 </Button>
                 <p className="font-body text-[10px] text-cream-dim text-center mt-1">
-                  {isGuestOrder ? 'Charges will be added to your room bill' : 'Order will be added to your open tab'}
+                  {isGuestOrder ? t('cart.chargedToYourRoom') : t('cart.addedToTab')}
                 </p>
               </DrawerFooter>
             )}
