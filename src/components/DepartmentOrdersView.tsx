@@ -275,7 +275,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               <Clock className="w-4 h-4 text-blue-400 shrink-0" />
               <div className="flex-1">
                 <span className="font-display text-sm text-blue-400 tracking-wider font-bold">
-                  🕒 {formatScheduledTime(scheduledFor)}
+                  🕒 {t('kitchen.serveAt', { time: formatScheduledTime(scheduledFor) })}
                 </span>
                 <span className="font-body text-xs text-blue-400/70 ml-2">
                   · {formatDistanceToNow(scheduledFor, { addSuffix: true })}
