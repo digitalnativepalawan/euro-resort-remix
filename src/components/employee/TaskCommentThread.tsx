@@ -170,7 +170,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
             <Button size="sm" onClick={submit} disabled={submitting || (!text.trim() && !imageUrl)}
               className="font-display text-xs tracking-wider gap-1 h-8">
               {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-              Send
+              {t('tasks.send')}
             </Button>
           </div>
         </div>
