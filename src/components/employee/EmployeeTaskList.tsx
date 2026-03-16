@@ -249,7 +249,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
           {!employeeId && activeEmployees.length > 0 && (
             <div className="space-y-1.5">
               <label className="font-body text-xs text-muted-foreground flex items-center gap-1">
-                <Users className="w-3 h-3" /> Assign to
+                <Users className="w-3 h-3" /> {t('tasks.assignTo')}
               </label>
               {assignees.length > 0 && (
                 <div className="flex flex-wrap gap-1">
