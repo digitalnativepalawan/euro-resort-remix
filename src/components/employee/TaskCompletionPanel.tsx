@@ -48,7 +48,7 @@ const TaskCompletionPanel = ({ taskTitle, onConfirm, onCancel }: Props) => {
       <Textarea
         value={comment}
         onChange={e => setComment(e.target.value)}
-        placeholder="Add a note (optional)"
+        placeholder={t('tasks.addNote')}
         className="bg-secondary border-border text-foreground font-body text-sm min-h-[60px]"
         rows={2}
       />
