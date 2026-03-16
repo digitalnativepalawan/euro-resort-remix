@@ -79,7 +79,7 @@ const GuestPortal = () => {
         .limit(1)
         .maybeSingle();
 
-      if (!booking) { toast.error('No active booking found for this room'); setLoading(false); return; }
+      if (!booking) { toast.error(t('guest.noActiveBooking')); setLoading(false); return; }
 
       const guestName = (booking as any).resort_ops_guests?.full_name || '';
       const lastNameFromBooking = guestName.split(' ').pop()?.toLowerCase() || '';
