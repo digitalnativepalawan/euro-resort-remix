@@ -240,11 +240,11 @@ const CashierBoard = () => {
         {/* Summary */}
         <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card/50 flex-shrink-0">
           <span className="font-display text-sm text-foreground tracking-wider">
-            {buckets.active.length + buckets.billOut.length} Active
+            {buckets.active.length + buckets.billOut.length} {t('common.active')}
           </span>
           {buckets.billOut.length > 0 && (
             <span className="font-body text-xs text-amber-400 font-bold">
-              {buckets.billOut.length} BILL OUT
+              {buckets.billOut.length} {t('cashier.billOut')}
             </span>
           )}
         </div>
