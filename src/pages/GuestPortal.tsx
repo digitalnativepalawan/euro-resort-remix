@@ -191,8 +191,8 @@ const GuestPortal = () => {
               />
               <GuestTile
                 icon={<ConciergeBell className="w-6 h-6" />}
-                label="Message Reception"
-                subtitle="Send a note directly to our front desk"
+                label={t('guest.messageReception')}
+                subtitle={t('guest.messageReceptionSub')}
                 onClick={() => setView('message')}
               />
             </div>
