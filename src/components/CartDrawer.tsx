@@ -435,7 +435,8 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
               )}
               <p className="font-display text-xs tracking-[0.3em] text-cream-dim uppercase">{brandName}</p>
               <DrawerTitle className="font-display text-lg text-foreground tracking-wider">
-                Your Order
+                {t('cart.yourOrder')}
+              </DrawerTitle>
               </DrawerTitle>
               {selectedOrderType && selectedLocation && (
                 <div className="flex justify-center gap-2 mt-1">
