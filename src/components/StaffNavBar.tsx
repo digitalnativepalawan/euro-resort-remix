@@ -25,10 +25,10 @@ const DEPT_LABEL_KEYS: Record<string, string> = {
   reception: 'reception.label',
   kitchen: 'kitchen.label',
   bar: 'bar.label',
-  housekeeping: 'Housekeeping',
-  maintenance: 'Maintenance',
-  experiences: 'Experiences',
-  orders: 'Orders',
+  housekeeping: 'staff.housekeeping',
+  maintenance: 'staff.maintenance',
+  experiences: 'staff.experiences',
+  orders: 'staff.orders',
 };
 
 interface StaffNavBarProps {
