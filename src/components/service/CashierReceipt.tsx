@@ -127,7 +127,7 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
   };
 
   const handleCopy = async () => {
-    const text = buildReceiptText(order, profile, invoiceSettings, t);
+    const text = buildReceiptText(order, profile, invoiceSettings, t, formatPrice);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
