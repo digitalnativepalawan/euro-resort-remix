@@ -1250,7 +1250,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
         </div>
         <div className="border-t border-border pt-2 flex justify-between">
           <span className="font-body text-sm text-foreground font-medium">Balance</span>
-          <span className={`font-body text-sm font-medium ${balance > 0 ? 'text-amber-400' : 'text-green-400'}`}>₱{balance.toLocaleString()}</span>
+          <span className={`font-body text-sm font-medium ${balance > 0 ? 'text-amber-400' : 'text-green-400'}`}>{formatPrice(balance)}</span>
         </div>
       </div>
 
