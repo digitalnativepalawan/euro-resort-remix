@@ -28,6 +28,7 @@ interface ReceptionCalendarProps {
 }
 
 const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: ReceptionCalendarProps) => {
+  const { t } = useTranslation();
   const [view, setView] = useState<CalendarView>('week');
   const [refDate, setRefDate] = useState(new Date());
   const [addOpen, setAddOpen] = useState(false);
