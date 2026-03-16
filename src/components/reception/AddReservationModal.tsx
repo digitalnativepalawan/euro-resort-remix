@@ -335,7 +335,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
                 <Input type="date" value={form.checkIn} onChange={e => update('checkIn', e.target.value)} />
               </div>
               <div>
-                <Label className="font-display text-xs tracking-wider">Check-out</Label>
+                <Label className="font-display text-xs tracking-wider">{t('calendar.checkOut')}</Label>
                 <Input type="date" value={form.checkOut} onChange={e => update('checkOut', e.target.value)} />
               </div>
             </div>
