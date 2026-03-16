@@ -145,7 +145,7 @@ const GuestPortal = () => {
       <div className="max-w-lg mx-auto px-4 py-6">
         {view !== 'dashboard' ? (
           <button onClick={() => setView('dashboard')} className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-body text-sm mb-4">
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className="w-4 h-4" /> {t('common.back')}
           </button>
         ) : (
           <>
