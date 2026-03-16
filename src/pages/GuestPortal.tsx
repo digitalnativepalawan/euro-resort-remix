@@ -37,6 +37,7 @@ const getPortalSession = (): GuestPortalSession | null => {
 };
 
 const GuestPortal = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: profile } = useResortProfile();
   const qc = useQueryClient();
