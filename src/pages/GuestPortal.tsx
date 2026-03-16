@@ -179,8 +179,8 @@ const GuestPortal = () => {
               />
               <GuestTile
                 icon={<Palmtree className="w-6 h-6" />}
-                label="Book Experiences"
-                subtitle="Tours, transport & equipment rental"
+                label={t('guest.bookExperiences')}
+                subtitle={t('guest.bookExperiencesSub')}
                 onClick={() => setView('experiences')}
               />
               <GuestTile
