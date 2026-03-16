@@ -625,7 +625,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                                   : 'border-border text-cream-dim'
                               }`}
                             >
-                              Today
+                              {t('common.today')}
                             </button>
                             <button
                               onClick={() => setScheduledDay('tomorrow')}
