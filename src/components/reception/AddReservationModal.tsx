@@ -121,7 +121,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
       return;
     }
     if (form.platform !== 'Maintenance' && !form.guestName.trim()) {
-      toast.error('Guest name is required');
+      toast.error(t('calendar.guestNameRequired'));
       return;
     }
 
