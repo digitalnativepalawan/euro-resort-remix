@@ -218,7 +218,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         }
       }
       await from('resort_ops_bookings').delete().eq('id', editBooking.id);
-      toast.success('Reservation deleted');
+      toast.success(t('calendar.reservationDeleted'));
       qc.invalidateQueries({ queryKey: ['rooms-bookings'] });
       qc.invalidateQueries({ queryKey: ['rooms-units'] });
       setDeleteOpen(false);
