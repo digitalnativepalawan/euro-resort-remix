@@ -505,7 +505,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
   const book = async () => {
     if (!selectedRate) return;
     setSubmitting(true);
-    const detail = `${selectedType} — ${selectedRate.rate_name} × ${qty} — ₱${totalPrice} — Start: ${startDate}${notes.trim() ? ` — Notes: ${notes.trim()}` : ''}`;
+    const detail = `${selectedType} — ${selectedRate.rate_name} × ${qty} — ${formatPrice(totalPrice)} — Start: ${startDate}${notes.trim() ? ` — Notes: ${notes.trim()}` : ''}`;
     await supabase.from('guest_requests').insert({
       booking_id: session.booking_id,
       room_id: session.room_id,
