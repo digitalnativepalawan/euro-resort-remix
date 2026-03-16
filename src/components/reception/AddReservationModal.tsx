@@ -378,7 +378,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
               disabled={saving || (liveConflicts.length > 0 && !canManage)}
               className="font-display text-xs tracking-wider"
             >
-              {saving ? 'Saving...' : isEdit ? 'Update' : 'Create'}
+              {saving ? t('calendar.saving') : isEdit ? t('common.update') : t('common.create')}
             </Button>
           </DialogFooter>
         </DialogContent>
