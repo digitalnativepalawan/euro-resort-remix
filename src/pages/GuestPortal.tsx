@@ -63,7 +63,7 @@ const GuestPortal = () => {
     setLoading(true);
     try {
       const unit = allUnits.find(u => u.unit_name === roomName);
-      if (!unit) { toast.error('Room not found'); setLoading(false); return; }
+      if (!unit) { toast.error(t('guest.roomNotFound')); setLoading(false); return; }
 
       const { data: opsUnit } = await supabase.from('resort_ops_units').select('id').ilike('name', roomName.trim()).maybeSingle();
       if (!opsUnit) { toast.error('Room not found'); setLoading(false); return; }
