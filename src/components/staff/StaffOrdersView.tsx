@@ -322,7 +322,7 @@ const StaffOrdersView = () => {
           {/* Submit */}
           {addCartTotal > 0 && (
             <Button onClick={handleSubmitAddItems} className="w-full font-display tracking-wider py-5">
-              Add ₱{addCartTotal.toLocaleString()} to Order
+              Add {formatPrice(addCartTotal)} to Order
             </Button>
           )}
         </DialogContent>
