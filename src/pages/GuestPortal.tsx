@@ -170,8 +170,8 @@ const GuestPortal = () => {
               />
               <GuestTile
                 icon={<span className="text-2xl">🍹</span>}
-                label="Order Drinks"
-                subtitle="Cocktails, coffee, fresh juices & more"
+                label={t('guest.orderDrinks')}
+                subtitle={t('guest.orderDrinksSub')}
                 onClick={() => {
                   setGuestSession({ room_id: session.room_id, room_name: session.room_name, guest_name: session.guest_name, booking_id: session.booking_id });
                   navigate('/menu?mode=guest-order&dept=bar');
