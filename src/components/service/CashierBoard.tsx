@@ -714,7 +714,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         {cashEntry && cashEntry.count > 0 && (
           <Collapsible>
             <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
-              <span className="font-display text-xs tracking-wider text-muted-foreground">CASH TRANSACTIONS ({cashEntry.count})</span>
+              <span className="font-display text-xs tracking-wider text-muted-foreground">{t('cashier.cashTransactions', { count: cashEntry.count })}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-2 space-y-1">
