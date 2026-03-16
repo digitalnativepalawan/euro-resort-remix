@@ -344,7 +344,8 @@ const MenuPage = () => {
                     </button>
                   </div>
                   <Button onClick={handleAddToCart} className="w-full font-display tracking-wider py-6 text-base">
-                    Add to Order — ₱{(selectedItem.price * addQuantity).toLocaleString()}
+                    {t('menu.addToOrder')} — ₱{(selectedItem.price * addQuantity).toLocaleString()}
+                  </Button>
                   </Button>
                 </>
               )}
