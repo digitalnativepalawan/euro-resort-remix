@@ -281,7 +281,7 @@ const CashierBoard = () => {
           )}
 
           {buckets.active.length === 0 && buckets.billOut.length === 0 && (
-            <p className="font-body text-sm text-muted-foreground text-center py-12">No active orders</p>
+            <p className="font-body text-sm text-muted-foreground text-center py-12">{t('cashier.noActiveOrders')}</p>
           )}
 
           {/* Completed — date picker + stacked cards */}
