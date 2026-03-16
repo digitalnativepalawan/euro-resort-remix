@@ -604,7 +604,7 @@ const BillOutPanel = ({
         {busy ? t('common.processing') : (
             <>
               <Check className="w-5 h-5" />
-              {order.status === 'Ready' ? t('cashier.serveAndConfirm') : t('cashier.confirmPayment')} — ₱{total.toLocaleString()}
+              {order.status === 'Ready' ? t('cashier.serveAndConfirm') : t('cashier.confirmPayment')} — {formatPrice(total)}
             </>
           )}
         </Button>
