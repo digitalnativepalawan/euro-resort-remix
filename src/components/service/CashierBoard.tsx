@@ -561,7 +561,7 @@ const BillOutPanel = ({
           {sc > 0 && (
             <div className="flex justify-between font-body text-sm">
               <span className="text-muted-foreground">{t('receipt.serviceCharge')}</span>
-              <span className="tabular-nums">₱{sc.toLocaleString()}</span>
+              <span className="tabular-nums">{formatPrice(sc)}</span>
             </div>
           )}
           <div className="flex justify-between font-display text-2xl text-gold pt-2">
