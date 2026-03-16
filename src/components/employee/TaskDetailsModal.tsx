@@ -43,7 +43,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
 
           {task.due_date && (
             <p className="font-body text-xs text-muted-foreground">
-              Due: {format(new Date(task.due_date), 'MMM d, h:mm a')}
+              {t('schedule.due')}: {format(new Date(task.due_date), 'MMM d, h:mm a')}
             </p>
           )}
 
