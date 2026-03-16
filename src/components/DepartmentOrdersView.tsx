@@ -52,6 +52,7 @@ const formatScheduledTime = (date: Date): string => {
 };
 
 const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrdersViewProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const audioCtxRef = useRef<AudioContext | null>(null);
