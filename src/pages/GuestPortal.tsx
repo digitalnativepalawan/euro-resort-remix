@@ -84,7 +84,7 @@ const GuestPortal = () => {
       const guestName = (booking as any).resort_ops_guests?.full_name || '';
       const lastNameFromBooking = guestName.split(' ').pop()?.toLowerCase() || '';
       if (lastNameFromBooking !== lastName.trim().toLowerCase()) {
-        toast.error('Last name does not match our records');
+        toast.error(t('guest.lastNameNoMatch'));
         setLoading(false);
         return;
       }
