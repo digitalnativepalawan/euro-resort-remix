@@ -348,7 +348,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
                     <Input type="number" value={form.adults} onChange={e => update('adults', e.target.value)} min="1" />
                   </div>
                   <div>
-                    <Label className="font-display text-xs tracking-wider">Children</Label>
+                    <Label className="font-display text-xs tracking-wider">{t('calendar.children')}</Label>
                     <Input type="number" value={form.children} onChange={e => update('children', e.target.value)} min="0" />
                   </div>
                 </div>
