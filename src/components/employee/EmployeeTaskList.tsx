@@ -294,12 +294,12 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
             </div>
           )}
 
-          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Task title"
+          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder={t('tasks.taskTitle')}
             className="bg-secondary border-border text-foreground font-body text-sm" />
-          <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (optional)"
+          <Input value={description} onChange={e => setDescription(e.target.value)} placeholder={t('tasks.descriptionOptional')}
             className="bg-secondary border-border text-foreground font-body text-sm" />
           <div>
-            <label className="font-body text-xs text-muted-foreground">Due date & time</label>
+            <label className="font-body text-xs text-muted-foreground">{t('tasks.dueDateAndTime')}</label>
             <Input type="datetime-local" value={dueDate} onChange={e => setDueDate(e.target.value)}
               className="bg-secondary border-border text-foreground font-body text-sm" />
           </div>
