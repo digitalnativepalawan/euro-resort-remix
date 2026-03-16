@@ -704,7 +704,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
                     <span className={`font-body text-sm ${method === 'Cash' ? 'text-gold font-semibold' : 'text-foreground'}`}>{method}</span>
                     <span className="font-body text-xs text-muted-foreground">({data.count})</span>
                   </div>
-                  <span className={`font-display text-sm tabular-nums ${method === 'Cash' ? 'text-gold' : 'text-foreground'}`}>₱{data.total.toLocaleString()}</span>
+                  <span className={`font-display text-sm tabular-nums ${method === 'Cash' ? 'text-gold' : 'text-foreground'}`}>{formatPrice(data.total)}</span>
                 </div>
               ))}
             </div>
