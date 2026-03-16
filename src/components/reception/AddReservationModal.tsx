@@ -30,6 +30,7 @@ interface AddReservationModalProps {
 const PLATFORMS = ['Direct', 'Airbnb', 'Booking.com', 'Agoda', 'Walk-in', 'Maintenance'];
 
 const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBooking }: AddReservationModalProps) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const isEdit = !!editBooking;
   const [saving, setSaving] = useState(false);
