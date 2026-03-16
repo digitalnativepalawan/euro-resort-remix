@@ -618,6 +618,7 @@ const BillOutPanel = ({
 /** Daily cash reconciliation summary */
 const DailySummary = ({ completed }: { completed: any[] }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const summary = useMemo(() => {
     const methods: Record<string, { count: number; total: number }> = {};
     let totalRevenue = 0;
