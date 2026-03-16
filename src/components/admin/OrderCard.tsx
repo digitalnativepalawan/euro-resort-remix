@@ -155,7 +155,7 @@ const OrderCard = ({ order, onAdvance, resortProfile, onAddItems, onViewTab, onD
         {items.map((item: any, idx: number) => (
           <div key={idx} className="flex justify-between font-body text-sm">
             <span className="text-foreground">{item.qty}× {item.name}</span>
-            <span className="text-cream-dim">₱{(item.price * item.qty).toFixed(0)}</span>
+            <span className="text-cream-dim">{formatPrice(item.price * item.qty)}</span>
           </div>
         ))}
       </div>
