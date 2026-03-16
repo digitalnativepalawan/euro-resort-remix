@@ -135,7 +135,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
           <Textarea
             value={text}
             onChange={e => setText(e.target.value)}
-            placeholder="Add a comment..."
+            placeholder={t('tasks.addComment')}
             className="bg-secondary border-border text-foreground font-body text-sm min-h-[50px]"
             rows={2}
           />
