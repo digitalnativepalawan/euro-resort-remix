@@ -197,7 +197,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
       const result = await checkStock(cart.items.map(i => ({ name: i.name, quantity: i.quantity })));
       if (!result.canFulfill) {
         setStockWarning(result.shortages);
-        toast.error('Some items are out of stock');
+        toast.error(t('cart.someItemsOutOfStock'));
         return;
       }
     }
