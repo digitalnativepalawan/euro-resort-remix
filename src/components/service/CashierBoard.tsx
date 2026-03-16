@@ -566,7 +566,7 @@ const BillOutPanel = ({
           )}
           <div className="flex justify-between font-display text-2xl text-gold pt-2">
             <span>{t('common.total')}</span>
-            <span className="tabular-nums">₱{total.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(total)}</span>
           </div>
         </div>
 
