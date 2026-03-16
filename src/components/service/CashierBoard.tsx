@@ -420,6 +420,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
   onAction?: (orderId: string, action: string) => Promise<void>;
 }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const items = (order.items as any[]) || [];
   const elapsed = formatDistanceToNow(new Date(order.created_at), { addSuffix: false });
   const foodItems = items.filter((i: any) => { const d = i.department || 'kitchen'; return d === 'kitchen' || d === 'both'; });
