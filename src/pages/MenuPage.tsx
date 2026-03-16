@@ -293,7 +293,7 @@ const MenuPage = () => {
                 </span>
               </div>
               <span className="font-display text-sm tracking-wider">
-                ₱{cart.total().toLocaleString()}
+                {formatPrice(cart.total())}
               </span>
             </button>
           )}
