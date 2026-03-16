@@ -498,7 +498,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     {vatRate > 0 && (
                       <div className="flex justify-between font-body text-sm">
                         <span className="text-cream-dim">{billingConfig?.tax_name || 'VAT'} ({vatRate}%)</span>
-                        <span className="text-foreground">₱{vatAmount.toLocaleString()}</span>
+                        <span className="text-foreground">{formatPrice(vatAmount)}</span>
                       </div>
                     )}
                     <Separator className="my-2" />
