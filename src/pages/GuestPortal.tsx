@@ -1306,7 +1306,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-body text-xs text-foreground font-medium">Total</span>
-                    <span className="font-body text-xs text-amber-400 font-medium">₱{orderTotal.toLocaleString()}</span>
+                    <span className="font-body text-xs text-amber-400 font-medium">{formatPrice(orderTotal)}</span>
                   </div>
                 </div>
                 {o.status === 'Served' && (
