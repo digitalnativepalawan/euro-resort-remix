@@ -436,7 +436,6 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
               <DrawerTitle className="font-display text-lg text-foreground tracking-wider">
                 {t('cart.yourOrder')}
               </DrawerTitle>
-              </DrawerTitle>
               {selectedOrderType && selectedLocation && (
                 <div className="flex justify-center gap-2 mt-1">
                   <span className="font-body text-xs bg-secondary px-2 py-0.5 rounded text-cream-dim">
