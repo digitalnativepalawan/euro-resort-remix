@@ -688,7 +688,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
               </div>
               <Badge className="bg-gold/20 text-gold border-gold/30 font-body text-xs">{cashEntry.count} {t('common.orders')}</Badge>
             </div>
-            <p className="font-display text-2xl text-gold tabular-nums">₱{cashEntry.total.toLocaleString()}</p>
+            <p className="font-display text-2xl text-gold tabular-nums">{formatPrice(cashEntry.total)}</p>
             <p className="font-body text-[11px] text-muted-foreground">{t('cashier.amountToReconcile')}</p>
           </div>
         )}
