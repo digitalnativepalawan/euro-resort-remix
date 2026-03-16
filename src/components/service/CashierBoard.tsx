@@ -211,7 +211,7 @@ const CashierBoard = () => {
 
     await supabase.from('orders').update(updateData).eq('id', orderId);
     qc.invalidateQueries({ queryKey: ['cashier-orders'] });
-    toast.success('Order updated');
+    toast.success(t('kitchen.orderUpdated'));
   };
 
   // Receipt view
