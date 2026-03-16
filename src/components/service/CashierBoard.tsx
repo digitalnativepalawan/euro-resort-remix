@@ -165,7 +165,7 @@ const CashierBoard = () => {
       setSelectedBooking(null);
 
       qc.invalidateQueries({ queryKey: ['cashier-orders'] });
-      toast.success('Payment confirmed');
+      toast.success(t('cashier.paymentConfirmed'));
     } finally {
       setBusy(false);
     }
