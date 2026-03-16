@@ -27,7 +27,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-base tracking-wider">Task Details</DialogTitle>
+          <DialogTitle className="font-display text-base tracking-wider">{t('tasks.taskDetails')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div>
