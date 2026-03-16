@@ -231,7 +231,7 @@ const MenuPage = () => {
             )}
 
             {filteredItems.length === 0 ? (
-              <p className="font-body text-sm text-cream-dim text-center py-12">No items found</p>
+              <p className="font-body text-sm text-cream-dim text-center py-12">{t('menu.noItemsFound')}</p>
             ) : (
               <div className="flex flex-col gap-1">
                 {filteredItems.map((item, idx) => {
