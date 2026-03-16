@@ -318,7 +318,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               <p className="font-body text-xs text-foreground/70 mt-0.5">{order.guest_name}</p>
             )}
             <p className="font-body text-xs text-cream-dim mt-0.5">
-              Ordered {formatDistanceToNow(new Date(order.created_at), { addSuffix: true })}
+              {t('kitchen.ordered', { time: formatDistanceToNow(new Date(order.created_at), { addSuffix: true }) })}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
