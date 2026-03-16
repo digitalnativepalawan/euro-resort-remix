@@ -185,8 +185,8 @@ const GuestPortal = () => {
               />
               <GuestTile
                 icon={<MessageSquare className="w-6 h-6" />}
-                label="Request Service"
-                subtitle="Housekeeping, towels, or anything you need"
+                label={t('guest.requestService')}
+                subtitle={t('guest.requestServiceSub')}
                 onClick={() => setView('request')}
               />
               <GuestTile
