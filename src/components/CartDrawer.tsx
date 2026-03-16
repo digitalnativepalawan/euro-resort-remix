@@ -513,7 +513,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     <div className="mt-4 pt-3 border-t border-border">
                       <div className="bg-gold/10 border border-gold/20 rounded-lg p-3 text-center">
                         <p className="font-display text-xs tracking-wider text-gold mb-1">Room {guestSession.room_name}</p>
-                        <p className="font-body text-xs text-cream-dim">All charges will be added to your room bill</p>
+                        <p className="font-body text-xs text-cream-dim">{t('cart.chargedToYourRoom')}</p>
                       </div>
                     </div>
                   )}
