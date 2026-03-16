@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ type Schedule = {
 };
 
 const EmployeeScheduleView = ({ employeeId }: { employeeId: string }) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 0 }));
   const weekDates = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
@@ -53,7 +55,6 @@ const EmployeeScheduleView = ({ employeeId }: { employeeId: string }) => {
 
   return (
     <div className="space-y-4">
-      {/* Week nav */}
       <div className="flex items-center justify-between gap-2">
         <Button size="sm" variant="outline" className="h-10 w-10 p-0" onClick={() => setWeekStart(addDays(weekStart, -7))}>
           <span className="text-lg">‹</span>
@@ -68,10 +69,9 @@ const EmployeeScheduleView = ({ employeeId }: { employeeId: string }) => {
         </Button>
       </div>
       <Button size="sm" variant="outline" className="w-full font-display text-xs h-10" onClick={goCurrentWeek}>
-        Current Week
+        {t('common.currentWeek')}
       </Button>
 
-      {/* 7 stacked day cards */}
       {weekDates.map(d => {
         const dateStr = format(d, 'yyyy-MM-dd');
         const dayShifts = schedulesByDate(dateStr);
@@ -81,10 +81,10 @@ const EmployeeScheduleView = ({ employeeId }: { employeeId: string }) => {
             <CardContent className="p-3 space-y-2">
               <div className={`font-display text-sm tracking-wider ${today ? 'text-accent' : 'text-foreground'}`}>
                 {format(d, 'EEE, MMM d')}
-                {today && <span className="ml-2 font-body text-[10px] text-accent">(Today)</span>}
+                {today && <span className="ml-2 font-body text-[10px] text-accent">({t('common.today')})</span>}
               </div>
               {dayShifts.length === 0 && (
-                <p className="font-body text-xs text-muted-foreground py-1">Off</p>
+                <p className="font-body text-xs text-muted-foreground py-1">{t('schedule.off')}</p>
               )}
               {dayShifts.map(s => (
                 <div key={s.id} className="flex items-center gap-2 bg-secondary rounded-md p-2">
