@@ -46,6 +46,7 @@ const MenuPage = () => {
     }
   }, [isGuestOrder, guestSession, navigate]);
 
+  const { formatPrice } = useCurrency();
   const { data: profile } = useResortProfile();
   const brandName = profile?.resort_name || 'Menu';
 
