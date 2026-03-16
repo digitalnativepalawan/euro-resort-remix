@@ -157,7 +157,7 @@ const MenuPage = () => {
                   className="flex items-center gap-1 text-cream-dim hover:text-foreground text-xs font-body transition-colors"
                 >
                   <LogOut className="w-3 h-3" />
-                  Exit
+                  {t('common.exit')}
                 </button>
               </div>
             )}

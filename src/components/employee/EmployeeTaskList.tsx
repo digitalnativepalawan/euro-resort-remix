@@ -249,12 +249,12 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
           {!employeeId && activeEmployees.length > 0 && (
             <div className="space-y-1.5">
               <label className="font-body text-xs text-muted-foreground flex items-center gap-1">
-                <Users className="w-3 h-3" /> Assign to
+                <Users className="w-3 h-3" /> {t('tasks.assignTo')}
               </label>
               {assignees.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {selectAll ? (
-                    <Badge variant="default" className="font-body text-xs">All Staff ({activeEmployees.length})</Badge>
+                    <Badge variant="default" className="font-body text-xs">{t('tasks.allStaff')} ({activeEmployees.length})</Badge>
                   ) : (
                     assignees.map(id => (
                       <Badge key={id} variant="secondary" className="font-body text-xs gap-1">
@@ -268,7 +268,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
               <div className="border border-border rounded-md p-2 max-h-36 overflow-y-auto space-y-1.5 bg-secondary">
                 <label className="flex items-center gap-2 cursor-pointer font-body text-sm font-semibold text-foreground">
                   <Checkbox checked={selectAll} onCheckedChange={(c) => handleSelectAll(!!c)} />
-                  All Staff
+                  {t('tasks.allStaff')}
                 </label>
                 <div className="border-t border-border my-1" />
                 {activeEmployees.map(emp => (
@@ -294,24 +294,24 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
             </div>
           )}
 
-          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Task title"
+          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder={t('tasks.taskTitle')}
             className="bg-secondary border-border text-foreground font-body text-sm" />
-          <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="Description (optional)"
+          <Input value={description} onChange={e => setDescription(e.target.value)} placeholder={t('tasks.descriptionOptional')}
             className="bg-secondary border-border text-foreground font-body text-sm" />
           <div>
-            <label className="font-body text-xs text-muted-foreground">Due date & time</label>
+            <label className="font-body text-xs text-muted-foreground">{t('tasks.dueDateAndTime')}</label>
             <Input type="datetime-local" value={dueDate} onChange={e => setDueDate(e.target.value)}
               className="bg-secondary border-border text-foreground font-body text-sm" />
           </div>
           <div className="space-y-1">
-            <label className="font-body text-xs text-muted-foreground">Send via</label>
+            <label className="font-body text-xs text-muted-foreground">{t('tasks.sendVia')}</label>
             <div className="flex gap-1">
               {(['whatsapp', 'messenger', 'none'] as const).map(m => (
                 <Button key={m} size="sm" type="button"
                   variant={sendVia === m ? 'default' : 'outline'}
                   onClick={() => setSendVia(m)}
                   className="font-body text-xs flex-1 capitalize">
-                  {m === 'none' ? 'Don\'t send' : m === 'whatsapp' ? '📱 WhatsApp' : '💬 Messenger'}
+                  {m === 'none' ? t('tasks.dontSend') : m === 'whatsapp' ? '📱 WhatsApp' : '💬 Messenger'}
                 </Button>
               ))}
             </div>
@@ -319,9 +319,9 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
           <div className="flex gap-2">
             <Button size="sm" onClick={addTask} className="font-display text-xs tracking-wider flex-1"
               disabled={!title.trim() || (!employeeId && assignees.length === 0)}>
-              {assignees.length > 1 || selectAll ? `Send to ${selectAll ? activeEmployees.length : assignees.length} staff` : 'Save'}
+              {assignees.length > 1 || selectAll ? t('tasks.sendToStaff', { count: selectAll ? activeEmployees.length : assignees.length }) : t('common.save')}
             </Button>
-            <Button size="sm" variant="outline" onClick={() => setShowForm(false)} className="font-display text-xs tracking-wider flex-1">Cancel</Button>
+            <Button size="sm" variant="outline" onClick={() => setShowForm(false)} className="font-display text-xs tracking-wider flex-1">{t('common.cancel')}</Button>
           </div>
         </div>
       )}
@@ -338,11 +338,11 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
             {editId === task.id ? (
               <div className="space-y-2">
                 <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="bg-secondary border-border text-foreground font-body text-sm" />
-                <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Description" className="bg-secondary border-border text-foreground font-body text-sm" />
+                <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder={t('tasks.descriptionOptional')} className="bg-secondary border-border text-foreground font-body text-sm" />
                 <Input type="datetime-local" value={editDue} onChange={e => setEditDue(e.target.value)} className="bg-secondary border-border text-foreground font-body text-sm" />
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={saveEdit} className="font-display text-xs tracking-wider flex-1">Save</Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditId(null)} className="font-display text-xs tracking-wider flex-1">Cancel</Button>
+                  <Button size="sm" onClick={saveEdit} className="font-display text-xs tracking-wider flex-1">{t('common.save')}</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditId(null)} className="font-display text-xs tracking-wider flex-1">{t('common.cancel')}</Button>
                 </div>
               </div>
             ) : isCompleting ? (
@@ -360,7 +360,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
                     {isCompleted && (
                       <div className="flex items-center gap-1.5 mb-1">
                         <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="font-display text-xs tracking-wider text-green-600">Completed</span>
+                        <span className="font-display text-xs tracking-wider text-green-600">{t('common.completed')}</span>
                       </div>
                     )}
 

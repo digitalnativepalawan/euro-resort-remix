@@ -226,12 +226,12 @@ const GuestPortal = () => {
         {/* Experiences hub — combines tours, transport, rentals */}
         {view === 'experiences' && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg text-foreground">Book an Experience</h2>
-            <p className="font-body text-xs text-muted-foreground">Choose from tours, transport, or equipment rental below.</p>
+            <h2 className="font-display text-lg text-foreground">{t('guest.bookAnExperience')}</h2>
+            <p className="font-body text-xs text-muted-foreground">{t('guest.chooseFromOptions')}</p>
             <div className="flex flex-col gap-3">
-              <GuestTile icon={<MapPin className="w-5 h-5" />} label="Island Tours" subtitle="Explore the best of Palawan" onClick={() => setView('tours')} />
-              <GuestTile icon={<Car className="w-5 h-5" />} label="Transport" subtitle="Airport transfers & van hire" onClick={() => setView('transport')} />
-              <GuestTile icon={<Bike className="w-5 h-5" />} label="Rent Equipment" subtitle="Scooters, bikes, kayaks & more" onClick={() => setView('rentals')} />
+              <GuestTile icon={<MapPin className="w-5 h-5" />} label={t('guest.islandTours')} subtitle={t('guest.islandToursSub')} onClick={() => setView('tours')} />
+              <GuestTile icon={<Car className="w-5 h-5" />} label={t('guest.transport')} subtitle={t('guest.transportSub')} onClick={() => setView('transport')} />
+              <GuestTile icon={<Bike className="w-5 h-5" />} label={t('guest.rentEquipment')} subtitle={t('guest.rentEquipmentSub')} onClick={() => setView('rentals')} />
             </div>
           </div>
         )}
@@ -267,6 +267,7 @@ const GuestTile = ({ icon, label, subtitle, onClick }: { icon: React.ReactNode; 
 
 /** Simple message-to-reception flow */
 const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: any; onDone: () => void }) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -293,25 +294,25 @@ const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSes
         <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
           <CheckCircle2 className="w-8 h-8 text-emerald-400" />
         </div>
-        <p className="font-display text-lg text-foreground">Message Sent!</p>
-        <p className="font-body text-sm text-muted-foreground text-center">Our team will get back to you shortly.</p>
-        <Button onClick={onDone} variant="outline" className="font-display tracking-wider mt-4">Done</Button>
+        <p className="font-display text-lg text-foreground">{t('guest.messageSent')}</p>
+        <p className="font-body text-sm text-muted-foreground text-center">{t('guest.teamWillGetBack')}</p>
+        <Button onClick={onDone} variant="outline" className="font-display tracking-wider mt-4">{t('common.done')}</Button>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-lg text-foreground">Message Reception</h2>
-      <p className="font-body text-sm text-muted-foreground">Send a message directly to our front desk team.</p>
+      <h2 className="font-display text-lg text-foreground">{t('guest.messageReceptionTitle')}</h2>
+      <p className="font-body text-sm text-muted-foreground">{t('guest.sendMessageToFrontDesk')}</p>
       <Textarea
         value={message}
         onChange={e => setMessage(e.target.value)}
-        placeholder="How can we help you today?"
+        placeholder={t('guest.howCanWeHelp')}
         className="bg-secondary border-border text-foreground min-h-[150px] text-base"
       />
       <Button onClick={send} disabled={submitting || !message.trim()} className="w-full font-display tracking-wider h-12">
-        {submitting ? 'Sending...' : 'Send Message'}
+        {submitting ? t('common.sending') : t('guest.sendMessage')}
       </Button>
     </div>
   );
@@ -319,6 +320,7 @@ const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSes
 
 // --- Tours (Enhanced: pickup time, notes, pending status) ---
 const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: tours = [] } = useQuery({
     queryKey: ['tours-guest'],
     queryFn: async () => {
@@ -337,7 +339,6 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
     if (!selectedTour) return;
     setSubmitting(true);
     const totalPrice = selectedTour.price * (parseInt(pax) || 1);
-    // Create pending booking — NO room charge yet
     await (supabase.from('tour_bookings') as any).insert({
       booking_id: session.booking_id,
       guest_name: session.guest_name,
@@ -351,7 +352,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
       notes: notes.trim(),
     });
     qc.invalidateQueries({ queryKey: ['tour-bookings-admin'] });
-    toast.success('Tour request submitted! Staff will confirm shortly.');
+    toast.success(t('guest.tourRequest'));
     setSelectedTour(null);
     setNotes('');
     setPickupTime('07:00');
@@ -360,17 +361,17 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Book a Tour</h2>
-      <p className="font-body text-xs text-muted-foreground">Select a tour below. Staff will confirm your booking.</p>
-      {tours.map((t: any) => (
-        <div key={t.id} onClick={() => setSelectedTour(t)} className={`bg-card border rounded-lg p-4 cursor-pointer transition-colors ${selectedTour?.id === t.id ? 'border-accent' : 'border-border hover:border-muted-foreground'}`}>
+      <h2 className="font-display text-lg text-foreground">{t('guest.bookATour')}</h2>
+      <p className="font-body text-xs text-muted-foreground">{t('guest.selectATour')}</p>
+      {tours.map((tour: any) => (
+        <div key={tour.id} onClick={() => setSelectedTour(tour)} className={`bg-card border rounded-lg p-4 cursor-pointer transition-colors ${selectedTour?.id === tour.id ? 'border-accent' : 'border-border hover:border-muted-foreground'}`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-body text-sm text-foreground font-medium">{t.name}</p>
-              <p className="font-body text-xs text-muted-foreground">{t.description}</p>
-              <p className="font-body text-xs text-muted-foreground">{t.duration} · {t.schedule} · Max {t.max_pax} pax</p>
+              <p className="font-body text-sm text-foreground font-medium">{tour.name}</p>
+              <p className="font-body text-xs text-muted-foreground">{tour.description}</p>
+              <p className="font-body text-xs text-muted-foreground">{tour.duration} · {tour.schedule} · Max {tour.max_pax} pax</p>
             </div>
-            <span className="font-body text-sm text-accent font-medium">₱{t.price}/pax</span>
+            <span className="font-body text-sm text-accent font-medium">₱{tour.price}/pax</span>
           </div>
         </div>
       ))}
@@ -379,34 +380,35 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
           <p className="font-body text-sm text-foreground font-medium">{selectedTour.name}</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Date</Label>
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {t('common.date')}</Label>
               <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
             <div className="space-y-1">
-              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" /> Pax</Label>
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" /> {t('guest.pax')}</Label>
               <Input type="number" value={pax} onChange={e => setPax(e.target.value)} min="1" max={selectedTour.max_pax} className="bg-card text-foreground h-10" />
             </div>
           </div>
           <div className="space-y-1">
-            <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Pickup Time</Label>
+            <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> {t('guest.pickupTime')}</Label>
             <Input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} className="bg-card text-foreground h-10" />
           </div>
           <div className="space-y-1">
-            <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> Special Requests</Label>
+            <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> {t('guest.specialRequests')}</Label>
             <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Vegetarian lunch, need snorkel gear..." className="bg-card text-foreground min-h-[60px]" />
           </div>
-          <p className="font-body text-sm text-foreground text-right">Total: ₱{selectedTour.price * (parseInt(pax) || 1)}</p>
-          <Button onClick={book} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Request Tour Booking'}</Button>
-          <p className="font-body text-xs text-muted-foreground text-center">Staff will confirm and charge to your room</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedTour.price * (parseInt(pax) || 1)}</p>
+          <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTourBooking')}</Button>
+          <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
       )}
-      {tours.length === 0 && <p className="font-body text-sm text-muted-foreground">No tours available at the moment.</p>}
+      {tours.length === 0 && <p className="font-body text-sm text-muted-foreground">{t('guest.noToursAvailable')}</p>}
     </div>
   );
 };
 
 // --- Transport (Now pending, no auto-charge) ---
 const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: rates = [] } = useQuery({
     queryKey: ['transport-guest'],
     queryFn: async () => {
@@ -423,7 +425,6 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
     if (!selectedRate) return;
     setSubmitting(true);
     const label = `${selectedRate.origin} → ${selectedRate.destination}`;
-    // Create pending request — NO room charge yet
     await supabase.from('guest_requests').insert({
       booking_id: session.booking_id,
       room_id: session.room_id,
@@ -433,15 +434,15 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
-    toast.success('Transport request submitted! Staff will confirm shortly.');
+    toast.success(t('guest.transportRequest'));
     setSelectedRate(null);
     setSubmitting(false);
   };
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Request Transport</h2>
-      <p className="font-body text-xs text-muted-foreground">Select a route. Staff will confirm and charge to your room.</p>
+      <h2 className="font-display text-lg text-foreground">{t('guest.requestTransport')}</h2>
+      <p className="font-body text-xs text-muted-foreground">{t('guest.selectARoute')}</p>
       {rates.map((r: any) => (
         <div key={r.id} onClick={() => setSelectedRate(r)} className={`bg-card border rounded-lg p-4 cursor-pointer transition-colors ${selectedRate?.id === r.id ? 'border-accent' : 'border-border hover:border-muted-foreground'}`}>
           <div className="flex justify-between items-center">
@@ -458,26 +459,27 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
           <p className="font-body text-sm text-foreground">{selectedRate.origin} → {selectedRate.destination}</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Date</Label>
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {t('common.date')}</Label>
               <Input type="date" value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
             <div className="space-y-1">
-              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Time</Label>
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> {t('guest.pickupTime')}</Label>
               <Input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
           </div>
-          <p className="font-body text-sm text-foreground text-right">Total: ₱{selectedRate.price}</p>
-          <Button onClick={book} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Request Transport'}</Button>
-          <p className="font-body text-xs text-muted-foreground text-center">Staff will confirm and charge to your room</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedRate.price}</p>
+          <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTransport')}</Button>
+          <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
       )}
-      {rates.length === 0 && <p className="font-body text-sm text-muted-foreground">No transport options available.</p>}
+      {rates.length === 0 && <p className="font-body text-sm text-muted-foreground">{t('guest.noTransportAvailable')}</p>}
     </div>
   );
 };
 
 // --- Rentals (Enhanced: duration selection, date, qty, notes, pending) ---
 const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: rates = [] } = useQuery({
     queryKey: ['rentals-guest'],
     queryFn: async () => {
@@ -486,7 +488,6 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
     },
   });
 
-  // Group rates by item_type
   const itemTypes = [...new Set(rates.map((r: any) => r.item_type))];
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedRate, setSelectedRate] = useState<any>(null);
@@ -498,19 +499,12 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
   const typeRates = rates.filter((r: any) => r.item_type === selectedType);
   const totalPrice = selectedRate ? selectedRate.price * (parseInt(qty) || 1) : 0;
 
-  const ITEM_ICONS: Record<string, string> = {
-    'Scooter': '🛵',
-    'Bicycle': '🚲',
-    'Kayak': '🛶',
-    'Surfboard': '🏄',
-    'Snorkel': '🤿',
-  };
+  const ITEM_ICONS: Record<string, string> = { 'Scooter': '🛵', 'Bicycle': '🚲', 'Kayak': '🛶', 'Surfboard': '🏄', 'Snorkel': '🤿' };
 
   const book = async () => {
     if (!selectedRate) return;
     setSubmitting(true);
     const detail = `${selectedType} — ${selectedRate.rate_name} × ${qty} — ₱${totalPrice} — Start: ${startDate}${notes.trim() ? ` — Notes: ${notes.trim()}` : ''}`;
-    // Create pending request — NO room charge yet
     await supabase.from('guest_requests').insert({
       booking_id: session.booking_id,
       room_id: session.room_id,
@@ -520,7 +514,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
-    toast.success('Rental request submitted! Staff will confirm shortly.');
+    toast.success(t('guest.rentalRequest'));
     setSelectedType(null);
     setSelectedRate(null);
     setNotes('');
@@ -530,8 +524,8 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Rent Equipment</h2>
-      <p className="font-body text-xs text-muted-foreground">Choose what you'd like to rent. Staff will confirm availability.</p>
+      <h2 className="font-display text-lg text-foreground">{t('guest.rentEquipmentTitle')}</h2>
+      <p className="font-body text-xs text-muted-foreground">{t('guest.chooseWhatToRent')}</p>
 
       {!selectedType ? (
         <div className="grid grid-cols-2 gap-3">
@@ -539,18 +533,18 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
             <button key={type} onClick={() => setSelectedType(type)} className="bg-card border border-border rounded-lg p-5 flex flex-col items-center gap-2 hover:border-accent transition-colors">
               <span className="text-3xl">{ITEM_ICONS[type] || '🏷️'}</span>
               <span className="font-body text-sm text-foreground font-medium">{type}</span>
-              <span className="font-body text-xs text-muted-foreground">{rates.filter((r: any) => r.item_type === type).length} options</span>
+              <span className="font-body text-xs text-muted-foreground">{rates.filter((r: any) => r.item_type === type).length} {t('guest.options')}</span>
             </button>
           ))}
-          {itemTypes.length === 0 && <p className="font-body text-sm text-muted-foreground col-span-2">No rentals available.</p>}
+          {itemTypes.length === 0 && <p className="font-body text-sm text-muted-foreground col-span-2">{t('guest.noRentalsAvailable')}</p>}
         </div>
       ) : (
         <div className="space-y-3">
           <button onClick={() => { setSelectedType(null); setSelectedRate(null); }} className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-body text-xs">
-            <ArrowLeft className="w-3 h-3" /> All equipment
+            <ArrowLeft className="w-3 h-3" /> {t('guest.allEquipment')}
           </button>
 
-          <h3 className="font-body text-sm text-foreground font-medium">{ITEM_ICONS[selectedType] || '🏷️'} {selectedType} — Choose Duration</h3>
+          <h3 className="font-body text-sm text-foreground font-medium">{ITEM_ICONS[selectedType] || '🏷️'} {selectedType} — {t('guest.chooseDuration')}</h3>
 
           <RadioGroup value={selectedRate?.id || ''} onValueChange={id => setSelectedRate(typeRates.find((r: any) => r.id === id))}>
             {typeRates.map((r: any) => (
@@ -575,24 +569,24 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
             <div className="bg-secondary p-4 rounded-lg space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Start Date</Label>
+                  <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {t('guest.startDate')}</Label>
                   <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="bg-card text-foreground h-10" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="font-body text-xs text-muted-foreground">Quantity</Label>
+                  <Label className="font-body text-xs text-muted-foreground">{t('guest.quantity')}</Label>
                   <Input type="number" value={qty} onChange={e => setQty(e.target.value)} min="1" max="5" className="bg-card text-foreground h-10" />
                 </div>
               </div>
               <div className="space-y-1">
-                <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> Preferences</Label>
+                <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> {t('guest.preferences')}</Label>
                 <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Automatic scooter preferred, need helmet..." className="bg-card text-foreground min-h-[60px]" />
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-body text-xs text-muted-foreground">{selectedRate.rate_name} × {qty}</span>
-                <span className="font-body text-sm text-foreground font-medium">Total: ₱{totalPrice}</span>
+                <span className="font-body text-sm text-foreground font-medium">{t('common.total')}: ₱{totalPrice}</span>
               </div>
-              <Button onClick={book} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Request Rental'}</Button>
-              <p className="font-body text-xs text-muted-foreground text-center">Staff will confirm availability and charge to your room</p>
+              <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestRental')}</Button>
+              <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirmAvailability')}</p>
             </div>
           )}
         </div>
@@ -603,6 +597,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
 // --- Request/Note ---
 const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: categories = [] } = useQuery({
     queryKey: ['request-cats-guest'],
     queryFn: async () => {
@@ -626,7 +621,7 @@ const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
-    toast.success('Request submitted!');
+    toast.success(t('guest.requestSubmitted'));
     setDetails('');
     setType('');
     setSubmitting(false);
@@ -634,23 +629,24 @@ const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Leave a Note / Request</h2>
+      <h2 className="font-display text-lg text-foreground">{t('guest.leaveANote')}</h2>
       <Select onValueChange={setType} value={type}>
         <SelectTrigger className="bg-secondary border-border text-foreground h-12">
-          <SelectValue placeholder="Select category" />
+          <SelectValue placeholder={t('guest.selectCategory')} />
         </SelectTrigger>
         <SelectContent className="bg-card border-border">
           {categories.map((c: any) => <SelectItem key={c.id} value={c.name} className="text-foreground">{c.icon} {c.name}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Textarea value={details} onChange={e => setDetails(e.target.value)} placeholder="Describe your request..." className="bg-secondary border-border text-foreground min-h-[120px]" />
-      <Button onClick={submit} disabled={submitting || !type || !details.trim()} className="w-full">{submitting ? 'Submitting...' : 'Submit Request'}</Button>
+      <Textarea value={details} onChange={e => setDetails(e.target.value)} placeholder={t('guest.describeRequest')} className="bg-secondary border-border text-foreground min-h-[120px]" />
+      <Button onClick={submit} disabled={submitting || !type || !details.trim()} className="w-full">{submitting ? t('common.submitting') : t('guest.submitRequest')}</Button>
     </div>
   );
 };
 
 // --- Review ---
 const ReviewView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: any; onDone: () => void }) => {
+  const { t } = useTranslation();
   const { data: categories = [] } = useQuery({
     queryKey: ['review-cats-guest'],
     queryFn: async () => {
@@ -672,14 +668,14 @@ const ReviewView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: 
       comments: comments.trim(),
     });
     qc.invalidateQueries({ queryKey: ['guest-reviews-admin'] });
-    toast.success('Thank you for your review!');
+    toast.success(t('guest.thankYouReview'));
     setSubmitting(false);
     onDone();
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-lg text-foreground">Write a Review</h2>
+      <h2 className="font-display text-lg text-foreground">{t('guest.writeAReview')}</h2>
       {categories.map((c: any) => {
         const selected = ratings[c.category_name] || 0;
         return (
@@ -711,7 +707,7 @@ const ReviewView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: 
         );
       })}
       <Textarea value={comments} onChange={e => setComments(e.target.value)} placeholder="Any additional comments..." className="bg-secondary border-border text-foreground min-h-[100px]" />
-      <Button onClick={submit} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Submit Review'}</Button>
+      <Button onClick={submit} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.submitReview')}</Button>
     </div>
   );
 };

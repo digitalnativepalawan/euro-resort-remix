@@ -25,10 +25,10 @@ const DEPT_LABEL_KEYS: Record<string, string> = {
   reception: 'reception.label',
   kitchen: 'kitchen.label',
   bar: 'bar.label',
-  housekeeping: 'Housekeeping',
-  maintenance: 'Maintenance',
-  experiences: 'Experiences',
-  orders: 'Orders',
+  housekeeping: 'staff.housekeeping',
+  maintenance: 'staff.maintenance',
+  experiences: 'staff.experiences',
+  orders: 'staff.orders',
 };
 
 interface StaffNavBarProps {
@@ -59,7 +59,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
   }
 
   const deptLabelKey = DEPT_LABEL_KEYS[currentDept] || '';
-  const deptLabel = deptLabelKey ? (deptLabelKey.includes('.') ? t(deptLabelKey) : deptLabelKey) : '';
+  const deptLabel = deptLabelKey ? t(deptLabelKey) : '';
   const deptColor = DEPT_COLORS[currentDept] || '';
 
   const handleLogout = () => {

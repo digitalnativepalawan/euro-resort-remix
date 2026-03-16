@@ -38,14 +38,14 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
 
   // Build activity timeline
   const activities: { label: string; time: string }[] = [
-    { label: 'Task created', time: format(new Date(task.created_at), 'MMM d, h:mm a') },
+    { label: t('tasks.taskCreated'), time: format(new Date(task.created_at), 'MMM d, h:mm a') },
   ];
   if (task.due_date) {
-    activities.push({ label: `Due date set: ${format(new Date(task.due_date), 'MMM d, h:mm a')}`, time: '' });
+    activities.push({ label: t('tasks.dueDateSet', { date: format(new Date(task.due_date), 'MMM d, h:mm a') }), time: '' });
   }
   if (isCompleted && task.completed_at) {
     activities.push({
-      label: `Completed by ${meta.completed_by || 'Staff'}`,
+      label: t('tasks.completedByStaff', { name: meta.completed_by || t('common.staff') }),
       time: format(new Date(task.completed_at), 'MMM d, h:mm a'),
     });
   }
@@ -65,7 +65,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
               <div>
                 <p className="font-display text-sm tracking-wider text-green-600">{t('common.completed')}</p>
                 {meta.completed_by && (
-                  <p className="font-body text-xs text-muted-foreground">By {meta.completed_by}</p>
+                  <p className="font-body text-xs text-muted-foreground">{t('common.by', { name: meta.completed_by })}</p>
                 )}
                 {task.completed_at && (
                   <p className="font-body text-xs text-muted-foreground">
@@ -130,7 +130,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
             {commentCount > 0 && (
               <div className="flex items-center gap-2">
                 <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                <span className="font-body text-xs text-foreground">{commentCount} comment{commentCount !== 1 ? 's' : ''}</span>
+                <span className="font-body text-xs text-foreground">{t('tasks.commentCount', { count: commentCount })}</span>
               </div>
             )}
           </div>
