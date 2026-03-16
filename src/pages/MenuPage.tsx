@@ -289,7 +289,7 @@ const MenuPage = () => {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5" />
                 <span className="font-display text-sm tracking-wider">
-                  {cart.count()} item{cart.count() !== 1 ? 's' : ''}
+                  {t('menu.itemCount', { count: cart.count() })}
                 </span>
               </div>
               <span className="font-display text-sm tracking-wider">
