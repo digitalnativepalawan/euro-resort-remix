@@ -548,7 +548,7 @@ const BillOutPanel = ({
           {items.map((item: any, idx: number) => (
             <div key={idx} className="flex justify-between font-body text-sm">
               <span className="text-foreground">{item.qty || item.quantity || 1}× {item.name}</span>
-              <span className="text-muted-foreground tabular-nums">₱{(item.price * (item.qty || item.quantity || 1)).toLocaleString()}</span>
+              <span className="text-muted-foreground tabular-nums">{formatPrice(item.price * (item.qty || item.quantity || 1))}</span>
             </div>
           ))}
         </div>
