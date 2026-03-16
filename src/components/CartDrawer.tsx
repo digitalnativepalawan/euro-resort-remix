@@ -569,7 +569,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     <div className="mt-4 pt-3 border-t border-border">
                       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
                         <Clock className="w-4 h-4 text-amber-400" />
-                        <span className="font-body text-xs text-amber-400">Payment will be set by cashier at settlement</span>
+                        <span className="font-body text-xs text-amber-400">{t('cart.paymentByCashier')}</span>
                       </div>
                     </div>
                   )}
