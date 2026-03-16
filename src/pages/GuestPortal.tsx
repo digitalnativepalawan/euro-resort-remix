@@ -431,7 +431,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
       room_id: session.room_id,
       guest_name: session.guest_name,
       request_type: 'Transport',
-      details: `${label} — ₱${selectedRate.price} — ${pickupDate} ${pickupTime}`,
+      details: `${label} — ${formatPrice(selectedRate.price)} — ${pickupDate} ${pickupTime}`,
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
