@@ -503,7 +503,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     )}
                     <Separator className="my-2" />
                     <div className="flex justify-between font-display text-lg tracking-wider">
-                      <span className="text-foreground">Total</span>
+                      <span className="text-foreground">{t('common.total')}</span>
                       <span className="text-gold">₱{grandTotal.toLocaleString()}</span>
                     </div>
                   </div>
