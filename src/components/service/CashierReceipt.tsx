@@ -99,11 +99,11 @@ h2, h3 { margin: 4px 0; }
   ${order.guest_name ? `<p class="small">${t('common.guest')}: ${order.guest_name}</p>` : ''}
 </div>
 <div class="line"></div>
-${items.map((i: any) => `<div class="row"><span>${i.qty || i.quantity || 1}× ${i.name}</span><span>₱${(i.price * (i.qty || i.quantity || 1)).toLocaleString()}</span></div>`).join('')}
+${items.map((i: any) => `<div class="row"><span>${i.qty || i.quantity || 1}× ${i.name}</span><span>${formatPrice(i.price * (i.qty || i.quantity || 1))}</span></div>`).join('')}
 <div class="line"></div>
-<div class="row"><span>${t('common.subtotal')}</span><span>₱${subtotal.toLocaleString()}</span></div>
-${sc > 0 ? `<div class="row"><span>${t('receipt.serviceCharge')}</span><span>₱${sc.toLocaleString()}</span></div>` : ''}
-<div class="row bold" style="font-size:14px"><span>${t('common.total').toUpperCase()}</span><span>₱${total.toLocaleString()}</span></div>
+<div class="row"><span>${t('common.subtotal')}</span><span>${formatPrice(subtotal)}</span></div>
+${sc > 0 ? `<div class="row"><span>${t('receipt.serviceCharge')}</span><span>${formatPrice(sc)}</span></div>` : ''}
+<div class="row bold" style="font-size:14px"><span>${t('common.total').toUpperCase()}</span><span>${formatPrice(total)}</span></div>
 <div class="line"></div>
 <div class="row"><span>${t('receipt.payment')}</span><span>${order.payment_type || '—'}</span></div>
 <div class="line"></div>
