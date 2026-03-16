@@ -257,7 +257,7 @@ const MenuPage = () => {
                               {item.name}
                             </span>
                             {isSoldOut && (
-                              <Badge variant="destructive" className="text-[10px] py-0 px-1.5">Sold Out</Badge>
+                              <Badge variant="destructive" className="text-[10px] py-0 px-1.5">{t('menu.soldOut')}</Badge>
                             )}
                             {!isSoldOut && isLowStock && (
                               <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-amber-500/50 text-amber-400">Low Stock</Badge>
