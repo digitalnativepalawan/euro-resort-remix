@@ -36,6 +36,7 @@ const ResortProfileForm = () => {
         instagram_url: profile.instagram_url || '', tiktok_url: profile.tiktok_url || '',
         website_url: profile.website_url || '', logo_url: profile.logo_url || '',
         logo_size: profile.logo_size || 128,
+        usd_exchange_rate: String(profile.usd_exchange_rate ?? 1.08),
       });
     }
   }, [profile]);
