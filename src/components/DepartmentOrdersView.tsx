@@ -304,7 +304,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
           <div className="flex items-center gap-2 mb-3 bg-blue-500/20 rounded px-3 py-1.5 border border-blue-400/40">
             <Clock className="w-4 h-4 text-blue-400" />
             <span className="font-display text-sm text-blue-400 tracking-widest font-bold uppercase">
-              Serve at {formatScheduledTime(new Date(order.scheduled_for))}
+              {t('kitchen.serveAt', { time: formatScheduledTime(new Date(order.scheduled_for)) })}
             </span>
           </div>
         )}
