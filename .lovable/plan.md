@@ -1,37 +1,84 @@
 
 
-## Plan: Fix Schedule Delete & Enhance Task/Assignment Scheduling
+# Multi-Currency Support Plan
 
-### Issues Found
+## Overview
+Add EUR/USD currency switching across the entire app. All prices currently use hardcoded `₱` (Philippine Peso). We will create a currency system that allows real-time switching between EUR (default) and USD, with an admin-configurable exchange rate.
 
-1. **Delete button bug**: The trash icon on shift blocks triggers `setDeleteId(s.id)`, but the parent div's `onClick={() => openEdit(s)}` fires simultaneously despite `stopPropagation`. On mobile, the tiny button (3x3 icon) is nearly impossible to tap. The AlertDialog `onOpenChange={() => setDeleteId(null)}` also races with the confirm action.
+## Scope
+**39 files** currently contain `₱` symbols that need updating.
 
-2. **Missing scheduling features**: The schedule only manages time shifts. There's no way to assign tasks like housecleaning, reception duty, or track completion from within the schedule view.
+---
 
-### Changes
+## Architecture
 
-**1. Fix Delete Button** (`WeeklyScheduleManager.tsx`)
-- Make `confirmDelete` capture `deleteId` before the dialog closes by saving it in a ref or local variable
-- Increase touch target size for edit/delete buttons on shift blocks
-- Prevent edit modal from opening when clicking edit/delete icons (the `stopPropagation` exists but the parent click handler on the entire timeline area also fires)
+### 1. Database Migration
+Add two columns to `resort_profile`:
+- `base_currency TEXT DEFAULT 'EUR'`
+- `usd_exchange_rate NUMERIC DEFAULT 1.08`
 
-**2. Add Task/Assignment Creation from Schedule** (`WeeklyScheduleManager.tsx`)
-- Add an "Assign Task" button alongside "Add Shift" 
-- New modal to create a task assignment: select employee, pick type (Housecleaning, Reception, Custom), set date/time, add notes
-- For housecleaning: select a room/unit to clean, auto-creates a `housekeeping_orders` entry assigned to the selected employee
-- For other tasks: creates an `employee_tasks` entry with due date and description
-- Tasks appear as colored pills on the timeline (already partially implemented)
+### 2. Currency Context (`src/contexts/CurrencyContext.tsx`)
+- React context + provider wrapping `<App />`
+- Reads `base_currency` and `usd_exchange_rate` from `resort_profile`
+- Stores selected currency in `localStorage`
+- Exposes:
+  - `currency: 'EUR' | 'USD'`
+  - `setCurrency(c)`
+  - `formatPrice(amountInEur: number): string` — converts and formats with correct symbol (€ / $)
+  - `exchangeRate: number`
 
-**3. Show Completion Info on Task Detail** (`WeeklyScheduleManager.tsx`)
-- In the task detail dialog, show who completed the task and when (`completed_at`)
-- For housekeeping pills, show completion status (`cleaning_completed_at`, `completed_by_name`)
-- Make housekeeping pills clickable to show full details (room, status, who inspected/cleaned)
+### 3. CurrencySwitcher Component (`src/components/CurrencySwitcher.tsx`)
+- Small dropdown (like LanguageSwitcher) showing `€ EUR` / `$ USD`
+- Added to all headers: `ServiceHeader`, `StaffNavBar`, login page, `GuestPortal`, Admin header, `MenuPage`
 
-**4. Enhance Task Detail Dialog** (`WeeklyScheduleManager.tsx`)
-- Add edit capability: change title, description, due date, reassign to different employee
-- Add delete capability for tasks
-- Show completion audit trail
+### 4. Admin Exchange Rate Setting
+- Add EUR/USD rate input field in `ResortProfileForm.tsx` under a "Currency" section
+- Saves to `resort_profile.usd_exchange_rate`
 
-### Files to Edit
-- `src/components/admin/WeeklyScheduleManager.tsx` — all changes in this single file
+### 5. Replace All ₱ Occurrences
+Create a `formatPrice` helper and replace every `₱${value.toLocaleString()}` pattern with `formatPrice(value)` across all 39 files. Key files grouped:
+
+**Guest-facing**: `GuestPortal.tsx`, `MenuPage.tsx`, `CartDrawer.tsx`
+**Cashier/Service**: `CashierBoard.tsx`, `CashierReceipt.tsx`, `ServiceOrderDetail.tsx`, `ServiceOrderCard.tsx`
+**Reception/Rooms**: `ReceptionPage.tsx`, `RoomBillingTab.tsx`, `PrintBill.tsx`, `CheckoutModal.tsx`, `AddPaymentModal.tsx`, `AdjustmentModal.tsx`, `GuestActivityTimeline.tsx`
+**Admin**: `RoomSetup.tsx`, `ReportsDashboard.tsx`, `PayrollDashboard.tsx`, `TimesheetDashboard.tsx`, `InventoryDashboard.tsx`, `RecipeEditor.tsx`, `OrderArchive.tsx`, `ExpenseReportsModal.tsx`, `ExpenseBulkImportModal.tsx`, `AccountingExport.tsx`, `TabInvoice.tsx`
+**Staff**: `StaffOrderHome.tsx`, `StaffOrdersView.tsx`, `EmployeePortal.tsx`, `ExperiencesPage.tsx`, `ManagerPage.tsx`
+**PDF/Print**: `generateInvoicePdf.ts` (already has `formatCurrency` — swap to use context-aware version), `PrintBill.tsx`
+
+### 6. `generateInvoicePdf.ts` Special Handling
+This file generates PDFs outside React context. Pass `currency` and `exchangeRate` as parameters to the function, and update its internal `formatCurrency` helper.
+
+---
+
+## Implementation Order
+
+1. **DB migration**: Add `usd_exchange_rate` column to `resort_profile`
+2. **CurrencyContext + formatPrice hook**: Core infrastructure
+3. **CurrencySwitcher component**: UI toggle
+4. **Wire switcher into headers**: ServiceHeader, StaffNavBar, GuestPortal, MenuPage, Admin
+5. **Admin config**: Exchange rate field in ResortProfileForm
+6. **Bulk replace ₱ in all 39 files**: Use `formatPrice()` from context hook
+7. **Update PDF/print utilities**: Pass currency params
+
+---
+
+## Technical Details
+
+```text
+CurrencyProvider (wraps App)
+  ├── reads resort_profile.usd_exchange_rate
+  ├── localStorage: selected currency
+  └── provides: { currency, setCurrency, formatPrice, exchangeRate }
+
+formatPrice(amountEur):
+  if currency === 'USD':
+    return `$${(amountEur * exchangeRate).toLocaleString(...)}`
+  else:
+    return `€${amountEur.toLocaleString(...)}`
+
+CurrencySwitcher:
+  DropdownMenu with EUR/USD options (like LanguageSwitcher)
+```
+
+All prices in the database remain stored in EUR. Conversion is display-only.
 
