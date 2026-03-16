@@ -161,8 +161,8 @@ const GuestPortal = () => {
             <div className="flex flex-col gap-3 mb-6">
               <GuestTile
                 icon={<UtensilsCrossed className="w-6 h-6" />}
-                label="Order Food"
-                subtitle="Browse our menu and order to your room"
+                label={t('guest.orderFood')}
+                subtitle={t('guest.orderFoodSub')}
                 onClick={() => {
                   setGuestSession({ room_id: session.room_id, room_name: session.room_name, guest_name: session.guest_name, booking_id: session.booking_id });
                   navigate('/menu?mode=guest-order&dept=kitchen');
