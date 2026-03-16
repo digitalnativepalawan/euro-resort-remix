@@ -737,7 +737,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
       </div>
 
       <div className="px-4 py-3 border-t border-border text-center">
-        <p className="font-body text-[10px] text-muted-foreground">Tap an order to open bill & payment · Tap completed orders to reprint</p>
+        <p className="font-body text-[10px] text-muted-foreground">{t('cashier.tapOrderHint')}</p>
       </div>
     </div>
   );
