@@ -695,7 +695,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         {/* Breakdown by method */}
         {sortedMethods.length > 0 && (
           <div className="space-y-2">
-            <p className="font-display text-xs tracking-wider text-muted-foreground">BREAKDOWN BY METHOD</p>
+            <p className="font-display text-xs tracking-wider text-muted-foreground">{t('cashier.breakdownByMethod')}</p>
             <div className="space-y-1">
               {sortedMethods.filter(([m]) => m !== 'Charge to Room').map(([method, data]) => (
                 <div key={method} className={`flex items-center justify-between rounded-lg px-3 py-2 ${method === 'Cash' ? 'bg-gold/5' : 'bg-secondary/50'}`}>
