@@ -63,7 +63,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
             <div className="flex items-center gap-3 border border-green-500/30 rounded-lg p-3 bg-green-500/5">
               <CheckCircle2 className="w-8 h-8 text-green-500 flex-shrink-0" />
               <div>
-                <p className="font-display text-sm tracking-wider text-green-600">Completed</p>
+                <p className="font-display text-sm tracking-wider text-green-600">{t('common.completed')}</p>
                 {meta.completed_by && (
                   <p className="font-body text-xs text-muted-foreground">By {meta.completed_by}</p>
                 )}
