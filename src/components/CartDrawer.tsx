@@ -684,7 +684,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
               <div className="mx-4 mt-3 p-3 rounded-lg border border-destructive/40 bg-destructive/10 space-y-2">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-destructive" />
-                  <span className="font-display text-xs tracking-wider text-destructive">Insufficient Stock</span>
+                  <span className="font-display text-xs tracking-wider text-destructive">{t('cart.insufficientStock')}</span>
                 </div>
                 {stockWarning.map((s, i) => (
                   <p key={i} className="font-body text-xs text-foreground">
