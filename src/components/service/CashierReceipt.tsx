@@ -170,7 +170,7 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
           )}
           <div className="flex justify-between font-display text-lg text-gold">
             <span>{t('common.total')}</span>
-            <span className="tabular-nums">₱{total.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(total)}</span>
           </div>
         </div>
 
