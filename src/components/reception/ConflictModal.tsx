@@ -66,7 +66,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
           )}
 
           {availableRooms.length === 0 && (
-            <p className="text-sm text-destructive font-body">No alternative rooms available for these dates.</p>
+            <p className="text-sm text-destructive font-body">{t('calendar.noAlternativeRooms')}</p>
           )}
         </div>
 
