@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import Index from "./pages/Index";
 import OrderType from "./pages/OrderType";
 import MenuPage from "./pages/MenuPage";
@@ -30,6 +31,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <ThemeProvider>
     <QueryClientProvider client={queryClient}>
+      <CurrencyProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -68,6 +70,7 @@ const App = () => (
         </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </CurrencyProvider>
     </QueryClientProvider>
   </ThemeProvider>
 );

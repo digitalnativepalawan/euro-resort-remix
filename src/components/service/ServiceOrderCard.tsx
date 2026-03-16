@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { Flame, GlassWater, Truck, CreditCard, Clock, CheckCircle2, Home, Receipt, FileText } from 'lucide-react';
@@ -33,6 +34,7 @@ interface ServiceOrderCardProps {
 
 const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDetail, compact, resortProfile }: ServiceOrderCardProps) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [busy, setBusy] = useState(false);
   const items = (order.items as any[]) || [];
   const isNew = order.status === 'New';
@@ -153,7 +155,7 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
         {(department === 'reception' ? items : deptItems).slice(0, compact ? 3 : 6).map((item: any, idx: number) => (
           <div key={idx} className="flex justify-between font-body">
             <span className="text-foreground text-sm truncate mr-2">{item.qty}× {item.name}</span>
-            <span className="text-muted-foreground text-sm tabular-nums flex-shrink-0">₱{(item.price * item.qty).toLocaleString()}</span>
+            <span className="text-muted-foreground text-sm tabular-nums flex-shrink-0">{formatPrice(item.price * item.qty)}</span>
           </div>
         ))}
         {(department === 'reception' ? items : deptItems).length > (compact ? 3 : 6) && (
@@ -163,7 +165,7 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
 
       <div className="pt-2.5 border-t border-border/50 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="font-display text-lg text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
+          <span className="font-display text-lg text-gold tabular-nums">{formatPrice(order.total)}</span>
           {primaryAction && onAction && department !== 'cashier' && (
             <Button
               onClick={(e) => handleAction(e, primaryAction!.action)}

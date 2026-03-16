@@ -22,7 +22,7 @@ const ResortProfileForm = () => {
     resort_name: '', tagline: '', address: '', phone: '', contact_name: '',
     contact_number: '', email: '', google_map_embed: '', google_map_url: '',
     facebook_url: '', instagram_url: '', tiktok_url: '', website_url: '',
-    logo_url: '', logo_size: 128,
+    logo_url: '', logo_size: 128, usd_exchange_rate: '1.08',
   });
 
   useEffect(() => {
@@ -36,6 +36,7 @@ const ResortProfileForm = () => {
         instagram_url: profile.instagram_url || '', tiktok_url: profile.tiktok_url || '',
         website_url: profile.website_url || '', logo_url: profile.logo_url || '',
         logo_size: profile.logo_size || 128,
+        usd_exchange_rate: String(profile.usd_exchange_rate ?? 1.08),
       });
     }
   }, [profile]);
@@ -65,11 +66,12 @@ const ResortProfileForm = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const payload = { ...form, usd_exchange_rate: parseFloat(form.usd_exchange_rate) || 1.08 };
       if (profile?.id) {
-        const { error } = await supabase.from('resort_profile').update(form).eq('id', profile.id);
+        const { error } = await supabase.from('resort_profile').update(payload).eq('id', profile.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('resort_profile').insert(form);
+        const { error } = await supabase.from('resort_profile').insert(payload);
         if (error) throw error;
       }
       qc.invalidateQueries({ queryKey: ['resort-profile'] });
@@ -181,6 +183,18 @@ const ResortProfileForm = () => {
         <div className="flex items-center gap-2">
           <Globe className="w-4 h-4 text-cream-dim shrink-0" />
           <Input value={form.website_url} onChange={set('website_url')} placeholder="Website URL" className={inputClass} />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <h4 className="font-display text-xs tracking-wider text-cream-dim flex items-center gap-1.5">
+          💱 {t('resort.currency')}
+        </h4>
+        <div>
+          <label className="font-body text-xs text-cream-dim">{t('resort.usdExchangeRate')}</label>
+          <Input value={form.usd_exchange_rate} onChange={e => setForm(f => ({ ...f, usd_exchange_rate: e.target.value }))}
+            type="number" step="0.01" placeholder="1.08" className={inputClass} />
+          <p className="font-body text-[10px] text-cream-dim mt-1">{t('resort.exchangeRateHint')}</p>
         </div>
       </div>
 

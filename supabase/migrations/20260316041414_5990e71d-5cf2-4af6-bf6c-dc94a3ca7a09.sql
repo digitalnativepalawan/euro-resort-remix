@@ -1,0 +1,1 @@
+ALTER TABLE public.resort_profile ADD COLUMN IF NOT EXISTS usd_exchange_rate numeric NOT NULL DEFAULT 1.08;

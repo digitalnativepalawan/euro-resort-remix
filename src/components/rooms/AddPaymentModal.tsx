@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import { supabase } from '@/integrations/supabase/client';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,6 +23,7 @@ interface AddPaymentModalProps {
 
 const AddPaymentModal = ({ open, onOpenChange, unitId, unitName, guestName, bookingId, currentBalance }: AddPaymentModalProps) => {
   const qc = useQueryClient();
+  const { formatPrice } = useCurrency();
   const { data: paymentMethods = [] } = usePaymentMethods();
   const active = paymentMethods.filter(m => m.is_active && m.name !== 'Charge to Room');
   const [amount, setAmount] = useState('');
@@ -70,7 +72,7 @@ const AddPaymentModal = ({ open, onOpenChange, unitId, unitName, guestName, book
         <div className="space-y-4">
           <div className="border border-border rounded-lg p-3 bg-secondary">
             <p className="font-body text-xs text-muted-foreground">Current Balance</p>
-            <p className="font-display text-lg text-foreground">₱{currentBalance.toLocaleString()}</p>
+            <p className="font-display text-lg text-foreground">{formatPrice(currentBalance)}</p>
           </div>
           <div>
             <label className="font-body text-xs text-muted-foreground">Payment Amount</label>

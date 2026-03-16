@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getStaffSession, clearStaffSession } from '@/lib/session';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 
 const DEPT_COLORS: Record<string, string> = {
   reception:    'bg-[hsl(210,70%,50%)] text-white',
@@ -154,6 +155,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
         <div className="hidden sm:flex items-center gap-2">
           <span className="font-body text-xs text-muted-foreground">{displayName}</span>
           <LanguageSwitcher />
+          <CurrencySwitcher />
           <ThemeToggle />
           <Button
             variant="ghost"
@@ -182,6 +184,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
                 <NavItems mobile />
               <div className="flex items-center gap-2 py-1">
                 <LanguageSwitcher />
+                <CurrencySwitcher />
                 <ThemeToggle />
                 <span className="font-body text-xs text-muted-foreground">{t('common.theme')}</span>
               </div>

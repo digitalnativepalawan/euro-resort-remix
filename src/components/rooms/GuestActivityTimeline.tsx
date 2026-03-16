@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { LogIn, StickyNote, MapPin, DollarSign, UtensilsCrossed, Clock } from 'lucide-react';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface GuestActivityTimelineProps {
   booking: any;
@@ -27,6 +28,7 @@ const iconMap = {
 const from = (t: string) => supabase.from(t as any) as any;
 
 const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) => {
+  const { formatPrice } = useCurrency();
   const { data: notes = [] } = useQuery({
     queryKey: ['timeline-notes', booking?.id],
     enabled: !!booking?.id,
@@ -100,7 +102,7 @@ const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) =>
       id: `tour-${t.id}`,
       type: 'tour',
       title: `Experience: ${t.tour_name}`,
-      subtitle: `${t.pax} pax · ₱${Number(t.price).toLocaleString()} · ${t.status}`,
+      subtitle: `${t.pax} pax · ${formatPrice(Number(t.price))} · ${t.status}`,
       time: t.created_at,
     });
   });
@@ -111,8 +113,8 @@ const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) =>
       id: `tx-${tx.id}`,
       type: 'billing',
       title: isCharge
-        ? `Charge: ₱${tx.total_amount.toLocaleString()}`
-        : `Payment: ₱${Math.abs(tx.total_amount).toLocaleString()}`,
+        ? `Charge: ${formatPrice(tx.total_amount)}`
+        : `Payment: ${formatPrice(Math.abs(tx.total_amount))}`,
       subtitle: tx.notes || tx.transaction_type?.replace('_', ' ') || '',
       time: tx.created_at,
     });
@@ -124,7 +126,7 @@ const GuestActivityTimeline = ({ booking, unit }: GuestActivityTimelineProps) =>
       id: `order-${o.id}`,
       type: 'order',
       title: `Order · ${itemCount} item${itemCount !== 1 ? 's' : ''}`,
-      subtitle: `₱${Number(o.total).toFixed(0)} · ${o.status}`,
+      subtitle: `${formatPrice(Number(o.total))} · ${o.status}`,
       time: o.created_at,
     });
   });

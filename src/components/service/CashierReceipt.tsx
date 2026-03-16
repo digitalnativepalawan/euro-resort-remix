@@ -7,13 +7,14 @@ import { useInvoiceSettings } from '@/hooks/useInvoiceSettings';
 import { useBillingConfig } from '@/hooks/useBillingConfig';
 import { formatDateTime } from '@/lib/dateFormat';
 import { toast } from 'sonner';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface CashierReceiptProps {
   order: any;
   onDone: () => void;
 }
 
-function buildReceiptText(order: any, profile: any, invoiceSettings: any, t: (key: string) => string): string {
+function buildReceiptText(order: any, profile: any, invoiceSettings: any, t: (key: string) => string, fp: (n: number) => string): string {
   const items = (order.items as any[]) || [];
   const subtotal = items.reduce((s: number, i: any) => s + i.price * (i.qty || i.quantity || 1), 0);
   const sc = Number(order.service_charge || 0);
@@ -32,12 +33,12 @@ function buildReceiptText(order: any, profile: any, invoiceSettings: any, t: (ke
   lines.push('─────────────');
   items.forEach((i: any) => {
     const qty = i.qty || i.quantity || 1;
-    lines.push(`${qty}× ${i.name} — ₱${(i.price * qty).toLocaleString()}`);
+    lines.push(`${qty}× ${i.name} — ${fp(i.price * qty)}`);
   });
   lines.push('─────────────');
-  lines.push(`${t('common.subtotal')}: ₱${subtotal.toLocaleString()}`);
-  if (sc > 0) lines.push(`${t('receipt.serviceCharge')}: ₱${sc.toLocaleString()}`);
-  lines.push(`*${t('common.total').toUpperCase()}: ₱${total.toLocaleString()}*`);
+  lines.push(`${t('common.subtotal')}: ${fp(subtotal)}`);
+  if (sc > 0) lines.push(`${t('receipt.serviceCharge')}: ${fp(sc)}`);
+  lines.push(`*${t('common.total').toUpperCase()}: ${fp(total)}*`);
   lines.push('');
   if (order.payment_type) lines.push(`${t('common.paidWith')}: ${order.payment_type}`);
   const thankYou = invoiceSettings?.thank_you_message || t('receipt.thankYou');
@@ -52,6 +53,7 @@ const CashierReceipt = ({ order, onDone }: CashierReceiptProps) => {
   const { data: profile } = useResortProfile();
   const { data: invoiceSettings } = useInvoiceSettings();
   const { data: config } = useBillingConfig();
+  const { formatPrice } = useCurrency();
   const [copied, setCopied] = useState(false);
 
   const items = (order.items as any[]) || [];
@@ -97,11 +99,11 @@ h2, h3 { margin: 4px 0; }
   ${order.guest_name ? `<p class="small">${t('common.guest')}: ${order.guest_name}</p>` : ''}
 </div>
 <div class="line"></div>
-${items.map((i: any) => `<div class="row"><span>${i.qty || i.quantity || 1}× ${i.name}</span><span>₱${(i.price * (i.qty || i.quantity || 1)).toLocaleString()}</span></div>`).join('')}
+${items.map((i: any) => `<div class="row"><span>${i.qty || i.quantity || 1}× ${i.name}</span><span>${formatPrice(i.price * (i.qty || i.quantity || 1))}</span></div>`).join('')}
 <div class="line"></div>
-<div class="row"><span>${t('common.subtotal')}</span><span>₱${subtotal.toLocaleString()}</span></div>
-${sc > 0 ? `<div class="row"><span>${t('receipt.serviceCharge')}</span><span>₱${sc.toLocaleString()}</span></div>` : ''}
-<div class="row bold" style="font-size:14px"><span>${t('common.total').toUpperCase()}</span><span>₱${total.toLocaleString()}</span></div>
+<div class="row"><span>${t('common.subtotal')}</span><span>${formatPrice(subtotal)}</span></div>
+${sc > 0 ? `<div class="row"><span>${t('receipt.serviceCharge')}</span><span>${formatPrice(sc)}</span></div>` : ''}
+<div class="row bold" style="font-size:14px"><span>${t('common.total').toUpperCase()}</span><span>${formatPrice(total)}</span></div>
 <div class="line"></div>
 <div class="row"><span>${t('receipt.payment')}</span><span>${order.payment_type || '—'}</span></div>
 <div class="line"></div>
@@ -119,13 +121,13 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
   };
 
   const handleShareWhatsApp = () => {
-    const text = buildReceiptText(order, profile, invoiceSettings, t);
+    const text = buildReceiptText(order, profile, invoiceSettings, t, formatPrice);
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
   const handleCopy = async () => {
-    const text = buildReceiptText(order, profile, invoiceSettings, t);
+    const text = buildReceiptText(order, profile, invoiceSettings, t, formatPrice);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -150,7 +152,7 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
           {items.map((i: any, idx: number) => (
             <div key={idx} className="flex justify-between">
               <span className="text-foreground">{i.qty || i.quantity || 1}× {i.name}</span>
-              <span className="text-muted-foreground tabular-nums">₱{(i.price * (i.qty || i.quantity || 1)).toLocaleString()}</span>
+              <span className="text-muted-foreground tabular-nums">{formatPrice(i.price * (i.qty || i.quantity || 1))}</span>
             </div>
           ))}
         </div>
@@ -158,17 +160,17 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
         <div className="border-t border-dashed border-border pt-3 space-y-1">
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('common.subtotal')}</span>
-            <span className="tabular-nums">₱{subtotal.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(subtotal)}</span>
           </div>
           {sc > 0 && (
             <div className="flex justify-between">
               <span className="text-muted-foreground">{t('receipt.serviceCharge')}</span>
-              <span className="tabular-nums">₱{sc.toLocaleString()}</span>
+              <span className="tabular-nums">{formatPrice(sc)}</span>
             </div>
           )}
           <div className="flex justify-between font-display text-lg text-gold">
             <span>{t('common.total')}</span>
-            <span className="tabular-nums">₱{total.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(total)}</span>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -352,6 +353,7 @@ const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
   selectedOrderId?: string;
   onSelect: (order: any) => void;
 }) => {
+  const { formatPrice } = useCurrency();
   const { roomGroups, ungrouped } = useMemo(() => {
     const groups: Record<string, any[]> = {};
     const solo: any[] = [];
@@ -382,7 +384,7 @@ const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
                   {roomOrders.length} order{roomOrders.length !== 1 ? 's' : ''}
                 </Badge>
               </div>
-              <span className="font-display text-sm text-gold tabular-nums">₱{totalAmount.toLocaleString()}</span>
+              <span className="font-display text-sm text-gold tabular-nums">{formatPrice(totalAmount)}</span>
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-3 pt-1 space-y-1.5">
               {roomOrders.map(order => (
@@ -419,6 +421,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
   onAction?: (orderId: string, action: string) => Promise<void>;
 }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const items = (order.items as any[]) || [];
   const elapsed = formatDistanceToNow(new Date(order.created_at), { addSuffix: false });
   const foodItems = items.filter((i: any) => { const d = i.department || 'kitchen'; return d === 'kitchen' || d === 'both'; });
@@ -486,7 +489,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
           {isRoomCharge && isPaid ? t('reception.roomCharge') : isPendingPayment ? t('cashier.pendingPayment') : isPaid ? t('cashier.paid') : order.status}
         </Badge>
 
-        <span className="font-display text-sm text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
+        <span className="font-display text-sm text-gold tabular-nums">{formatPrice(order.total)}</span>
       </div>
     </div>
   );
@@ -513,6 +516,7 @@ const BillOutPanel = ({
   onPreviewReceipt: () => void;
 }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const items = (order.items as any[]) || [];
   const subtotal = items.reduce((s: number, i: any) => s + i.price * (i.qty || i.quantity || 1), 0);
   const sc = Number(order.service_charge || 0);
@@ -547,7 +551,7 @@ const BillOutPanel = ({
           {items.map((item: any, idx: number) => (
             <div key={idx} className="flex justify-between font-body text-sm">
               <span className="text-foreground">{item.qty || item.quantity || 1}× {item.name}</span>
-              <span className="text-muted-foreground tabular-nums">₱{(item.price * (item.qty || item.quantity || 1)).toLocaleString()}</span>
+              <span className="text-muted-foreground tabular-nums">{formatPrice(item.price * (item.qty || item.quantity || 1))}</span>
             </div>
           ))}
         </div>
@@ -555,17 +559,17 @@ const BillOutPanel = ({
         <div className="border-t border-border/50 pt-3 space-y-1">
           <div className="flex justify-between font-body text-sm">
             <span className="text-muted-foreground">{t('common.subtotal')}</span>
-            <span className="tabular-nums">₱{subtotal.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(subtotal)}</span>
           </div>
           {sc > 0 && (
             <div className="flex justify-between font-body text-sm">
               <span className="text-muted-foreground">{t('receipt.serviceCharge')}</span>
-              <span className="tabular-nums">₱{sc.toLocaleString()}</span>
+              <span className="tabular-nums">{formatPrice(sc)}</span>
             </div>
           )}
           <div className="flex justify-between font-display text-2xl text-gold pt-2">
             <span>{t('common.total')}</span>
-            <span className="tabular-nums">₱{total.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(total)}</span>
           </div>
         </div>
 
@@ -603,7 +607,7 @@ const BillOutPanel = ({
         {busy ? t('common.processing') : (
             <>
               <Check className="w-5 h-5" />
-              {order.status === 'Ready' ? t('cashier.serveAndConfirm') : t('cashier.confirmPayment')} — ₱{total.toLocaleString()}
+              {order.status === 'Ready' ? t('cashier.serveAndConfirm') : t('cashier.confirmPayment')} — {formatPrice(total)}
             </>
           )}
         </Button>
@@ -615,6 +619,7 @@ const BillOutPanel = ({
 /** Daily cash reconciliation summary */
 const DailySummary = ({ completed }: { completed: any[] }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const summary = useMemo(() => {
     const methods: Record<string, { count: number; total: number }> = {};
     let totalRevenue = 0;
@@ -658,7 +663,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         {/* Register revenue (excluding room charges) */}
         <div className="text-center space-y-1">
           <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">{t('cashier.registerRevenueToday')}</p>
-          <p className="font-display text-3xl text-gold tabular-nums">₱{summary.registerRevenue.toLocaleString()}</p>
+          <p className="font-display text-3xl text-gold tabular-nums">{formatPrice(summary.registerRevenue)}</p>
           <p className="font-body text-xs text-muted-foreground">{t('cashier.settledOrders', { count: summary.orderCount - summary.roomChargeCount })}</p>
         </div>
 
@@ -672,7 +677,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
               </div>
               <span className="font-body text-xs text-blue-400">{summary.roomChargeCount} {t('common.orders')}</span>
             </div>
-            <p className="font-display text-lg text-blue-400 tabular-nums">₱{summary.roomChargeTotal.toLocaleString()}</p>
+            <p className="font-display text-lg text-blue-400 tabular-nums">{formatPrice(summary.roomChargeTotal)}</p>
             <p className="font-body text-[10px] text-muted-foreground">{t('cashier.chargedToGuestRooms')}</p>
           </div>
         )}
@@ -687,7 +692,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
               </div>
               <Badge className="bg-gold/20 text-gold border-gold/30 font-body text-xs">{cashEntry.count} {t('common.orders')}</Badge>
             </div>
-            <p className="font-display text-2xl text-gold tabular-nums">₱{cashEntry.total.toLocaleString()}</p>
+            <p className="font-display text-2xl text-gold tabular-nums">{formatPrice(cashEntry.total)}</p>
             <p className="font-body text-[11px] text-muted-foreground">{t('cashier.amountToReconcile')}</p>
           </div>
         )}
@@ -703,7 +708,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
                     <span className={`font-body text-sm ${method === 'Cash' ? 'text-gold font-semibold' : 'text-foreground'}`}>{method}</span>
                     <span className="font-body text-xs text-muted-foreground">({data.count})</span>
                   </div>
-                  <span className={`font-display text-sm tabular-nums ${method === 'Cash' ? 'text-gold' : 'text-foreground'}`}>₱{data.total.toLocaleString()}</span>
+                  <span className={`font-display text-sm tabular-nums ${method === 'Cash' ? 'text-gold' : 'text-foreground'}`}>{formatPrice(data.total)}</span>
                 </div>
               ))}
             </div>
@@ -724,7 +729,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
                     <p className="font-body text-xs text-foreground truncate">{o.location_detail || o.order_type}</p>
                     <p className="font-body text-[10px] text-muted-foreground">{o.closed_at ? formatTime(o.closed_at) : '—'}</p>
                   </div>
-                  <span className="font-display text-sm text-gold tabular-nums">₱{Number(o.total).toLocaleString()}</span>
+                  <span className="font-display text-sm text-gold tabular-nums">{formatPrice(Number(o.total))}</span>
                 </div>
               ))}
             </CollapsibleContent>

@@ -1,5 +1,6 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Badge } from '@/components/ui/badge';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +29,7 @@ const STATUS_DOT: Record<string, string> = {
 
 const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department, onAction, resortProfile }: ServiceOrderDetailProps) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [busy, setBusy] = useState<string | null>(null);
 
   if (!order) return null;
@@ -160,7 +162,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
                     {dept === 'bar' ? <GlassWater className="w-3.5 h-3.5 text-muted-foreground" /> : <Flame className="w-3.5 h-3.5 text-muted-foreground" />}
                     <span className="font-body text-sm text-foreground">{item.qty}× {item.name}</span>
                   </div>
-                  <span className="font-body text-sm text-muted-foreground tabular-nums">₱{(item.price * item.qty).toLocaleString()}</span>
+                  <span className="font-body text-sm text-muted-foreground tabular-nums">{formatPrice(item.price * item.qty)}</span>
                 </div>
               );
             })}
@@ -170,7 +172,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
 
           <div className="flex items-center justify-between">
             <span className="font-display text-sm tracking-wider text-muted-foreground">{t('common.total').toUpperCase()}</span>
-            <span className="font-display text-xl text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
+            <span className="font-display text-xl text-gold tabular-nums">{formatPrice(order.total)}</span>
           </div>
 
           {actions.length > 0 && (

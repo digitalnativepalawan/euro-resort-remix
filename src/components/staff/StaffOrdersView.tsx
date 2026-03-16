@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import OrderCard from '@/components/admin/OrderCard';
 import { useResortProfile } from '@/hooks/useResortProfile';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -16,6 +17,7 @@ const STATUSES = ['New', 'Preparing', 'Served', 'Paid'];
 
 const StaffOrdersView = () => {
   const qc = useQueryClient();
+  const { formatPrice } = useCurrency();
   const { data: resortProfile } = useResortProfile();
   const session = getStaffSession();
   const perms = session?.permissions || [];
@@ -281,7 +283,7 @@ const StaffOrdersView = () => {
                 <div key={item.id} className="flex items-center justify-between py-2 px-1">
                   <div className="flex-1 min-w-0">
                     <span className="font-display text-sm text-foreground block">{item.name}</span>
-                    <span className="font-display text-xs text-gold">₱{item.price.toLocaleString()}</span>
+                    <span className="font-display text-xs text-gold">{formatPrice(item.price)}</span>
                   </div>
                   {inCart ? (
                     <div className="flex items-center gap-2">
@@ -320,7 +322,7 @@ const StaffOrdersView = () => {
           {/* Submit */}
           {addCartTotal > 0 && (
             <Button onClick={handleSubmitAddItems} className="w-full font-display tracking-wider py-5">
-              Add ₱{addCartTotal.toLocaleString()} to Order
+              Add {formatPrice(addCartTotal)} to Order
             </Button>
           )}
         </DialogContent>

@@ -7,6 +7,7 @@ import { getStaffSession, clearStaffSession } from '@/lib/session';
 import { canEdit } from '@/lib/permissions';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 
 const DEPT_CONFIG: Record<string, { labelKey: string; icon: React.ReactNode; gradient: string }> = {
   kitchen: { labelKey: 'kitchen.label', icon: <Flame className="w-4 h-4" />, gradient: 'from-[hsl(25,85%,55%)] to-[hsl(15,80%,45%)]' },
@@ -65,6 +66,7 @@ const ServiceHeader = ({ department }: ServiceHeaderProps) => {
             </Button>
           )}
           <LanguageSwitcher />
+          <CurrencySwitcher />
           <ThemeToggle />
           {staffName && (
             <span className="font-body text-xs text-muted-foreground hidden sm:inline truncate max-w-[140px]">{staffName}</span>

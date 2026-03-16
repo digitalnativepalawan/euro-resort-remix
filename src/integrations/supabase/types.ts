@@ -1978,6 +1978,7 @@ export type Database = {
           resort_name: string
           tagline: string | null
           tiktok_url: string | null
+          usd_exchange_rate: number
           website_url: string | null
         }
         Insert: {
@@ -1997,6 +1998,7 @@ export type Database = {
           resort_name?: string
           tagline?: string | null
           tiktok_url?: string | null
+          usd_exchange_rate?: number
           website_url?: string | null
         }
         Update: {
@@ -2016,6 +2018,7 @@ export type Database = {
           resort_name?: string
           tagline?: string | null
           tiktok_url?: string | null
+          usd_exchange_rate?: number
           website_url?: string | null
         }
         Relationships: []

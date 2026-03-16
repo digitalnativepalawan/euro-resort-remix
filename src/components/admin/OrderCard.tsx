@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { Badge } from '@/components/ui/badge';
 import { ChefHat, Truck, CreditCard, CheckCircle2, AlertTriangle, Download, MessageCircle, PlusCircle, Receipt, Trash2, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -33,6 +34,7 @@ interface OrderCardProps {
 
 const OrderCard = ({ order, onAdvance, resortProfile, onAddItems, onViewTab, onDelete }: OrderCardProps) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const { formatPrice } = useCurrency();
   const [advancing, setAdvancing] = useState(false);
   const canInvoice = order.status === 'Served' || order.status === 'Paid';
 
@@ -153,7 +155,7 @@ const OrderCard = ({ order, onAdvance, resortProfile, onAddItems, onViewTab, onD
         {items.map((item: any, idx: number) => (
           <div key={idx} className="flex justify-between font-body text-sm">
             <span className="text-foreground">{item.qty}× {item.name}</span>
-            <span className="text-cream-dim">₱{(item.price * item.qty).toFixed(0)}</span>
+            <span className="text-cream-dim">{formatPrice(item.price * item.qty)}</span>
           </div>
         ))}
       </div>
@@ -162,7 +164,7 @@ const OrderCard = ({ order, onAdvance, resortProfile, onAddItems, onViewTab, onD
       <div className="pt-3 border-t border-border space-y-2">
         {/* Total + payment */}
         <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-display text-sm text-gold">₱{order.total.toLocaleString()}</span>
+          <span className="font-display text-sm text-gold">{formatPrice(order.total)}</span>
           {order.payment_type && (
             <span className="font-body text-xs text-cream-dim">({order.payment_type})</span>
           )}
