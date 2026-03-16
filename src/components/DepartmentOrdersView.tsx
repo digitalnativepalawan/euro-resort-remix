@@ -285,7 +285,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
             <div className="flex items-center gap-2 bg-amber-500/10 rounded px-3 py-1.5 border border-amber-400/30">
               <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="font-body text-xs text-amber-400">
-                ⏰ Prepare at {formatScheduledTime(prepTime)} · {formatDistanceToNow(prepTime, { addSuffix: true })}
+                ⏰ {t('kitchen.prepareAt', { time: formatScheduledTime(prepTime) })} · {formatDistanceToNow(prepTime, { addSuffix: true })}
               </span>
             </div>
           </div>
