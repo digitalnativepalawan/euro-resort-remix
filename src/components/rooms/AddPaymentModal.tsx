@@ -23,6 +23,7 @@ interface AddPaymentModalProps {
 
 const AddPaymentModal = ({ open, onOpenChange, unitId, unitName, guestName, bookingId, currentBalance }: AddPaymentModalProps) => {
   const qc = useQueryClient();
+  const { formatPrice } = useCurrency();
   const { data: paymentMethods = [] } = usePaymentMethods();
   const active = paymentMethods.filter(m => m.is_active && m.name !== 'Charge to Room');
   const [amount, setAmount] = useState('');
