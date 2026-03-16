@@ -365,7 +365,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
         window.open(url, '_blank');
       }
     } catch {
-      toast.error('Failed to place order');
+      toast.error(t('cart.failedToPlaceOrder'));
     } finally {
       setSubmitting(false);
     }
