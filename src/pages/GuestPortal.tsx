@@ -1412,7 +1412,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                   </p>
                 </div>
               </div>
-              <span className="font-body text-sm font-medium text-foreground">+₱{Math.abs(t.total_amount || 0).toLocaleString()}</span>
+              <span className="font-body text-sm font-medium text-foreground">+{formatPrice(Math.abs(t.total_amount || 0))}</span>
             </div>
           ))}
         </div>
