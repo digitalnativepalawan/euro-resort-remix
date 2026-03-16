@@ -353,6 +353,7 @@ const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
   selectedOrderId?: string;
   onSelect: (order: any) => void;
 }) => {
+  const { formatPrice } = useCurrency();
   const { roomGroups, ungrouped } = useMemo(() => {
     const groups: Record<string, any[]> = {};
     const solo: any[] = [];
