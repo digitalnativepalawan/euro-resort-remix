@@ -375,7 +375,7 @@ const MenuPage = () => {
               }`}
             >
               <UtensilsCrossed className="w-5 h-5" />
-              <span className="font-body text-[10px] tracking-wider">Menu</span>
+              <span className="font-body text-[10px] tracking-wider">{t('service.menu')}</span>
             </button>
             <button
               onClick={() => setStaffTab('orders')}
