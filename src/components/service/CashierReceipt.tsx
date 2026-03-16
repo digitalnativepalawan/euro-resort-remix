@@ -160,7 +160,7 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
         <div className="border-t border-dashed border-border pt-3 space-y-1">
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('common.subtotal')}</span>
-            <span className="tabular-nums">₱{subtotal.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(subtotal)}</span>
           </div>
           {sc > 0 && (
             <div className="flex justify-between">
