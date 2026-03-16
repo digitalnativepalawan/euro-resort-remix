@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Calendar, User, Clock } from 'lucide-react';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, readOnly = false }: Props) => {
+  const { t } = useTranslation();
   const taskId = task?.id ?? null;
   const meta = task?.completion_meta || {};
   const isCompleted = task?.status === 'completed';
@@ -52,7 +54,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
         <DrawerHeader className="pb-2">
-          <DrawerTitle className="font-display text-base tracking-wider">Task Details</DrawerTitle>
+          <DrawerTitle className="font-display text-base tracking-wider">{t('tasks.taskDetails')}</DrawerTitle>
         </DrawerHeader>
 
         <div className="px-4 pb-6 space-y-4 overflow-y-auto">
@@ -61,7 +63,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
             <div className="flex items-center gap-3 border border-green-500/30 rounded-lg p-3 bg-green-500/5">
               <CheckCircle2 className="w-8 h-8 text-green-500 flex-shrink-0" />
               <div>
-                <p className="font-display text-sm tracking-wider text-green-600">Completed</p>
+                <p className="font-display text-sm tracking-wider text-green-600">{t('common.completed')}</p>
                 {meta.completed_by && (
                   <p className="font-body text-xs text-muted-foreground">By {meta.completed_by}</p>
                 )}
@@ -105,7 +107,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
           {/* Completion proof */}
           {isCompleted && (meta.comment || meta.image_url) && (
             <div className="border border-border rounded-lg p-3 space-y-2">
-              <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Completion Note</p>
+              <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('tasks.completionNote')}</p>
               {meta.comment && <p className="font-body text-sm text-foreground">"{meta.comment}"</p>}
               {meta.image_url && (
                 <a href={meta.image_url} target="_blank" rel="noopener noreferrer">
@@ -117,7 +119,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
 
           {/* Activity log */}
           <div className="space-y-1.5">
-            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Activity</p>
+            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('tasks.activity')}</p>
             {activities.map((a, i) => (
               <div key={i} className="flex items-center gap-2">
                 <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
@@ -135,7 +137,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
 
           {/* Comment thread */}
           <div className="space-y-1.5">
-            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Comments</p>
+            <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('tasks.comments')}</p>
             <TaskCommentThread taskId={task.id} authorName={authorName} readOnly={readOnly} />
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle } from 'lucide-react';
@@ -16,25 +17,26 @@ interface ConflictModalProps {
 }
 
 const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlternative, onOverride, canOverride }: ConflictModalProps) => {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display tracking-wider text-destructive">
             <AlertTriangle className="h-5 w-5" />
-            Booking Conflict
+            {t('calendar.bookingConflict')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground font-body">
-            This room is already booked for the selected dates:
+            {t('calendar.roomAlreadyBooked')}
           </p>
 
           {conflicts.map(c => (
             <div key={c.id} className="border border-border rounded-lg p-3 bg-secondary space-y-1">
               <p className="font-display text-sm tracking-wider text-foreground">
-                {c.resort_ops_guests?.full_name || 'Unknown Guest'}
+                {c.resort_ops_guests?.full_name || t('calendar.unknownGuest')}
               </p>
               <p className="font-body text-xs text-muted-foreground">
                 {format(parseISO(c.check_in), 'MMM d')} → {format(parseISO(c.check_out), 'MMM d, yyyy')}
@@ -45,7 +47,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
 
           {availableRooms.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-display tracking-wider text-foreground">Alternative Rooms</p>
+              <p className="text-sm font-display tracking-wider text-foreground">{t('calendar.alternativeRooms')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {availableRooms.slice(0, 6).map(room => (
                   <Button
@@ -64,17 +66,17 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
           )}
 
           {availableRooms.length === 0 && (
-            <p className="text-sm text-destructive font-body">No alternative rooms available for these dates.</p>
+            <p className="text-sm text-destructive font-body">{t('calendar.noAlternativeRooms')}</p>
           )}
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">
-            Cancel
+            {t('common.cancel')}
           </Button>
           {canOverride && (
             <Button variant="destructive" onClick={onOverride} className="font-display text-xs tracking-wider">
-              Override & Book
+              {t('calendar.overrideAndBook')}
             </Button>
           )}
         </DialogFooter>

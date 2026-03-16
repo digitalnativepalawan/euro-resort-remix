@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -27,6 +28,7 @@ interface ReceptionCalendarProps {
 }
 
 const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: ReceptionCalendarProps) => {
+  const { t } = useTranslation();
   const [view, setView] = useState<CalendarView>('week');
   const [refDate, setRefDate] = useState(new Date());
   const [addOpen, setAddOpen] = useState(false);
@@ -207,13 +209,13 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" />
-          <h2 className="font-display text-lg tracking-wider text-foreground">Booking Calendar</h2>
+          <h2 className="font-display text-lg tracking-wider text-foreground">{t('calendar.bookingCalendar')}</h2>
         </div>
 
         {canEdit && (
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={() => { setEditBooking(null); setAddOpen(true); }} className="font-display text-xs tracking-wider">
-              <Plus className="h-3.5 w-3.5 mr-1" /> Reservation
+              <Plus className="h-3.5 w-3.5 mr-1" /> {t('calendar.reservation')}
             </Button>
             <Button
               size="sm"
@@ -225,7 +227,7 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
               }}
               className="font-display text-xs tracking-wider text-destructive border-destructive/40 hover:bg-destructive/10"
             >
-              <Wrench className="h-3.5 w-3.5 mr-1" /> Block Room
+              <Wrench className="h-3.5 w-3.5 mr-1" /> {t('calendar.blockRoom')}
             </Button>
           </div>
         )}
@@ -234,9 +236,9 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
         <ToggleGroup type="single" value={view} onValueChange={v => v && setView(v as CalendarView)} className="bg-secondary rounded-lg p-0.5">
-          <ToggleGroupItem value="week" className="font-display text-[10px] tracking-wider px-3 h-7">Week</ToggleGroupItem>
-          <ToggleGroupItem value="2week" className="font-display text-[10px] tracking-wider px-3 h-7">2 Weeks</ToggleGroupItem>
-          <ToggleGroupItem value="month" className="font-display text-[10px] tracking-wider px-3 h-7">Month</ToggleGroupItem>
+          <ToggleGroupItem value="week" className="font-display text-[10px] tracking-wider px-3 h-7">{t('calendar.week')}</ToggleGroupItem>
+          <ToggleGroupItem value="2week" className="font-display text-[10px] tracking-wider px-3 h-7">{t('calendar.twoWeek')}</ToggleGroupItem>
+          <ToggleGroupItem value="month" className="font-display text-[10px] tracking-wider px-3 h-7">{t('calendar.month')}</ToggleGroupItem>
         </ToggleGroup>
 
         <div className="flex items-center gap-1">
@@ -244,7 +246,7 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="sm" onClick={goToday} className="font-display text-[10px] tracking-wider h-7 px-2">
-            Today
+            {t('calendar.today')}
           </Button>
           <Button variant="ghost" size="icon" onClick={() => navigate('next')} className="h-7 w-7">
             <ChevronRight className="h-4 w-4" />
@@ -257,10 +259,10 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-[10px] font-body text-muted-foreground">
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500/50" /> Occupied</span>
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500/50" /> Upcoming</span>
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-muted/50" /> Checked Out</span>
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-destructive/50" /> Blocked</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500/50" /> {t('calendar.occupied')}</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500/50" /> {t('calendar.upcoming')}</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-muted/50" /> {t('calendar.checkedOut')}</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-destructive/50" /> {t('calendar.blocked')}</span>
       </div>
 
       {/* Views */}

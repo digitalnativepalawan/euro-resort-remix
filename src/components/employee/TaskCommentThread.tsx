@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ interface Props {
 }
 
 const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments = 10, maxImages = 3 }: Props) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [text, setText] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
@@ -55,7 +57,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (atImageLimit) { toast.error(`Max ${maxImages} images per task`); return; }
+    if (atImageLimit) { toast.error(t('tasks.commentLimitReached')); return; }
     setUploading(true);
     try {
       const compressed = await compressImage(file, 800);
@@ -65,9 +67,9 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
       if (error) throw error;
       const { data: pub } = supabase.storage.from('receipts').getPublicUrl(path);
       setImageUrl(pub.publicUrl);
-      toast.success('Image uploaded');
+      toast.success(t('tasks.imageUploaded'));
     } catch {
-      toast.error('Upload failed');
+      toast.error(t('tasks.uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -91,7 +93,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
       setShowLink(false);
       qc.invalidateQueries({ queryKey: ['task-comments', taskId] });
     } catch {
-      toast.error('Failed to add comment');
+      toast.error(t('tasks.failedToAddComment'));
     } finally {
       setSubmitting(false);
     }
@@ -133,7 +135,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
           <Textarea
             value={text}
             onChange={e => setText(e.target.value)}
-            placeholder="Add a comment..."
+            placeholder={t('tasks.addComment')}
             className="bg-secondary border-border text-foreground font-body text-sm min-h-[50px]"
             rows={2}
           />
@@ -168,7 +170,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
             <Button size="sm" onClick={submit} disabled={submitting || (!text.trim() && !imageUrl)}
               className="font-display text-xs tracking-wider gap-1 h-8">
               {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-              Send
+              {t('tasks.send')}
             </Button>
           </div>
         </div>
@@ -177,7 +179,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
       {atCommentLimit && (
         <div className="flex items-center gap-1.5 text-muted-foreground py-1">
           <AlertCircle className="w-3.5 h-3.5" />
-          <span className="font-body text-xs">Comment limit reached — contact admin if more updates are needed.</span>
+          <span className="font-body text-xs">{t('tasks.commentLimitReached')}</span>
         </div>
       )}
     </div>

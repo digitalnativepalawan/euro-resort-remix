@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => {
+  const { t } = useTranslation();
   if (!task) return null;
   const meta: CompletionMeta = task.completion_meta || {};
   const isCompleted = task.status === 'completed';
@@ -25,7 +27,7 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-base tracking-wider">Task Details</DialogTitle>
+          <DialogTitle className="font-display text-base tracking-wider">{t('tasks.taskDetails')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div>
@@ -49,12 +51,12 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
             <div className="border border-green-500/30 rounded-lg p-3 bg-green-500/5 space-y-2">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="font-display text-xs tracking-wider text-green-600">Task Completed</span>
+                <span className="font-display text-xs tracking-wider text-green-600">{t('tasks.taskCompletedLabel')}</span>
               </div>
 
               {meta.completed_by && (
                 <p className="font-body text-sm text-foreground">
-                  Completed by: <span className="font-semibold">{meta.completed_by}</span>
+                  {t('tasks.completedBy')} <span className="font-semibold">{meta.completed_by}</span>
                 </p>
               )}
 
@@ -66,14 +68,14 @@ const TaskDetailsModal = ({ open, onOpenChange, task, employeeName }: Props) => 
 
               {meta.comment && (
                 <div className="border-t border-border pt-2">
-                  <p className="font-body text-xs text-muted-foreground mb-0.5">Comment</p>
+                  <p className="font-body text-xs text-muted-foreground mb-0.5">{t('tasks.comment')}</p>
                   <p className="font-body text-sm text-foreground">"{meta.comment}"</p>
                 </div>
               )}
 
               {meta.image_url && (
                 <div className="border-t border-border pt-2">
-                  <p className="font-body text-xs text-muted-foreground mb-1">Proof</p>
+                  <p className="font-body text-xs text-muted-foreground mb-1">{t('tasks.proof')}</p>
                   <a href={meta.image_url} target="_blank" rel="noopener noreferrer">
                     <img src={meta.image_url} alt="completion proof" className="w-full max-w-[200px] rounded-lg border border-border object-cover" />
                   </a>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ interface AddReservationModalProps {
 const PLATFORMS = ['Direct', 'Airbnb', 'Booking.com', 'Agoda', 'Walk-in', 'Maintenance'];
 
 const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBooking }: AddReservationModalProps) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const isEdit = !!editBooking;
   const [saving, setSaving] = useState(false);
@@ -111,21 +113,21 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
   const handleSave = async () => {
     if (!form.unitId || !form.checkIn || !form.checkOut) {
-      toast.error('Room, check-in, and check-out are required');
+      toast.error(t('calendar.roomCheckInCheckOutRequired'));
       return;
     }
     if (form.checkIn >= form.checkOut) {
-      toast.error('Check-out must be after check-in');
+      toast.error(t('calendar.checkOutAfterCheckIn'));
       return;
     }
     if (form.platform !== 'Maintenance' && !form.guestName.trim()) {
-      toast.error('Guest name is required');
+      toast.error(t('calendar.guestNameRequired'));
       return;
     }
 
     // Block save for non-managers if there are conflicts
     if (liveConflicts.length > 0 && !canManage) {
-      toast.error('This room is already booked for these dates. Please choose another room.');
+      toast.error(t('calendar.roomAlreadyBookedSimple'));
       return;
     }
 
@@ -179,10 +181,10 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
       if (isEdit) {
         await from('resort_ops_bookings').update(payload as any).eq('id', editBooking!.id);
-        toast.success('Reservation updated');
+        toast.success(t('calendar.reservationUpdated'));
       } else {
         await from('resort_ops_bookings').insert(payload as any);
-        toast.success('Reservation created');
+        toast.success(t('calendar.reservationCreated'));
       }
 
       qc.invalidateQueries({ queryKey: ['rooms-bookings'] });
@@ -216,7 +218,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         }
       }
       await from('resort_ops_bookings').delete().eq('id', editBooking.id);
-      toast.success('Reservation deleted');
+      toast.success(t('calendar.reservationDeleted'));
       qc.invalidateQueries({ queryKey: ['rooms-bookings'] });
       qc.invalidateQueries({ queryKey: ['rooms-units'] });
       setDeleteOpen(false);
@@ -248,15 +250,15 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display tracking-wider">
-              {isEdit ? 'Edit Reservation' : 'New Reservation'}
+              {isEdit ? t('calendar.editReservation') : t('calendar.newReservation')}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-3">
             <div>
-              <Label className="font-display text-xs tracking-wider">Room</Label>
+              <Label className="font-display text-xs tracking-wider">{t('calendar.room')}</Label>
               <Select value={form.unitId} onValueChange={v => update('unitId', v)}>
-                <SelectTrigger><SelectValue placeholder="Select room" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('calendar.selectRoom')} /></SelectTrigger>
                 <SelectContent>
                   {sortedRooms.map(r => {
                     const conflicts = roomConflictMap.get(r.id);
@@ -311,7 +313,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
             )}
 
             <div>
-              <Label className="font-display text-xs tracking-wider">Platform</Label>
+              <Label className="font-display text-xs tracking-wider">{t('calendar.platformLabel')}</Label>
               <Select value={form.platform} onValueChange={v => update('platform', v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -322,18 +324,18 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
 
             {!isMaintenance && (
               <div>
-                <Label className="font-display text-xs tracking-wider">Guest Name</Label>
-                <Input value={form.guestName} onChange={e => update('guestName', e.target.value)} placeholder="Full name" />
+              <Label className="font-display text-xs tracking-wider">{t('calendar.guestNameLabel')}</Label>
+                <Input value={form.guestName} onChange={e => update('guestName', e.target.value)} placeholder={t('calendar.fullName')} />
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label className="font-display text-xs tracking-wider">Check-in</Label>
+                <Label className="font-display text-xs tracking-wider">{t('calendar.checkIn')}</Label>
                 <Input type="date" value={form.checkIn} onChange={e => update('checkIn', e.target.value)} />
               </div>
               <div>
-                <Label className="font-display text-xs tracking-wider">Check-out</Label>
+                <Label className="font-display text-xs tracking-wider">{t('calendar.checkOut')}</Label>
                 <Input type="date" value={form.checkOut} onChange={e => update('checkOut', e.target.value)} />
               </div>
             </div>
@@ -342,24 +344,24 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
               <>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label className="font-display text-xs tracking-wider">Adults</Label>
+                    <Label className="font-display text-xs tracking-wider">{t('calendar.adults')}</Label>
                     <Input type="number" value={form.adults} onChange={e => update('adults', e.target.value)} min="1" />
                   </div>
                   <div>
-                    <Label className="font-display text-xs tracking-wider">Children</Label>
+                    <Label className="font-display text-xs tracking-wider">{t('calendar.children')}</Label>
                     <Input type="number" value={form.children} onChange={e => update('children', e.target.value)} min="0" />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="font-display text-xs tracking-wider">Room Rate (₱)</Label>
+                  <Label className="font-display text-xs tracking-wider">{t('calendar.roomRate')}</Label>
                   <Input type="number" value={form.roomRate} onChange={e => update('roomRate', e.target.value)} min="0" />
                 </div>
               </>
             )}
 
             <div>
-              <Label className="font-display text-xs tracking-wider">Notes</Label>
+              <Label className="font-display text-xs tracking-wider">{t('calendar.notes')}</Label>
               <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} rows={2} />
             </div>
           </div>
@@ -367,16 +369,16 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
           <DialogFooter className="gap-2 flex-col sm:flex-row">
             {isEdit && (
               <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)} className="font-display text-xs tracking-wider sm:mr-auto">
-                Delete
+                {t('common.delete')}
               </Button>
             )}
-            <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">Cancel</Button>
+            <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">{t('common.cancel')}</Button>
             <Button
               onClick={handleSave}
               disabled={saving || (liveConflicts.length > 0 && !canManage)}
               className="font-display text-xs tracking-wider"
             >
-              {saving ? 'Saving...' : isEdit ? 'Update' : 'Create'}
+              {saving ? t('calendar.saving') : isEdit ? t('common.update') : t('common.create')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -391,7 +393,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
         onSelectAlternative={room => {
           update('unitId', room.id);
           setConflictOpen(false);
-          toast.info(`Switched to ${room.name}`);
+          toast.info(t('calendar.switchedTo', { room: room.name }));
         }}
         onOverride={() => {
           setForceOverride(true);
@@ -404,15 +406,15 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-display tracking-wider">Delete Reservation</AlertDialogTitle>
+            <AlertDialogTitle className="font-display tracking-wider">{t('calendar.deleteReservation')}</AlertDialogTitle>
             <AlertDialogDescription className="font-body">
-              This will permanently remove this reservation. This action cannot be undone.
+              {t('calendar.deleteReservationDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-display text-xs tracking-wider">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="font-display text-xs tracking-wider">{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={deleting} className="font-display text-xs tracking-wider bg-destructive text-destructive-foreground">
-              {deleting ? 'Deleting...' : 'Delete'}
+              {deleting ? t('common.deleting') : t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

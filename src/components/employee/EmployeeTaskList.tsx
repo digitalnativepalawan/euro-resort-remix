@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ interface Props {
 }
 
 const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, employees = [] }: Props) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: resortProfile } = useResortProfile();
   const [title, setTitle] = useState('');
@@ -159,7 +161,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
     setTitle(''); setDescription(''); setDueDate(''); setShowForm(false);
     if (!employeeId) { setAssignees([]); setSelectAll(false); }
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success(`Task added to ${count} staff member${count > 1 ? 's' : ''}`);
+    toast.success(t('tasks.taskAdded', { count: targetIds.length }));
 
     bulkSendMessages(targetIds, savedTitle, savedDesc, savedDue, sendVia);
   };
@@ -177,7 +179,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
     }).eq('id', task.id);
     setCompletingTaskId(null);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task completed ✔');
+    toast.success(t('tasks.taskCompleted'));
   };
 
   const toggleComplete = async (task: any) => {
@@ -189,7 +191,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
         completion_meta: {},
       }).eq('id', task.id);
       qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-      toast.success('Task reopened');
+      toast.success(t('tasks.taskReopened'));
     } else {
       // Open completion panel
       setCompletingTaskId(task.id);
@@ -205,19 +207,19 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
     }).eq('id', editId);
     setEditId(null);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task updated');
+    toast.success(t('tasks.taskUpdated'));
   };
 
   const archiveTask = async (id: string) => {
     await (supabase.from('employee_tasks' as any) as any).update({ archived_at: new Date().toISOString() }).eq('id', id);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task archived');
+    toast.success(t('tasks.taskArchived'));
   };
 
   const restoreTask = async (id: string) => {
     await (supabase.from('employee_tasks' as any) as any).update({ archived_at: null }).eq('id', id);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task restored');
+    toast.success(t('tasks.taskRestored'));
   };
 
   const getEmployeeName = (id: string) => {
@@ -237,7 +239,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
       {!readOnly && (
         <Button size="sm" variant="outline" onClick={() => setShowForm(!showForm)}
           className="font-display text-xs tracking-wider gap-1 w-full">
-          <Plus className="w-3.5 h-3.5" /> Add Task
+          <Plus className="w-3.5 h-3.5" /> {t('tasks.addTask')}
         </Button>
       )}
 
@@ -324,7 +326,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
         </div>
       )}
 
-      {sorted.length === 0 && <p className="font-body text-xs text-muted-foreground text-center py-4">No tasks</p>}
+      {sorted.length === 0 && <p className="font-body text-xs text-muted-foreground text-center py-4">{t('common.noTasks')}</p>}
 
       {sorted.map(task => {
         const isCompleted = task.status === 'completed';

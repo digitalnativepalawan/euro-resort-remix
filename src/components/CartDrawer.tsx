@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/lib/cart';
@@ -37,8 +38,8 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
           className={`flex-1 min-h-[36px] py-1.5 border font-display text-xs tracking-wider rounded transition-colors ${
             tabMode === 'new' ? 'border-accent text-accent bg-accent/10' : 'border-border text-muted-foreground'
           }`}>
-          New Tab
-        </button>
+           New Tab
+         </button>
         <button onClick={() => setTabMode('existing')}
           className={`flex-1 min-h-[36px] py-1.5 border font-display text-xs tracking-wider rounded transition-colors ${
             tabMode === 'existing' ? 'border-accent text-accent bg-accent/10' : 'border-border text-muted-foreground'
@@ -77,6 +78,7 @@ interface CartDrawerProps {
 }
 
 const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, locationDetail: initialLocation, initialGuestName = '' }: CartDrawerProps) => {
+  const { t } = useTranslation();
   const cart = useCart();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -182,7 +184,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
 
   const handleSendToKitchen = async () => {
     if (!selectedOrderType || !selectedLocation) {
-      toast.error('Please select order type and location');
+      toast.error(t('cart.selectOrderTypeAndLocation'));
       return;
     }
     // Payment type is now set by the cashier at settlement time, not at order placement
@@ -195,7 +197,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
       const result = await checkStock(cart.items.map(i => ({ name: i.name, quantity: i.quantity })));
       if (!result.canFulfill) {
         setStockWarning(result.shortages);
-        toast.error('Some items are out of stock');
+        toast.error(t('cart.someItemsOutOfStock'));
         return;
       }
     }
@@ -343,9 +345,9 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
       const toastLabel = (() => {
         const hk = orderItems.some(i => i.department === 'kitchen' || i.department === 'both');
         const hb = orderItems.some(i => i.department === 'bar' || i.department === 'both');
-        if (hk && hb) return 'Order sent to Kitchen & Bar!';
-        if (hb && !hk) return 'Order sent to Bar!';
-        return 'Order sent to Kitchen!';
+        if (hk && hb) return t('cart.orderSentToKitchenAndBar');
+        if (hb && !hk) return t('cart.orderSentToBar');
+        return t('cart.orderSentToKitchen');
       })();
       toast.success(toastLabel);
 
@@ -363,7 +365,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
         window.open(url, '_blank');
       }
     } catch {
-      toast.error('Failed to place order');
+      toast.error(t('cart.failedToPlaceOrder'));
     } finally {
       setSubmitting(false);
     }
@@ -384,7 +386,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
           <>
             <div className="flex flex-col items-center justify-center py-12 px-6 gap-4">
               <CheckCircle2 className="w-16 h-16 text-green-400 animate-fade-in" />
-              <h2 className="font-display text-2xl tracking-wider text-foreground">Order Sent!</h2>
+              <h2 className="font-display text-2xl tracking-wider text-foreground">{t('cart.orderSent')}</h2>
               <div className="flex gap-2">
                 <span className="font-body text-xs bg-secondary px-2 py-0.5 rounded text-cream-dim">
                   {TYPE_LABELS[selectedOrderType] || selectedOrderType}
@@ -394,10 +396,10 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                 </span>
               </div>
               <p className="font-body text-sm text-cream-dim text-center">
-                {orderSummary.itemCount} item{orderSummary.itemCount !== 1 ? 's' : ''} · ₱{orderSummary.grandTotal.toLocaleString()}
+                {t('menu.itemCount', { count: orderSummary.itemCount })} · ₱{orderSummary.grandTotal.toLocaleString()}
               </p>
               <p className="font-body text-xs text-cream-dim text-center mt-2">
-                {isGuestOrder ? 'Charged to your room' : 'Added to your open tab'}
+                {isGuestOrder ? t('cart.chargedToRoom') : t('cart.addedToOpenTab')}
               </p>
             </div>
             <DrawerFooter className="pt-0 gap-2">
@@ -413,13 +415,13 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   setSelectedOrderType(''); setSelectedLocation(''); setPaymentType(''); setGuestName(''); setScheduleMode('asap');
                 }
               }} className="font-display tracking-wider py-6 w-full">
-                Place Another Order
+                {t('cart.placeAnotherOrder')}
               </Button>
               <Button variant="outline" onClick={() => {
                 handleClose(false);
                 if (returnTo) navigate(returnTo);
               }} className="font-display tracking-wider py-6 w-full">
-                {returnTo ? 'Back to Board' : 'Done'}
+                {returnTo ? t('cart.backToBoard') : t('common.done')}
               </Button>
             </DrawerFooter>
           </>
@@ -432,7 +434,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
               )}
               <p className="font-display text-xs tracking-[0.3em] text-cream-dim uppercase">{brandName}</p>
               <DrawerTitle className="font-display text-lg text-foreground tracking-wider">
-                Your Order
+                {t('cart.yourOrder')}
               </DrawerTitle>
               {selectedOrderType && selectedLocation && (
                 <div className="flex justify-center gap-2 mt-1">
@@ -448,7 +450,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
 
             <div className="px-4 overflow-y-auto flex-1">
               {cart.items.length === 0 ? (
-                <p className="font-body text-cream-dim text-center py-8">Your order is empty</p>
+                <p className="font-body text-cream-dim text-center py-8">{t('cart.orderEmpty')}</p>
               ) : (
                 <>
                   <div className="flex flex-col gap-3">
@@ -482,7 +484,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   <Separator className="my-4" />
                   <div className="space-y-1.5">
                     <div className="flex justify-between font-body text-sm">
-                      <span className="text-cream-dim">Subtotal</span>
+                      <span className="text-cream-dim">{t('common.subtotal')}</span>
                       <span className="text-foreground">₱{subtotal.toLocaleString()}</span>
                     </div>
                     {scRate > 0 && (
@@ -499,7 +501,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     )}
                     <Separator className="my-2" />
                     <div className="flex justify-between font-display text-lg tracking-wider">
-                      <span className="text-foreground">Total</span>
+                      <span className="text-foreground">{t('common.total')}</span>
                       <span className="text-gold">₱{grandTotal.toLocaleString()}</span>
                     </div>
                   </div>
@@ -509,7 +511,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     <div className="mt-4 pt-3 border-t border-border">
                       <div className="bg-gold/10 border border-gold/20 rounded-lg p-3 text-center">
                         <p className="font-display text-xs tracking-wider text-gold mb-1">Room {guestSession.room_name}</p>
-                        <p className="font-body text-xs text-cream-dim">All charges will be added to your room bill</p>
+                        <p className="font-body text-xs text-cream-dim">{t('cart.chargedToYourRoom')}</p>
                       </div>
                     </div>
                   )}
@@ -517,7 +519,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   {/* Order type selection for guests who haven't pre-selected */}
                   {!isGuestOrder && needsOrderType && orderTypes.length > 0 && (
                     <div className="mt-4 pt-3 border-t border-border">
-                      <p className="font-display text-sm text-foreground tracking-wider mb-3">Where's your order?</p>
+                      <p className="font-display text-sm text-foreground tracking-wider mb-3">{t('cart.whereIsYourOrder')}</p>
                       <div className="grid grid-cols-2 gap-2 mb-3">
                         {orderTypes.map(ot => (
                           <button
@@ -565,7 +567,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     <div className="mt-4 pt-3 border-t border-border">
                       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
                         <Clock className="w-4 h-4 text-amber-400" />
-                        <span className="font-body text-xs text-amber-400">Payment will be set by cashier at settlement</span>
+                        <span className="font-body text-xs text-amber-400">{t('cart.paymentByCashier')}</span>
                       </div>
                     </div>
                   )}
@@ -573,7 +575,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   {/* Guest name for Room, WalkIn, DineIn orders (not for guest-order mode - auto-filled) */}
                   {(selectedOrderType === 'Room' || selectedOrderType === 'WalkIn' || selectedOrderType === 'DineIn') && !isGuestOrder && (
                     <div className="mt-3">
-                      <label className="font-body text-xs text-cream-dim">Guest Name (optional)</label>
+                      <label className="font-body text-xs text-cream-dim">{t('cart.guestNameOptional')}</label>
                       <Input value={guestName} onChange={e => setGuestName(e.target.value)}
                         placeholder="Guest name" className="bg-secondary border-border text-foreground font-body mt-1" />
                     </div>
@@ -584,7 +586,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     <div className="mt-4 pt-3 border-t border-border">
                       <div className="flex items-center gap-2 mb-3">
                         <Clock className="w-4 h-4 text-cream-dim" />
-                        <p className="font-display text-sm text-foreground tracking-wider">Scheduled Time</p>
+                        <p className="font-display text-sm text-foreground tracking-wider">{t('cart.scheduledTime')}</p>
                       </div>
                       <div className="flex gap-2 mb-3">
                         <button
@@ -595,7 +597,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                               : 'border-border text-cream-dim'
                           }`}
                         >
-                          ASAP
+                          {t('cart.asap')}
                         </button>
                         <button
                           onClick={() => setScheduleMode('scheduled')}
@@ -605,7 +607,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                               : 'border-border text-cream-dim'
                           }`}
                         >
-                          Schedule
+                          {t('cart.schedule')}
                         </button>
                       </div>
 
@@ -621,7 +623,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                                   : 'border-border text-cream-dim'
                               }`}
                             >
-                              Today
+                              {t('common.today')}
                             </button>
                             <button
                               onClick={() => setScheduledDay('tomorrow')}
@@ -631,7 +633,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                                   : 'border-border text-cream-dim'
                               }`}
                             >
-                              Tomorrow
+                              {t('common.tomorrow')}
                             </button>
                           </div>
 
@@ -680,7 +682,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
               <div className="mx-4 mt-3 p-3 rounded-lg border border-destructive/40 bg-destructive/10 space-y-2">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-destructive" />
-                  <span className="font-display text-xs tracking-wider text-destructive">Insufficient Stock</span>
+                  <span className="font-display text-xs tracking-wider text-destructive">{t('cart.insufficientStock')}</span>
                 </div>
                 {stockWarning.map((s, i) => (
                   <p key={i} className="font-body text-xs text-foreground">
@@ -693,7 +695,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   onClick={() => { setOverrideStock(true); setStockWarning([]); }}
                   className="font-display text-xs tracking-wider w-full mt-1"
                 >
-                  Override & Send Anyway
+                  {t('cart.overrideAndSend')}
                 </Button>
               </div>
             )}
@@ -706,16 +708,16 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   className="font-display tracking-wider py-6 w-full gap-2 text-base"
                 >
                   <Send className="w-4 h-4" />
-                  {submitting ? 'Sending...' : isGuestOrder ? 'Send Order' : (() => {
+                  {submitting ? t('common.sending') : isGuestOrder ? t('cart.sendOrder') : (() => {
                     const hasKitchen = cart.items.some(i => (i.department || 'kitchen') === 'kitchen' || (i.department || 'kitchen') === 'both');
                     const hasBar = cart.items.some(i => i.department === 'bar' || i.department === 'both');
-                    if (hasKitchen && hasBar) return 'Send to Kitchen & Bar';
-                    if (hasBar && !hasKitchen) return 'Send to Bar';
-                    return 'Send to Kitchen';
+                    if (hasKitchen && hasBar) return t('cart.sendToKitchenAndBar');
+                    if (hasBar && !hasKitchen) return t('cart.sendToBar');
+                    return t('cart.sendToKitchen');
                   })()}
                 </Button>
                 <p className="font-body text-[10px] text-cream-dim text-center mt-1">
-                  {isGuestOrder ? 'Charges will be added to your room bill' : 'Order will be added to your open tab'}
+                  {isGuestOrder ? t('cart.chargedToYourRoom') : t('cart.addedToTab')}
                 </p>
               </DrawerFooter>
             )}

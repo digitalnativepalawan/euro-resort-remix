@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useResortProfile } from '@/hooks/useResortProfile';
@@ -36,6 +37,7 @@ const getPortalSession = (): GuestPortalSession | null => {
 };
 
 const GuestPortal = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: profile } = useResortProfile();
   const qc = useQueryClient();
@@ -61,10 +63,10 @@ const GuestPortal = () => {
     setLoading(true);
     try {
       const unit = allUnits.find(u => u.unit_name === roomName);
-      if (!unit) { toast.error('Room not found'); setLoading(false); return; }
+      if (!unit) { toast.error(t('guest.roomNotFound')); setLoading(false); return; }
 
       const { data: opsUnit } = await supabase.from('resort_ops_units').select('id').ilike('name', roomName.trim()).maybeSingle();
-      if (!opsUnit) { toast.error('Room not found'); setLoading(false); return; }
+      if (!opsUnit) { toast.error(t('guest.roomNotFound')); setLoading(false); return; }
 
       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
       const { data: booking } = await supabase
@@ -77,12 +79,12 @@ const GuestPortal = () => {
         .limit(1)
         .maybeSingle();
 
-      if (!booking) { toast.error('No active booking found for this room'); setLoading(false); return; }
+      if (!booking) { toast.error(t('guest.noActiveBooking')); setLoading(false); return; }
 
       const guestName = (booking as any).resort_ops_guests?.full_name || '';
       const lastNameFromBooking = guestName.split(' ').pop()?.toLowerCase() || '';
       if (lastNameFromBooking !== lastName.trim().toLowerCase()) {
-        toast.error('Last name does not match our records');
+        toast.error(t('guest.lastNameNoMatch'));
         setLoading(false);
         return;
       }
@@ -102,8 +104,8 @@ const GuestPortal = () => {
       };
       sessionStorage.setItem(GUEST_PORTAL_KEY, JSON.stringify(portalSession));
       setSession(portalSession);
-      toast.success(`Welcome, ${guestName.split(' ')[0]}!`);
-    } catch { toast.error('Login failed'); }
+      toast.success(t('guest.welcome', { name: guestName.split(' ')[0] }));
+    } catch { toast.error(t('guest.loginFailed')); }
     setLoading(false);
   };
 
@@ -117,22 +119,22 @@ const GuestPortal = () => {
     return (
       <div className="min-h-screen bg-navy-texture flex flex-col items-center justify-center px-6">
         {profile?.logo_url && <img src={profile.logo_url} alt="Logo" style={{ width: profile.logo_size || 96, height: profile.logo_size || 96 }} className="object-contain mb-4" />}
-        <h1 className="font-display text-2xl tracking-wider text-foreground mb-1">Guest Portal</h1>
-        <p className="font-body text-sm text-muted-foreground mb-8">Access your room services</p>
+        <h1 className="font-display text-2xl tracking-wider text-foreground mb-1">{t('guest.guestPortal')}</h1>
+        <p className="font-body text-sm text-muted-foreground mb-8">{t('guest.accessRoomServices')}</p>
         <div className="w-full max-w-xs space-y-3">
           <Select onValueChange={setRoomName} value={roomName}>
             <SelectTrigger className="bg-secondary border-border text-foreground font-body text-center h-12">
-              <SelectValue placeholder="Select your room" />
+              <SelectValue placeholder={t('guest.selectYourRoom')} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border">
               {allUnits.map(u => <SelectItem key={u.id} value={u.unit_name} className="text-foreground font-body">{u.unit_name}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Your last name" className="bg-secondary border-border text-foreground font-body text-center text-lg h-12" onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+          <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder={t('guest.yourLastName')} className="bg-secondary border-border text-foreground font-body text-center text-lg h-12" onKeyDown={e => e.key === 'Enter' && handleLogin()} />
           <Button onClick={handleLogin} disabled={loading || !roomName || !lastName.trim()} className="w-full font-display text-sm tracking-wider h-12">
-            {loading ? 'Verifying...' : 'Enter Portal'}
+            {loading ? t('common.verifying') : t('guest.enterPortal')}
           </Button>
-          <button onClick={() => navigate('/')} className="w-full font-body text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">Back to Home</button>
+          <button onClick={() => navigate('/')} className="w-full font-body text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">{t('guest.backToHome')}</button>
         </div>
       </div>
     );
@@ -143,24 +145,24 @@ const GuestPortal = () => {
       <div className="max-w-lg mx-auto px-4 py-6">
         {view !== 'dashboard' ? (
           <button onClick={() => setView('dashboard')} className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-body text-sm mb-4">
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className="w-4 h-4" /> {t('common.back')}
           </button>
         ) : (
           <>
             {/* Welcome header */}
             <div className="bg-card border border-border rounded-lg p-5 mb-6">
-              <p className="font-display text-xl text-foreground">Welcome, {session.guest_name.split(' ')[0]}!</p>
-              <p className="font-body text-sm text-muted-foreground mt-1">{session.room_name} · Check-out: {new Date(session.check_out).toLocaleDateString()}</p>
+              <p className="font-display text-xl text-foreground">{t('guest.welcome', { name: session.guest_name.split(' ')[0] })}</p>
+              <p className="font-body text-sm text-muted-foreground mt-1">{session.room_name} · {t('reception.checkOut')}: {new Date(session.check_out).toLocaleDateString()}</p>
             </div>
 
-            <p className="font-display text-sm tracking-wider text-muted-foreground mb-4">What can we help with?</p>
+            <p className="font-display text-sm tracking-wider text-muted-foreground mb-4">{t('guest.whatCanWeHelp')}</p>
 
             {/* 5 large concierge tiles — stacked on mobile */}
             <div className="flex flex-col gap-3 mb-6">
               <GuestTile
                 icon={<UtensilsCrossed className="w-6 h-6" />}
-                label="Order Food"
-                subtitle="Browse our menu and order to your room"
+                label={t('guest.orderFood')}
+                subtitle={t('guest.orderFoodSub')}
                 onClick={() => {
                   setGuestSession({ room_id: session.room_id, room_name: session.room_name, guest_name: session.guest_name, booking_id: session.booking_id });
                   navigate('/menu?mode=guest-order&dept=kitchen');
@@ -168,8 +170,8 @@ const GuestPortal = () => {
               />
               <GuestTile
                 icon={<span className="text-2xl">🍹</span>}
-                label="Order Drinks"
-                subtitle="Cocktails, coffee, fresh juices & more"
+                label={t('guest.orderDrinks')}
+                subtitle={t('guest.orderDrinksSub')}
                 onClick={() => {
                   setGuestSession({ room_id: session.room_id, room_name: session.room_name, guest_name: session.guest_name, booking_id: session.booking_id });
                   navigate('/menu?mode=guest-order&dept=bar');
@@ -177,20 +179,20 @@ const GuestPortal = () => {
               />
               <GuestTile
                 icon={<Palmtree className="w-6 h-6" />}
-                label="Book Experiences"
-                subtitle="Tours, transport & equipment rental"
+                label={t('guest.bookExperiences')}
+                subtitle={t('guest.bookExperiencesSub')}
                 onClick={() => setView('experiences')}
               />
               <GuestTile
                 icon={<MessageSquare className="w-6 h-6" />}
-                label="Request Service"
-                subtitle="Housekeeping, towels, or anything you need"
+                label={t('guest.requestService')}
+                subtitle={t('guest.requestServiceSub')}
                 onClick={() => setView('request')}
               />
               <GuestTile
                 icon={<ConciergeBell className="w-6 h-6" />}
-                label="Message Reception"
-                subtitle="Send a note directly to our front desk"
+                label={t('guest.messageReception')}
+                subtitle={t('guest.messageReceptionSub')}
                 onClick={() => setView('message')}
               />
             </div>
@@ -199,24 +201,24 @@ const GuestPortal = () => {
             <div className="grid grid-cols-4 gap-3 mb-6">
               <button onClick={() => setView('orders')} className="bg-secondary/50 border border-border rounded-lg py-3 px-3 text-center hover:bg-secondary transition-colors">
                 <ClipboardList className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
-                <span className="font-body text-xs text-muted-foreground">My Orders</span>
+                <span className="font-body text-xs text-muted-foreground">{t('guest.myOrders')}</span>
               </button>
               <button onClick={() => setView('requests')} className="bg-secondary/50 border border-border rounded-lg py-3 px-3 text-center hover:bg-secondary transition-colors">
                 <CheckCircle2 className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
-                <span className="font-body text-xs text-muted-foreground">My Requests</span>
+                <span className="font-body text-xs text-muted-foreground">{t('guest.myRequests')}</span>
               </button>
               <button onClick={() => setView('bill')} className="bg-secondary/50 border border-border rounded-lg py-3 px-3 text-center hover:bg-secondary transition-colors">
                 <Receipt className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
-                <span className="font-body text-xs text-muted-foreground">My Bill</span>
+                <span className="font-body text-xs text-muted-foreground">{t('guest.myBill')}</span>
               </button>
               <button onClick={() => setView('review')} className="bg-secondary/50 border border-border rounded-lg py-3 px-3 text-center hover:bg-secondary transition-colors">
                 <Star className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
-                <span className="font-body text-xs text-muted-foreground">Review</span>
+                <span className="font-body text-xs text-muted-foreground">{t('guest.review')}</span>
               </button>
             </div>
 
             <button onClick={logout} className="flex items-center justify-center gap-2 w-full font-body text-xs text-muted-foreground hover:text-foreground py-2">
-              <LogOut className="w-3.5 h-3.5" /> Sign out
+              <LogOut className="w-3.5 h-3.5" /> {t('common.signOut')}
             </button>
           </>
         )}
