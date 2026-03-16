@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getStaffSession, clearStaffSession } from '@/lib/session';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 
 const DEPT_COLORS: Record<string, string> = {
   reception:    'bg-[hsl(210,70%,50%)] text-white',
