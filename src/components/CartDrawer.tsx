@@ -486,7 +486,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   <Separator className="my-4" />
                   <div className="space-y-1.5">
                     <div className="flex justify-between font-body text-sm">
-                      <span className="text-cream-dim">Subtotal</span>
+                      <span className="text-cream-dim">{t('common.subtotal')}</span>
                       <span className="text-foreground">₱{subtotal.toLocaleString()}</span>
                     </div>
                     {scRate > 0 && (
