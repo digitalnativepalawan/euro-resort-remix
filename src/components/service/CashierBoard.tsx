@@ -253,7 +253,7 @@ const CashierBoard = () => {
           {/* Bill Out section — grouped by room */}
           {buckets.billOut.length > 0 && (
             <div className="p-3">
-              <h3 className="font-display text-xs tracking-wider text-amber-400 mb-2 px-1">💰 BILL OUT — Awaiting Payment</h3>
+              <h3 className="font-display text-xs tracking-wider text-amber-400 mb-2 px-1">💰 {t('cashier.billOut')} — {t('cashier.awaitingPayment')}</h3>
               <GroupedBillOut
                 orders={buckets.billOut}
                 selectedOrderId={selectedOrder?.id}
