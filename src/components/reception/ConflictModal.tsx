@@ -47,7 +47,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
 
           {availableRooms.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-display tracking-wider text-foreground">Alternative Rooms</p>
+              <p className="text-sm font-display tracking-wider text-foreground">{t('calendar.alternativeRooms')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {availableRooms.slice(0, 6).map(room => (
                   <Button
