@@ -372,7 +372,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
                 {t('common.delete')}
               </Button>
             )}
-            <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">Cancel</Button>
+            <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">{t('common.cancel')}</Button>
             <Button
               onClick={handleSave}
               disabled={saving || (liveConflicts.length > 0 && !canManage)}
