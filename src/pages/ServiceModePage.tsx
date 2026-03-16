@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Flame, GlassWater, BellRing, Banknote, ArrowLeft, LayoutGrid, UtensilsCrossed } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
@@ -7,69 +8,69 @@ import { useMemo } from 'react';
 import { getStaffSession } from '@/lib/session';
 import { getHomeRoute } from '@/lib/getHomeRoute';
 import { hasAccess, canEdit } from '@/lib/permissions';
-
-const departments = [
-  {
-    key: 'kitchen',
-    label: 'Kitchen',
-    subtitle: 'Food preparation board',
-    icon: <Flame className="w-7 h-7" />,
-    gradient: 'from-[hsl(25,85%,55%)] to-[hsl(15,80%,45%)]',
-    glow: 'shadow-[0_0_30px_-5px_hsl(25,85%,55%,0.3)]',
-    route: '/service/kitchen',
-    statusField: 'kitchen_status',
-    permKeys: ['kitchen'],
-  },
-  {
-    key: 'bar',
-    label: 'Bar',
-    subtitle: 'Drink preparation board',
-    icon: <GlassWater className="w-7 h-7" />,
-    gradient: 'from-[hsl(270,60%,55%)] to-[hsl(280,55%,42%)]',
-    glow: 'shadow-[0_0_30px_-5px_hsl(270,60%,55%,0.3)]',
-    route: '/service/bar',
-    statusField: 'bar_status',
-    permKeys: ['bar'],
-  },
-  {
-    key: 'reception',
-    label: 'Reception',
-    subtitle: 'Service coordination & billing',
-    icon: <BellRing className="w-7 h-7" />,
-    gradient: 'from-[hsl(210,70%,50%)] to-[hsl(220,65%,40%)]',
-    glow: 'shadow-[0_0_30px_-5px_hsl(210,70%,50%,0.3)]',
-    route: '/service/reception',
-    statusField: null,
-    permKeys: ['reception_display', 'reception'],
-  },
-  {
-    key: 'cashier',
-    label: 'Cashier',
-    subtitle: 'Fast checkout & payment',
-    icon: <Banknote className="w-7 h-7" />,
-    gradient: 'from-[hsl(45,90%,50%)] to-[hsl(35,85%,42%)]',
-    glow: 'shadow-[0_0_30px_-5px_hsl(45,90%,50%,0.3)]',
-    route: '/service/cashier',
-    statusField: null,
-    permKeys: ['cashier'],
-  },
-];
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const ServiceModePage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const departments = useMemo(() => [
+    {
+      key: 'kitchen',
+      label: t('kitchen.label'),
+      subtitle: t('kitchen.subtitle'),
+      icon: <Flame className="w-7 h-7" />,
+      gradient: 'from-[hsl(25,85%,55%)] to-[hsl(15,80%,45%)]',
+      glow: 'shadow-[0_0_30px_-5px_hsl(25,85%,55%,0.3)]',
+      route: '/service/kitchen',
+      statusField: 'kitchen_status',
+      permKeys: ['kitchen'],
+    },
+    {
+      key: 'bar',
+      label: t('bar.label'),
+      subtitle: t('bar.subtitle'),
+      icon: <GlassWater className="w-7 h-7" />,
+      gradient: 'from-[hsl(270,60%,55%)] to-[hsl(280,55%,42%)]',
+      glow: 'shadow-[0_0_30px_-5px_hsl(270,60%,55%,0.3)]',
+      route: '/service/bar',
+      statusField: 'bar_status',
+      permKeys: ['bar'],
+    },
+    {
+      key: 'reception',
+      label: t('reception.label'),
+      subtitle: t('reception.subtitle'),
+      icon: <BellRing className="w-7 h-7" />,
+      gradient: 'from-[hsl(210,70%,50%)] to-[hsl(220,65%,40%)]',
+      glow: 'shadow-[0_0_30px_-5px_hsl(210,70%,50%,0.3)]',
+      route: '/service/reception',
+      statusField: null,
+      permKeys: ['reception_display', 'reception'],
+    },
+    {
+      key: 'cashier',
+      label: t('cashier.label'),
+      subtitle: t('cashier.subtitle'),
+      icon: <Banknote className="w-7 h-7" />,
+      gradient: 'from-[hsl(45,90%,50%)] to-[hsl(35,85%,42%)]',
+      glow: 'shadow-[0_0_30px_-5px_hsl(45,90%,50%,0.3)]',
+      route: '/service/cashier',
+      statusField: null,
+      permKeys: ['cashier'],
+    },
+  ], [t]);
 
   const session = useMemo(() => getStaffSession(), []);
   const staffName = session?.name || '';
   const perms: string[] = session?.permissions || [];
   const isAdmin = perms.includes('admin');
 
-  // Filter departments by permission
   const visibleDepartments = useMemo(() => {
     if (isAdmin) return departments;
     return departments.filter(dept => dept.permKeys.some(k => hasAccess(perms, k)));
-  }, [perms, isAdmin]);
+  }, [perms, isAdmin, departments]);
 
-  // Fetch today's active orders for live counts
   const { data: orders = [] } = useQuery({
     queryKey: ['service-mode-counts'],
     queryFn: async () => {
@@ -96,7 +97,6 @@ const ServiceModePage = () => {
       if (hasFood && o.kitchen_status !== 'ready') kitchen++;
       if (hasDrinks && o.bar_status !== 'ready') bar++;
       reception++;
-      // Cashier count = served non-auto-payable (awaiting payment)
       if (o.status === 'Served' && !isAutoPayable(o)) cashier++;
     });
     return { kitchen, bar, reception, cashier };
@@ -111,8 +111,9 @@ const ServiceModePage = () => {
           </Button>
           <div className="flex items-center gap-2.5 flex-1">
             <LayoutGrid className="w-5 h-5 text-gold" />
-            <h1 className="font-display text-lg tracking-[0.12em] text-foreground">Service Mode</h1>
+            <h1 className="font-display text-lg tracking-[0.12em] text-foreground">{t('service.serviceMode')}</h1>
           </div>
+          <LanguageSwitcher />
           {staffName && (
             <span className="font-body text-xs text-muted-foreground truncate max-w-[120px]">{staffName}</span>
           )}
@@ -122,7 +123,7 @@ const ServiceModePage = () => {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-lg space-y-4">
           <p className="font-body text-sm text-muted-foreground text-center mb-2">
-            Select a department to open its live board
+            {t('service.selectDepartment')}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visibleDepartments.map(dept => {
@@ -133,9 +134,7 @@ const ServiceModePage = () => {
                   onClick={() => navigate(dept.route)}
                   className={`relative overflow-hidden rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm p-5 flex flex-col gap-4 text-left group transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${dept.glow} hover:border-accent/40`}
                 >
-                  {/* Gradient accent strip */}
                   <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${dept.gradient}`} />
-
                   <div className="flex items-center justify-between">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${dept.gradient} flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-200`}>
                       {dept.icon}
@@ -155,7 +154,6 @@ const ServiceModePage = () => {
             })}
           </div>
 
-          {/* Menu button — only for staff who can place orders */}
           {(isAdmin || canEdit(perms, 'orders')) && (
             <button
               onClick={() => navigate('/order-type?mode=staff&returnTo=/service')}
@@ -165,8 +163,8 @@ const ServiceModePage = () => {
                 <UtensilsCrossed className="w-7 h-7" />
               </div>
               <div className="text-left">
-                <p className="font-display text-xl text-foreground tracking-wider">Menu</p>
-                <p className="font-body text-xs text-muted-foreground mt-0.5">Place a new order</p>
+                <p className="font-display text-xl text-foreground tracking-wider">{t('service.menu')}</p>
+                <p className="font-body text-xs text-muted-foreground mt-0.5">{t('service.placeNewOrder')}</p>
               </div>
             </button>
           )}
