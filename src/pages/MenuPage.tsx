@@ -306,7 +306,7 @@ const MenuPage = () => {
               <button onClick={() => navigate('/')} className="text-cream-dim hover:text-foreground transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
                 <Home className="w-5 h-5" />
               </button>
-              <h1 className="font-display text-lg tracking-[0.15em] text-foreground">ORDERS</h1>
+              <h1 className="font-display text-lg tracking-[0.15em] text-foreground">{t('menu.orders').toUpperCase()}</h1>
               <div className="w-[44px]" />
             </div>
           </div>
