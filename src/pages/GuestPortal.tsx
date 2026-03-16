@@ -408,6 +408,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
 
 // --- Transport (Now pending, no auto-charge) ---
 const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: rates = [] } = useQuery({
     queryKey: ['transport-guest'],
     queryFn: async () => {
@@ -424,7 +425,6 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
     if (!selectedRate) return;
     setSubmitting(true);
     const label = `${selectedRate.origin} → ${selectedRate.destination}`;
-    // Create pending request — NO room charge yet
     await supabase.from('guest_requests').insert({
       booking_id: session.booking_id,
       room_id: session.room_id,
@@ -434,15 +434,15 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
-    toast.success('Transport request submitted! Staff will confirm shortly.');
+    toast.success(t('guest.transportRequest'));
     setSelectedRate(null);
     setSubmitting(false);
   };
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Request Transport</h2>
-      <p className="font-body text-xs text-muted-foreground">Select a route. Staff will confirm and charge to your room.</p>
+      <h2 className="font-display text-lg text-foreground">{t('guest.requestTransport')}</h2>
+      <p className="font-body text-xs text-muted-foreground">{t('guest.selectARoute')}</p>
       {rates.map((r: any) => (
         <div key={r.id} onClick={() => setSelectedRate(r)} className={`bg-card border rounded-lg p-4 cursor-pointer transition-colors ${selectedRate?.id === r.id ? 'border-accent' : 'border-border hover:border-muted-foreground'}`}>
           <div className="flex justify-between items-center">
@@ -459,20 +459,20 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
           <p className="font-body text-sm text-foreground">{selectedRate.origin} → {selectedRate.destination}</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Date</Label>
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {t('common.date')}</Label>
               <Input type="date" value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
             <div className="space-y-1">
-              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Time</Label>
+              <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> {t('guest.pickupTime')}</Label>
               <Input type="time" value={pickupTime} onChange={e => setPickupTime(e.target.value)} className="bg-card text-foreground h-10" />
             </div>
           </div>
-          <p className="font-body text-sm text-foreground text-right">Total: ₱{selectedRate.price}</p>
-          <Button onClick={book} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Request Transport'}</Button>
-          <p className="font-body text-xs text-muted-foreground text-center">Staff will confirm and charge to your room</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedRate.price}</p>
+          <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTransport')}</Button>
+          <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
       )}
-      {rates.length === 0 && <p className="font-body text-sm text-muted-foreground">No transport options available.</p>}
+      {rates.length === 0 && <p className="font-body text-sm text-muted-foreground">{t('guest.noTransportAvailable')}</p>}
     </div>
   );
 };
