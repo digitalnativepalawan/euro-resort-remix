@@ -7,6 +7,7 @@ import { useInvoiceSettings } from '@/hooks/useInvoiceSettings';
 import { useBillingConfig } from '@/hooks/useBillingConfig';
 import { formatDateTime } from '@/lib/dateFormat';
 import { toast } from 'sonner';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface CashierReceiptProps {
   order: any;
