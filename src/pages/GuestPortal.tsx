@@ -134,7 +134,7 @@ const GuestPortal = () => {
           <Button onClick={handleLogin} disabled={loading || !roomName || !lastName.trim()} className="w-full font-display text-sm tracking-wider h-12">
             {loading ? t('common.verifying') : t('guest.enterPortal')}
           </Button>
-          <button onClick={() => navigate('/')} className="w-full font-body text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">Back to Home</button>
+          <button onClick={() => navigate('/')} className="w-full font-body text-xs text-muted-foreground hover:text-foreground py-2 transition-colors">{t('guest.backToHome')}</button>
         </div>
       </div>
     );
