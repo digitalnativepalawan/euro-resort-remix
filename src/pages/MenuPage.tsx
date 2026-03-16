@@ -26,6 +26,7 @@ interface MenuItem {
 }
 
 const MenuPage = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const mode = searchParams.get('mode') || 'guest';
