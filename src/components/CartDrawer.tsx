@@ -492,7 +492,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                     {scRate > 0 && (
                       <div className="flex justify-between font-body text-sm">
                         <span className="text-cream-dim">{billingConfig?.service_charge_name || 'Service Charge'} ({scRate}%)</span>
-                        <span className="text-foreground">₱{serviceCharge.toLocaleString()}</span>
+                        <span className="text-foreground">{formatPrice(serviceCharge)}</span>
                       </div>
                     )}
                     {vatRate > 0 && (
