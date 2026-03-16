@@ -18,6 +18,7 @@ export interface ResortProfile {
   tiktok_url: string;
   website_url: string;
   logo_size: number | null;
+  usd_exchange_rate: number | null;
   created_at: string;
 }
 
