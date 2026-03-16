@@ -22,6 +22,7 @@ interface Props {
 }
 
 const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, employees = [] }: Props) => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: resortProfile } = useResortProfile();
   const [title, setTitle] = useState('');
