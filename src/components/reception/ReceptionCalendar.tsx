@@ -236,9 +236,9 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
         <ToggleGroup type="single" value={view} onValueChange={v => v && setView(v as CalendarView)} className="bg-secondary rounded-lg p-0.5">
-          <ToggleGroupItem value="week" className="font-display text-[10px] tracking-wider px-3 h-7">Week</ToggleGroupItem>
-          <ToggleGroupItem value="2week" className="font-display text-[10px] tracking-wider px-3 h-7">2 Weeks</ToggleGroupItem>
-          <ToggleGroupItem value="month" className="font-display text-[10px] tracking-wider px-3 h-7">Month</ToggleGroupItem>
+          <ToggleGroupItem value="week" className="font-display text-[10px] tracking-wider px-3 h-7">{t('calendar.week')}</ToggleGroupItem>
+          <ToggleGroupItem value="2week" className="font-display text-[10px] tracking-wider px-3 h-7">{t('calendar.twoWeek')}</ToggleGroupItem>
+          <ToggleGroupItem value="month" className="font-display text-[10px] tracking-wider px-3 h-7">{t('calendar.month')}</ToggleGroupItem>
         </ToggleGroup>
 
         <div className="flex items-center gap-1">
