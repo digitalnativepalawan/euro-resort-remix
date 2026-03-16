@@ -455,7 +455,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               <>
                 <div className="flex items-center gap-2 pt-3 pb-1">
                   <Clock className="w-4 h-4 text-blue-400" />
-                  <span className="font-display text-xs tracking-widest text-blue-400 uppercase font-bold">Scheduled for Later</span>
+                  <span className="font-display text-xs tracking-widest text-blue-400 uppercase font-bold">{t('kitchen.scheduledForLater')}</span>
                   <span className="font-body text-xs text-cream-dim">({scheduledOrders.length})</span>
                 </div>
                 {scheduledOrders.map(order => renderOrderCard(order, true))}
