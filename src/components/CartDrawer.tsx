@@ -38,8 +38,8 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
           className={`flex-1 min-h-[36px] py-1.5 border font-display text-xs tracking-wider rounded transition-colors ${
             tabMode === 'new' ? 'border-accent text-accent bg-accent/10' : 'border-border text-muted-foreground'
           }`}>
-          New Tab
-        </button>
+           New Tab
+         </button>
         <button onClick={() => setTabMode('existing')}
           className={`flex-1 min-h-[36px] py-1.5 border font-display text-xs tracking-wider rounded transition-colors ${
             tabMode === 'existing' ? 'border-accent text-accent bg-accent/10' : 'border-border text-muted-foreground'
