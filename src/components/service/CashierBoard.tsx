@@ -487,7 +487,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
           {isRoomCharge && isPaid ? t('reception.roomCharge') : isPendingPayment ? t('cashier.pendingPayment') : isPaid ? t('cashier.paid') : order.status}
         </Badge>
 
-        <span className="font-display text-sm text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
+        <span className="font-display text-sm text-gold tabular-nums">{formatPrice(order.total)}</span>
       </div>
     </div>
   );
