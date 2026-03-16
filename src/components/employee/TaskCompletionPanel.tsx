@@ -14,6 +14,7 @@ interface Props {
 }
 
 const TaskCompletionPanel = ({ taskTitle, onConfirm, onCancel }: Props) => {
+  const { t } = useTranslation();
   const [comment, setComment] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
