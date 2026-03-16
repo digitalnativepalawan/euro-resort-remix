@@ -72,7 +72,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose} className="font-display text-xs tracking-wider">
-            Cancel
+            {t('common.cancel')}
           </Button>
           {canOverride && (
             <Button variant="destructive" onClick={onOverride} className="font-display text-xs tracking-wider">
