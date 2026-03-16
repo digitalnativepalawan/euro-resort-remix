@@ -1201,7 +1201,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
           <p className="font-display text-xs tracking-wider text-muted-foreground uppercase">Stay Details</p>
           <div className="flex justify-between">
             <span className="font-body text-sm text-muted-foreground">Room Rate</span>
-            <span className="font-body text-sm text-foreground">₱{bookingRoomRate.toLocaleString()}/night</span>
+            <span className="font-body text-sm text-foreground">{formatPrice(bookingRoomRate)}/night</span>
           </div>
           <div className="flex justify-between">
             <span className="font-body text-sm text-muted-foreground">Duration</span>
