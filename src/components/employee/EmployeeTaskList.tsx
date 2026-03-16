@@ -239,7 +239,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
       {!readOnly && (
         <Button size="sm" variant="outline" onClick={() => setShowForm(!showForm)}
           className="font-display text-xs tracking-wider gap-1 w-full">
-          <Plus className="w-3.5 h-3.5" /> Add Task
+          <Plus className="w-3.5 h-3.5" /> {t('tasks.addTask')}
         </Button>
       )}
 
