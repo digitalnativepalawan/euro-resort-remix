@@ -254,7 +254,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
               {assignees.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {selectAll ? (
-                    <Badge variant="default" className="font-body text-xs">All Staff ({activeEmployees.length})</Badge>
+                    <Badge variant="default" className="font-body text-xs">{t('tasks.allStaff')} ({activeEmployees.length})</Badge>
                   ) : (
                     assignees.map(id => (
                       <Badge key={id} variant="secondary" className="font-body text-xs gap-1">
