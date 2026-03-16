@@ -57,7 +57,7 @@ const TaskCompletionPanel = ({ taskTitle, onConfirm, onCancel }: Props) => {
         <Button size="sm" variant="outline" type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
           className="font-body text-xs gap-1">
           {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-          {imageUrl ? 'Replace Photo' : 'Add Photo'}
+          {imageUrl ? t('tasks.replacePhoto') : t('tasks.addPhoto')}
         </Button>
         {imageUrl && (
           <img src={imageUrl} alt="proof" className="h-10 w-10 rounded object-cover border border-border" />
