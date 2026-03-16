@@ -556,7 +556,7 @@ const BillOutPanel = ({
         <div className="border-t border-border/50 pt-3 space-y-1">
           <div className="flex justify-between font-body text-sm">
             <span className="text-muted-foreground">{t('common.subtotal')}</span>
-            <span className="tabular-nums">₱{subtotal.toLocaleString()}</span>
+            <span className="tabular-nums">{formatPrice(subtotal)}</span>
           </div>
           {sc > 0 && (
             <div className="flex justify-between font-body text-sm">
