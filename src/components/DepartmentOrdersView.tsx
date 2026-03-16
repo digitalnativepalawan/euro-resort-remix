@@ -239,7 +239,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
     navigate('/');
   };
 
-  const deptLabel = department === 'kitchen' ? '🍳 Kitchen' : '🍹 Bar';
+  const deptLabel = department === 'kitchen' ? `🍳 ${t('kitchen.label')}` : `🍹 ${t('bar.label')}`;
 
   // Render a single order card
   const renderOrderCard = (order: any, isScheduledCard: boolean) => {
