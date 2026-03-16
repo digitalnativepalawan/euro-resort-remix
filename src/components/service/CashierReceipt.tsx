@@ -121,7 +121,7 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
   };
 
   const handleShareWhatsApp = () => {
-    const text = buildReceiptText(order, profile, invoiceSettings, t);
+    const text = buildReceiptText(order, profile, invoiceSettings, t, formatPrice);
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
