@@ -326,7 +326,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
         </div>
       )}
 
-      {sorted.length === 0 && <p className="font-body text-xs text-muted-foreground text-center py-4">No tasks</p>}
+      {sorted.length === 0 && <p className="font-body text-xs text-muted-foreground text-center py-4">{t('common.noTasks')}</p>}
 
       {sorted.map(task => {
         const isCompleted = task.status === 'completed';

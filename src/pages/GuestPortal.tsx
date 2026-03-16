@@ -218,7 +218,7 @@ const GuestPortal = () => {
             </div>
 
             <button onClick={logout} className="flex items-center justify-center gap-2 w-full font-body text-xs text-muted-foreground hover:text-foreground py-2">
-              <LogOut className="w-3.5 h-3.5" /> Sign out
+              <LogOut className="w-3.5 h-3.5" /> {t('common.signOut')}
             </button>
           </>
         )}

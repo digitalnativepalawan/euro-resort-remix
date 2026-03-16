@@ -259,10 +259,10 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-[10px] font-body text-muted-foreground">
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500/50" /> Occupied</span>
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500/50" /> Upcoming</span>
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-muted/50" /> Checked Out</span>
-        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-destructive/50" /> Blocked</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-blue-500/50" /> {t('calendar.occupied')}</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-500/50" /> {t('calendar.upcoming')}</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-muted/50" /> {t('calendar.checkedOut')}</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-destructive/50" /> {t('calendar.blocked')}</span>
       </div>
 
       {/* Views */}

@@ -76,7 +76,7 @@ const ConflictModal = ({ open, onClose, conflicts, availableRooms, onSelectAlter
           </Button>
           {canOverride && (
             <Button variant="destructive" onClick={onOverride} className="font-display text-xs tracking-wider">
-              Override & Book
+              {t('calendar.overrideAndBook')}
             </Button>
           )}
         </DialogFooter>

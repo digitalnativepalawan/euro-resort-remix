@@ -414,7 +414,7 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
           <AlertDialogFooter>
             <AlertDialogCancel className="font-display text-xs tracking-wider">{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} disabled={deleting} className="font-display text-xs tracking-wider bg-destructive text-destructive-foreground">
-              {deleting ? 'Deleting...' : 'Delete'}
+              {deleting ? t('common.deleting') : t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
