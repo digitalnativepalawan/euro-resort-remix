@@ -657,9 +657,9 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
       <div className="flex-1 px-4 py-4 space-y-5">
         {/* Register revenue (excluding room charges) */}
         <div className="text-center space-y-1">
-          <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Register Revenue Today</p>
+          <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">{t('cashier.registerRevenueToday')}</p>
           <p className="font-display text-3xl text-gold tabular-nums">₱{summary.registerRevenue.toLocaleString()}</p>
-          <p className="font-body text-xs text-muted-foreground">{summary.orderCount - summary.roomChargeCount} settled order{(summary.orderCount - summary.roomChargeCount) !== 1 ? 's' : ''}</p>
+          <p className="font-body text-xs text-muted-foreground">{t('cashier.settledOrders', { count: summary.orderCount - summary.roomChargeCount })}</p>
         </div>
 
         {/* Room charges info */}
