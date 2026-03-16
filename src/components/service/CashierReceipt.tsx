@@ -152,7 +152,7 @@ ${footerText ? `<p class="center small">${footerText}</p>` : ''}
           {items.map((i: any, idx: number) => (
             <div key={idx} className="flex justify-between">
               <span className="text-foreground">{i.qty || i.quantity || 1}× {i.name}</span>
-              <span className="text-muted-foreground tabular-nums">₱{(i.price * (i.qty || i.quantity || 1)).toLocaleString()}</span>
+              <span className="text-muted-foreground tabular-nums">{formatPrice(i.price * (i.qty || i.quantity || 1))}</span>
             </div>
           ))}
         </div>
