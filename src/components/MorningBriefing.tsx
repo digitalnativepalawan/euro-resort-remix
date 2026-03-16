@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -58,12 +59,10 @@ function useMorningBriefing() {
           .is('archived_at', null),
         from('employees').select('id, display_name, name'),
         from('resort_ops_units').select('id, name'),
-        // Today's tours
         from('guest_tours')
           .select('tour_name, unit_name, pax, status, tour_date, pickup_time')
           .eq('tour_date', today)
           .in('status', ['booked', 'confirmed']),
-        // Pending guest requests
         from('guest_requests')
           .select('request_type, details, guest_name, status')
           .eq('status', 'pending'),
@@ -78,7 +77,6 @@ function useMorningBriefing() {
       const tours = (toursRes.data as any[]) || [];
       const requests = (requestsRes.data as any[]) || [];
 
-      // --- Stats ---
       const unitStatusMap = new Map(units.map((u: any) => [u.id, u.status]));
 
       const occupiedRooms = units.filter((u) => {
@@ -95,14 +93,12 @@ function useMorningBriefing() {
       const todayArrivals = bookings.filter((b: any) => b.check_in === today);
       const todayDepartures = bookings.filter((b: any) => b.check_out === today);
 
-      // --- Admin tasks ---
       const empMap = new Map(employees.map((e: any) => [e.id, e.display_name || e.name || 'Staff']));
       const adminTasks = ((tasksRes.data as any[]) || []).map((t: any) => ({
         title: t.title,
         assignee: empMap.get(t.employee_id) || 'Unassigned',
       }));
 
-      // --- Real-time Ops Tasks ---
       const opsTasks: OpsTask[] = [];
 
       const getUnitName = (b: any) => {
@@ -112,28 +108,25 @@ function useMorningBriefing() {
       };
       const getGuestName = (b: any) => b.resort_ops_guests?.full_name || 'Guest';
 
-      // Arrivals — only show if unit is NOT already occupied (guest hasn't checked in yet)
       todayArrivals.forEach((b: any) => {
         const unitStatus = unitStatusMap.get(b.unit_id);
-        if (unitStatus === 'occupied') return; // Already checked in, skip
+        if (unitStatus === 'occupied') return;
         opsTasks.push({
-          label: `Prepare ${getUnitName(b)} for arrival — ${getGuestName(b)}`,
+          label: `prepare_arrival:${getUnitName(b)}:${getGuestName(b)}`,
           icon: 'arrival',
           urgent: true,
         });
       });
 
-      // Departures — only show if unit is still occupied (guest hasn't checked out yet)
       todayDepartures.forEach((b: any) => {
         const unitStatus = unitStatusMap.get(b.unit_id);
-        if (unitStatus !== 'occupied') return; // Already checked out, skip
+        if (unitStatus !== 'occupied') return;
         opsTasks.push({
-          label: `Checkout pending: ${getUnitName(b)} — ${getGuestName(b)}`,
+          label: `checkout_pending:${getUnitName(b)}:${getGuestName(b)}`,
           icon: 'departure',
         });
       });
 
-      // Rooms to clean
       if (roomsToClean > 0) {
         const dirtyNames = units
           .filter((u) => u.status === 'dirty' || u.status === 'cleaning' || u.status === 'to_clean')
@@ -142,21 +135,19 @@ function useMorningBriefing() {
             return ou?.name || 'Room';
           });
         opsTasks.push({
-          label: `Clean ${dirtyNames.length} room${dirtyNames.length > 1 ? 's' : ''}: ${dirtyNames.join(', ')}`,
+          label: `clean_rooms:${dirtyNames.length}:${dirtyNames.join(', ')}`,
           icon: 'clean',
           urgent: true,
         });
       }
 
-      // Tours today
       tours.forEach((t: any) => {
         opsTasks.push({
-          label: `Tour: ${t.tour_name} — ${t.unit_name}, ${t.pax} pax${t.pickup_time ? ` @ ${t.pickup_time}` : ''}`,
+          label: `Tour: ${t.tour_name} — ${t.unit_name}, ${t.pax}${t.pickup_time ? ` @ ${t.pickup_time}` : ''}`,
           icon: 'tour',
         });
       });
 
-      // Pending guest requests
       requests.forEach((r: any) => {
         const type = (r.request_type || 'request').replace(/_/g, ' ');
         opsTasks.push({
@@ -166,17 +157,15 @@ function useMorningBriefing() {
         });
       });
 
-      // Pending kitchen orders
       if (pendingKitchenCount > 0) {
         opsTasks.push({
-          label: `${pendingKitchenCount} pending kitchen order${pendingKitchenCount > 1 ? 's' : ''}`,
+          label: `pending_kitchen:${pendingKitchenCount}`,
           icon: 'kitchen',
         });
       }
 
-      // If nothing, show all-clear
       if (opsTasks.length === 0) {
-        opsTasks.push({ label: 'All clear — no pending operations', icon: 'kitchen' });
+        opsTasks.push({ label: 'all_clear', icon: 'kitchen' });
       }
 
       return {
@@ -190,18 +179,10 @@ function useMorningBriefing() {
         opsTasks,
       };
     },
-    refetchInterval: 15_000, // More frequent for real-time ops
+    refetchInterval: 15_000,
     staleTime: 5_000,
   });
 }
-
-const statsDef = [
-  { key: 'occupancy', icon: BedDouble, label: 'Occupancy' },
-  { key: 'arrivals', icon: LogIn, label: 'Arrivals today' },
-  { key: 'departures', icon: LogOut, label: 'Departures today' },
-  { key: 'cleaning', icon: Sparkles, label: 'Rooms to clean' },
-  { key: 'kitchen', icon: UtensilsCrossed, label: 'Pending kitchen' },
-] as const;
 
 const opsIconMap: Record<string, typeof LogIn> = {
   arrival: LogIn,
@@ -213,42 +194,67 @@ const opsIconMap: Record<string, typeof LogIn> = {
 };
 
 const MorningBriefing = () => {
+  const { t } = useTranslation();
   const { data: rawData, isLoading } = useMorningBriefing();
   const data = rawData ? { ...rawData, adminTasks: rawData.adminTasks || [], opsTasks: rawData.opsTasks || [] } : undefined;
 
+  const statsDef = [
+    { key: 'occupancy', icon: BedDouble, label: t('briefing.occupancy') },
+    { key: 'arrivals', icon: LogIn, label: t('briefing.arrivalsToday') },
+    { key: 'departures', icon: LogOut, label: t('briefing.departuresToday') },
+    { key: 'cleaning', icon: Sparkles, label: t('briefing.roomsToClean') },
+    { key: 'kitchen', icon: UtensilsCrossed, label: t('briefing.pendingKitchen') },
+  ];
+
   const values: Record<string, string> = data
     ? {
-        occupancy: `${data.occupiedRooms} / ${data.totalRooms}`,
-        arrivals: String(data.arrivalsToday),
-        departures: String(data.departuresToday),
-        cleaning: String(data.roomsToClean),
-        kitchen: String(data.pendingKitchenOrders),
-      }
+      occupancy: `${data.occupiedRooms} / ${data.totalRooms}`,
+      arrivals: String(data.arrivalsToday),
+      departures: String(data.departuresToday),
+      cleaning: String(data.roomsToClean),
+      kitchen: String(data.pendingKitchenOrders),
+    }
     : {};
+
+  const renderOpsLabel = (task: OpsTask) => {
+    if (task.label === 'all_clear') return t('briefing.allClear');
+    if (task.label.startsWith('prepare_arrival:')) {
+      const [, room, guest] = task.label.split(':');
+      return t('briefing.prepareForArrival', { room, guest });
+    }
+    if (task.label.startsWith('checkout_pending:')) {
+      const [, room, guest] = task.label.split(':');
+      return t('briefing.checkoutPending', { room, guest });
+    }
+    if (task.label.startsWith('clean_rooms:')) {
+      const [, count, names] = task.label.split(':');
+      return t('briefing.cleanRooms', { count: Number(count), names });
+    }
+    if (task.label.startsWith('pending_kitchen:')) {
+      const count = Number(task.label.split(':')[1]);
+      return t('briefing.pendingKitchenOrders', { count });
+    }
+    return task.label;
+  };
 
   return (
     <Card className="border-primary/20 bg-primary/5 mb-4">
       <CardContent className="p-4">
-        {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Sun className="h-5 w-5 text-primary" />
             <h2 className="font-display text-sm font-semibold tracking-wide text-foreground">
-              Morning Briefing
+              {t('briefing.morningBriefing')}
             </h2>
           </div>
           <span className="text-[11px] text-muted-foreground">
-            Updated: {getManilaTimeStr()}
+            {t('briefing.updated', { time: getManilaTimeStr() })}
           </span>
         </div>
 
-        {/* Stats grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           {statsDef.map((s) => (
-            <div
-              key={s.key}
-              className="flex items-center gap-2 rounded-md bg-background/60 border border-border/50 px-3 py-2"
-            >
+            <div key={s.key} className="flex items-center gap-2 rounded-md bg-background/60 border border-border/50 px-3 py-2">
               <s.icon className="h-4 w-4 shrink-0 text-muted-foreground" />
               <div className="min-w-0">
                 <p className="text-[11px] text-muted-foreground truncate">{s.label}</p>
@@ -260,43 +266,40 @@ const MorningBriefing = () => {
           ))}
         </div>
 
-        {/* Task sections */}
         {!isLoading && data && (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* Admin Tasks */}
             <div className="rounded-md bg-background/60 border border-border/50 p-3">
               <div className="flex items-center gap-1.5 mb-2">
                 <ClipboardList className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-xs font-semibold text-foreground tracking-wide">Admin Tasks</h3>
+                <h3 className="text-xs font-semibold text-foreground tracking-wide">{t('briefing.adminTasks')}</h3>
               </div>
               {data.adminTasks.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">No admin tasks scheduled today</p>
+                <p className="text-xs text-muted-foreground italic">{t('briefing.noAdminTasks')}</p>
               ) : (
                 <ul className="space-y-1">
-                  {data.adminTasks.map((t, i) => (
+                  {data.adminTasks.map((task, i) => (
                     <li key={i} className="text-xs text-foreground leading-relaxed">
                       <span className="text-muted-foreground mr-1">•</span>
-                      {t.title} <span className="text-muted-foreground">— {t.assignee}</span>
+                      {task.title} <span className="text-muted-foreground">— {task.assignee}</span>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            {/* Operations Tasks — Real-time */}
             <div className="rounded-md bg-background/60 border border-border/50 p-3">
               <div className="flex items-center gap-1.5 mb-2">
                 <Zap className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-xs font-semibold text-foreground tracking-wide">Live Operations</h3>
+                <h3 className="text-xs font-semibold text-foreground tracking-wide">{t('briefing.liveOperations')}</h3>
               </div>
               <ul className="space-y-1.5">
-                {data.opsTasks.map((t, i) => {
-                  const Icon = opsIconMap[t.icon] || Zap;
+                {data.opsTasks.map((task, i) => {
+                  const Icon = opsIconMap[task.icon] || Zap;
                   return (
                     <li key={i} className="flex items-start gap-1.5 text-xs leading-relaxed">
-                      <Icon className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${t.urgent ? 'text-amber-400' : 'text-muted-foreground'}`} />
-                      <span className={t.urgent ? 'text-foreground font-medium' : 'text-foreground'}>
-                        {t.label}
+                      <Icon className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${task.urgent ? 'text-amber-400' : 'text-muted-foreground'}`} />
+                      <span className={task.urgent ? 'text-foreground font-medium' : 'text-foreground'}>
+                        {renderOpsLabel(task)}
                       </span>
                     </li>
                   );

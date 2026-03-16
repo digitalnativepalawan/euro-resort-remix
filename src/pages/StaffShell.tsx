@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { hasAccess, canEdit } from '@/lib/permissions';
 import { getStaffSession } from '@/lib/session';
 import ReceptionHome from '@/components/staff/ReceptionHome';
@@ -15,21 +16,22 @@ import { useDepartmentAlerts } from '@/hooks/useDepartmentAlerts';
 
 interface RoleDef {
   key: string;
-  label: string;
+  labelKey: string;
   perm: string;
 }
 
 const ROLES: RoleDef[] = [
-  { key: 'reception', label: 'Reception', perm: 'reception' },
-  { key: 'housekeeping', label: 'Housekeeping', perm: 'housekeeping' },
-  { key: 'kitchen', label: 'Kitchen', perm: 'kitchen' },
-  { key: 'bar', label: 'Bar', perm: 'bar' },
-  { key: 'experiences', label: 'Experiences', perm: 'experiences' },
-  { key: 'orders', label: 'Orders', perm: 'orders' },
+  { key: 'reception', labelKey: 'staff.reception', perm: 'reception' },
+  { key: 'housekeeping', labelKey: 'staff.housekeeping', perm: 'housekeeping' },
+  { key: 'kitchen', labelKey: 'staff.kitchen', perm: 'kitchen' },
+  { key: 'bar', labelKey: 'staff.bar', perm: 'bar' },
+  { key: 'experiences', labelKey: 'staff.experiences', perm: 'experiences' },
+  { key: 'orders', labelKey: 'staff.orders', perm: 'orders' },
 ];
 
 const StaffShell = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const session = getStaffSession();
   const perms: string[] = session?.permissions || [];
   const isAdmin = perms.includes('admin');
@@ -37,7 +39,6 @@ const StaffShell = () => {
   const availableRoles = useMemo(() => {
     if (isAdmin) return ROLES;
     return ROLES.filter(r => {
-      // Orders tab requires edit (placing orders), not just view
       if (r.key === 'orders') return canEdit(perms, r.perm);
       return hasAccess(perms, r.perm);
     });
@@ -53,12 +54,9 @@ const StaffShell = () => {
 
   return (
     <div className="min-h-screen bg-navy-texture overflow-x-hidden">
-      {/* Global navigation bar */}
       <StaffNavBar />
 
       <div className="max-w-2xl mx-auto px-4 pb-4">
-
-        {/* Role switcher — only show if multiple roles */}
         {availableRoles.length > 1 && (
           <div className="flex gap-1 mb-4 overflow-x-auto scrollbar-hide pb-1">
             {availableRoles.map(r => (
@@ -71,19 +69,15 @@ const StaffShell = () => {
                     : 'bg-secondary text-muted-foreground border-border hover:text-foreground'
                 } ${alerts[r.key as keyof typeof alerts] && activeRole !== r.key ? 'tab-pulse' : ''}`}
               >
-                {r.label}
+                {t(r.labelKey)}
               </button>
             ))}
           </div>
         )}
 
-        {/* Morning Briefing — top-level operational summary */}
         <MorningBriefing />
-
-        {/* Action Required — always visible, sorted by urgency */}
         <ActionRequiredPanel />
 
-        {/* Role-specific home screen */}
         {activeRole === 'reception' && <ReceptionHome />}
         {activeRole === 'housekeeping' && <HousekeepingHome />}
         {activeRole === 'kitchen' && <KitchenHome />}
