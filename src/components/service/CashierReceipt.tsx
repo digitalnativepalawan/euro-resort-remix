@@ -53,6 +53,7 @@ const CashierReceipt = ({ order, onDone }: CashierReceiptProps) => {
   const { data: profile } = useResortProfile();
   const { data: invoiceSettings } = useInvoiceSettings();
   const { data: config } = useBillingConfig();
+  const { formatPrice } = useCurrency();
   const [copied, setCopied] = useState(false);
 
   const items = (order.items as any[]) || [];
