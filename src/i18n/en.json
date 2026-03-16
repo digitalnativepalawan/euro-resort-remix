@@ -730,7 +730,10 @@
     "socialMedia": "Social Media",
     "saveResortProfile": "Save Resort Profile",
     "profileSaved": "Resort profile saved",
-    "profileSaveFailed": "Failed to save profile: {{error}}"
+    "profileSaveFailed": "Failed to save profile: {{error}}",
+    "currency": "Currency",
+    "usdExchangeRate": "EUR → USD Exchange Rate",
+    "exchangeRateHint": "How many USD per 1 EUR (e.g. 1.08). Used for display conversion only."
   },
   "rooms": {
     "roomSetup": "Room Setup",
