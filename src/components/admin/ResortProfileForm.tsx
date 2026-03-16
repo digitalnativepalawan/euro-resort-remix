@@ -22,7 +22,7 @@ const ResortProfileForm = () => {
     resort_name: '', tagline: '', address: '', phone: '', contact_name: '',
     contact_number: '', email: '', google_map_embed: '', google_map_url: '',
     facebook_url: '', instagram_url: '', tiktok_url: '', website_url: '',
-    logo_url: '', logo_size: 128,
+    logo_url: '', logo_size: 128, usd_exchange_rate: '1.08',
   });
 
   useEffect(() => {
