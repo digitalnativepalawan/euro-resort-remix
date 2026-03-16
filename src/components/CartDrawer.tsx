@@ -25,6 +25,7 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
   selectedTabId: string; setSelectedTabId: (v: string) => void;
 }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: openTabs = [] } = useQuery({
     queryKey: ['open-tabs-picker'],
     queryFn: async () => {
