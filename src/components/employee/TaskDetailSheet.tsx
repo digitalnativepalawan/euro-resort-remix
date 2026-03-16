@@ -54,7 +54,7 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
         <DrawerHeader className="pb-2">
-          <DrawerTitle className="font-display text-base tracking-wider">Task Details</DrawerTitle>
+          <DrawerTitle className="font-display text-base tracking-wider">{t('tasks.taskDetails')}</DrawerTitle>
         </DrawerHeader>
 
         <div className="px-4 pb-6 space-y-4 overflow-y-auto">
