@@ -597,6 +597,7 @@ const RentalsView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
 // --- Request/Note ---
 const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
+  const { t } = useTranslation();
   const { data: categories = [] } = useQuery({
     queryKey: ['request-cats-guest'],
     queryFn: async () => {
@@ -620,7 +621,7 @@ const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
       status: 'pending',
     });
     qc.invalidateQueries({ queryKey: ['guest-requests-admin'] });
-    toast.success('Request submitted!');
+    toast.success(t('guest.requestSubmitted'));
     setDetails('');
     setType('');
     setSubmitting(false);
@@ -628,17 +629,17 @@ const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-lg text-foreground">Leave a Note / Request</h2>
+      <h2 className="font-display text-lg text-foreground">{t('guest.leaveANote')}</h2>
       <Select onValueChange={setType} value={type}>
         <SelectTrigger className="bg-secondary border-border text-foreground h-12">
-          <SelectValue placeholder="Select category" />
+          <SelectValue placeholder={t('guest.selectCategory')} />
         </SelectTrigger>
         <SelectContent className="bg-card border-border">
           {categories.map((c: any) => <SelectItem key={c.id} value={c.name} className="text-foreground">{c.icon} {c.name}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Textarea value={details} onChange={e => setDetails(e.target.value)} placeholder="Describe your request..." className="bg-secondary border-border text-foreground min-h-[120px]" />
-      <Button onClick={submit} disabled={submitting || !type || !details.trim()} className="w-full">{submitting ? 'Submitting...' : 'Submit Request'}</Button>
+      <Textarea value={details} onChange={e => setDetails(e.target.value)} placeholder={t('guest.describeRequest')} className="bg-secondary border-border text-foreground min-h-[120px]" />
+      <Button onClick={submit} disabled={submitting || !type || !details.trim()} className="w-full">{submitting ? t('common.submitting') : t('guest.submitRequest')}</Button>
     </div>
   );
 };
