@@ -225,7 +225,6 @@ const MenuPage = () => {
               <p className="font-body text-xs text-cream-dim mb-4">
                 {t('menu.resultCount', { count: filteredItems.length })} {t('menu.resultsFor', { query: searchQuery })}
               </p>
-              </p>
             ) : (
               <h2 className="font-display text-xl tracking-wider text-foreground mb-6">{activeCategory}</h2>
             )}
