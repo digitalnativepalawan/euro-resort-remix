@@ -267,6 +267,7 @@ const GuestTile = ({ icon, label, subtitle, onClick }: { icon: React.ReactNode; 
 
 /** Simple message-to-reception flow */
 const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: any; onDone: () => void }) => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -293,25 +294,25 @@ const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSes
         <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
           <CheckCircle2 className="w-8 h-8 text-emerald-400" />
         </div>
-        <p className="font-display text-lg text-foreground">Message Sent!</p>
-        <p className="font-body text-sm text-muted-foreground text-center">Our team will get back to you shortly.</p>
-        <Button onClick={onDone} variant="outline" className="font-display tracking-wider mt-4">Done</Button>
+        <p className="font-display text-lg text-foreground">{t('guest.messageSent')}</p>
+        <p className="font-body text-sm text-muted-foreground text-center">{t('guest.teamWillGetBack')}</p>
+        <Button onClick={onDone} variant="outline" className="font-display tracking-wider mt-4">{t('common.done')}</Button>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-lg text-foreground">Message Reception</h2>
-      <p className="font-body text-sm text-muted-foreground">Send a message directly to our front desk team.</p>
+      <h2 className="font-display text-lg text-foreground">{t('guest.messageReceptionTitle')}</h2>
+      <p className="font-body text-sm text-muted-foreground">{t('guest.sendMessageToFrontDesk')}</p>
       <Textarea
         value={message}
         onChange={e => setMessage(e.target.value)}
-        placeholder="How can we help you today?"
+        placeholder={t('guest.howCanWeHelp')}
         className="bg-secondary border-border text-foreground min-h-[150px] text-base"
       />
       <Button onClick={send} disabled={submitting || !message.trim()} className="w-full font-display tracking-wider h-12">
-        {submitting ? 'Sending...' : 'Send Message'}
+        {submitting ? t('common.sending') : t('guest.sendMessage')}
       </Button>
     </div>
   );
