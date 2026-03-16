@@ -386,7 +386,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
           <>
             <div className="flex flex-col items-center justify-center py-12 px-6 gap-4">
               <CheckCircle2 className="w-16 h-16 text-green-400 animate-fade-in" />
-              <h2 className="font-display text-2xl tracking-wider text-foreground">Order Sent!</h2>
+              <h2 className="font-display text-2xl tracking-wider text-foreground">{t('cart.orderSent')}</h2>
               <div className="flex gap-2">
                 <span className="font-body text-xs bg-secondary px-2 py-0.5 rounded text-cream-dim">
                   {TYPE_LABELS[selectedOrderType] || selectedOrderType}
