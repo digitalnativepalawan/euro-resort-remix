@@ -683,12 +683,12 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-gold" />
-                <span className="font-display text-sm tracking-wider text-gold">CASH</span>
+                <span className="font-display text-sm tracking-wider text-gold">{t('cashier.cash')}</span>
               </div>
-              <Badge className="bg-gold/20 text-gold border-gold/30 font-body text-xs">{cashEntry.count} orders</Badge>
+              <Badge className="bg-gold/20 text-gold border-gold/30 font-body text-xs">{cashEntry.count} {t('common.orders')}</Badge>
             </div>
             <p className="font-display text-2xl text-gold tabular-nums">₱{cashEntry.total.toLocaleString()}</p>
-            <p className="font-body text-[11px] text-muted-foreground">Amount to reconcile with cash drawer</p>
+            <p className="font-body text-[11px] text-muted-foreground">{t('cashier.amountToReconcile')}</p>
           </div>
         )}
 
