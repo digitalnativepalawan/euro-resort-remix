@@ -38,14 +38,14 @@ const TaskDetailSheet = ({ open, onOpenChange, task, employeeName, authorName, r
 
   // Build activity timeline
   const activities: { label: string; time: string }[] = [
-    { label: 'Task created', time: format(new Date(task.created_at), 'MMM d, h:mm a') },
+    { label: t('tasks.taskCreated'), time: format(new Date(task.created_at), 'MMM d, h:mm a') },
   ];
   if (task.due_date) {
-    activities.push({ label: `Due date set: ${format(new Date(task.due_date), 'MMM d, h:mm a')}`, time: '' });
+    activities.push({ label: t('tasks.dueDateSet', { date: format(new Date(task.due_date), 'MMM d, h:mm a') }), time: '' });
   }
   if (isCompleted && task.completed_at) {
     activities.push({
-      label: `Completed by ${meta.completed_by || 'Staff'}`,
+      label: t('tasks.completedByStaff', { name: meta.completed_by || t('common.staff') }),
       time: format(new Date(task.completed_at), 'MMM d, h:mm a'),
     });
   }
