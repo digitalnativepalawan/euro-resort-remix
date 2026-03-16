@@ -322,6 +322,7 @@ const MessageReceptionView = ({ session, qc, onDone }: { session: GuestPortalSes
 // --- Tours (Enhanced: pickup time, notes, pending status) ---
 const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { data: tours = [] } = useQuery({
     queryKey: ['tours-guest'],
     queryFn: async () => {
