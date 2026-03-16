@@ -1241,7 +1241,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
         {activeRequestsTotal > 0 && (
           <div className="flex justify-between mb-2">
             <span className="font-body text-sm text-muted-foreground">Transport & Rentals</span>
-            <span className="font-body text-sm text-foreground">₱{activeRequestsTotal.toLocaleString()}</span>
+            <span className="font-body text-sm text-foreground">{formatPrice(activeRequestsTotal)}</span>
           </div>
         )}
         <div className="flex justify-between mb-2">
