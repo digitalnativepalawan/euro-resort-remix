@@ -360,7 +360,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
                     {isCompleted && (
                       <div className="flex items-center gap-1.5 mb-1">
                         <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="font-display text-xs tracking-wider text-green-600">Completed</span>
+                        <span className="font-display text-xs tracking-wider text-green-600">{t('common.completed')}</span>
                       </div>
                     )}
 

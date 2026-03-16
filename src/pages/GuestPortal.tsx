@@ -646,6 +646,7 @@ const RequestView = ({ session, qc }: { session: GuestPortalSession; qc: any }) 
 
 // --- Review ---
 const ReviewView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: any; onDone: () => void }) => {
+  const { t } = useTranslation();
   const { data: categories = [] } = useQuery({
     queryKey: ['review-cats-guest'],
     queryFn: async () => {
@@ -667,14 +668,14 @@ const ReviewView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: 
       comments: comments.trim(),
     });
     qc.invalidateQueries({ queryKey: ['guest-reviews-admin'] });
-    toast.success('Thank you for your review!');
+    toast.success(t('guest.thankYouReview'));
     setSubmitting(false);
     onDone();
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-lg text-foreground">Write a Review</h2>
+      <h2 className="font-display text-lg text-foreground">{t('guest.writeAReview')}</h2>
       {categories.map((c: any) => {
         const selected = ratings[c.category_name] || 0;
         return (
@@ -706,7 +707,7 @@ const ReviewView = ({ session, qc, onDone }: { session: GuestPortalSession; qc: 
         );
       })}
       <Textarea value={comments} onChange={e => setComments(e.target.value)} placeholder="Any additional comments..." className="bg-secondary border-border text-foreground min-h-[100px]" />
-      <Button onClick={submit} disabled={submitting} className="w-full">{submitting ? 'Submitting...' : 'Submit Review'}</Button>
+      <Button onClick={submit} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.submitReview')}</Button>
     </div>
   );
 };
