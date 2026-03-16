@@ -397,7 +397,7 @@ const ToursView = ({ session, qc }: { session: GuestPortalSession; qc: any }) =>
             <Label className="font-body text-xs text-muted-foreground flex items-center gap-1"><StickyNote className="w-3 h-3" /> {t('guest.specialRequests')}</Label>
             <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Vegetarian lunch, need snorkel gear..." className="bg-card text-foreground min-h-[60px]" />
           </div>
-          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: ₱{selectedTour.price * (parseInt(pax) || 1)}</p>
+          <p className="font-body text-sm text-foreground text-right">{t('common.total')}: {formatPrice(selectedTour.price * (parseInt(pax) || 1))}</p>
           <Button onClick={book} disabled={submitting} className="w-full">{submitting ? t('common.submitting') : t('guest.requestTourBooking')}</Button>
           <p className="font-body text-xs text-muted-foreground text-center">{t('guest.staffWillConfirm')}</p>
         </div>
