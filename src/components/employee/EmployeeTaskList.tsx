@@ -304,14 +304,14 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
               className="bg-secondary border-border text-foreground font-body text-sm" />
           </div>
           <div className="space-y-1">
-            <label className="font-body text-xs text-muted-foreground">Send via</label>
+            <label className="font-body text-xs text-muted-foreground">{t('tasks.sendVia')}</label>
             <div className="flex gap-1">
               {(['whatsapp', 'messenger', 'none'] as const).map(m => (
                 <Button key={m} size="sm" type="button"
                   variant={sendVia === m ? 'default' : 'outline'}
                   onClick={() => setSendVia(m)}
                   className="font-body text-xs flex-1 capitalize">
-                  {m === 'none' ? 'Don\'t send' : m === 'whatsapp' ? '📱 WhatsApp' : '💬 Messenger'}
+                  {m === 'none' ? t('tasks.dontSend') : m === 'whatsapp' ? '📱 WhatsApp' : '💬 Messenger'}
                 </Button>
               ))}
             </div>
