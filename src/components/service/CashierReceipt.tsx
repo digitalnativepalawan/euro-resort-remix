@@ -33,12 +33,12 @@ function buildReceiptText(order: any, profile: any, invoiceSettings: any, t: (ke
   lines.push('─────────────');
   items.forEach((i: any) => {
     const qty = i.qty || i.quantity || 1;
-    lines.push(`${qty}× ${i.name} — ₱${(i.price * qty).toLocaleString()}`);
+    lines.push(`${qty}× ${i.name} — ${fp(i.price * qty)}`);
   });
   lines.push('─────────────');
-  lines.push(`${t('common.subtotal')}: ₱${subtotal.toLocaleString()}`);
-  if (sc > 0) lines.push(`${t('receipt.serviceCharge')}: ₱${sc.toLocaleString()}`);
-  lines.push(`*${t('common.total').toUpperCase()}: ₱${total.toLocaleString()}*`);
+  lines.push(`${t('common.subtotal')}: ${fp(subtotal)}`);
+  if (sc > 0) lines.push(`${t('receipt.serviceCharge')}: ${fp(sc)}`);
+  lines.push(`*${t('common.total').toUpperCase()}: ${fp(total)}*`);
   lines.push('');
   if (order.payment_type) lines.push(`${t('common.paidWith')}: ${order.payment_type}`);
   const thankYou = invoiceSettings?.thank_you_message || t('receipt.thankYou');
