@@ -161,7 +161,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
     setTitle(''); setDescription(''); setDueDate(''); setShowForm(false);
     if (!employeeId) { setAssignees([]); setSelectAll(false); }
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success(`Task added to ${count} staff member${count > 1 ? 's' : ''}`);
+    toast.success(t('tasks.taskAdded', { count: targetIds.length }));
 
     bulkSendMessages(targetIds, savedTitle, savedDesc, savedDue, sendVia);
   };
