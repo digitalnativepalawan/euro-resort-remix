@@ -119,8 +119,8 @@ const GuestPortal = () => {
     return (
       <div className="min-h-screen bg-navy-texture flex flex-col items-center justify-center px-6">
         {profile?.logo_url && <img src={profile.logo_url} alt="Logo" style={{ width: profile.logo_size || 96, height: profile.logo_size || 96 }} className="object-contain mb-4" />}
-        <h1 className="font-display text-2xl tracking-wider text-foreground mb-1">Guest Portal</h1>
-        <p className="font-body text-sm text-muted-foreground mb-8">Access your room services</p>
+        <h1 className="font-display text-2xl tracking-wider text-foreground mb-1">{t('guest.guestPortal')}</h1>
+        <p className="font-body text-sm text-muted-foreground mb-8">{t('guest.accessRoomServices')}</p>
         <div className="w-full max-w-xs space-y-3">
           <Select onValueChange={setRoomName} value={roomName}>
             <SelectTrigger className="bg-secondary border-border text-foreground font-body text-center h-12">
