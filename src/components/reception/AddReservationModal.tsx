@@ -406,9 +406,9 @@ const AddReservationModal = ({ open, onClose, rooms, bookings, canManage, editBo
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-display tracking-wider">Delete Reservation</AlertDialogTitle>
+            <AlertDialogTitle className="font-display tracking-wider">{t('calendar.deleteReservation')}</AlertDialogTitle>
             <AlertDialogDescription className="font-body">
-              This will permanently remove this reservation. This action cannot be undone.
+              {t('calendar.deleteReservationDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
