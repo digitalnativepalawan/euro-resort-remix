@@ -213,7 +213,7 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
   const archiveTask = async (id: string) => {
     await (supabase.from('employee_tasks' as any) as any).update({ archived_at: new Date().toISOString() }).eq('id', id);
     qc.invalidateQueries({ queryKey: ['employee-tasks'] });
-    toast.success('Task archived');
+    toast.success(t('tasks.taskArchived'));
   };
 
   const restoreTask = async (id: string) => {
