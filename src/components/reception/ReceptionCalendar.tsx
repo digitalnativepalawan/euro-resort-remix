@@ -209,7 +209,7 @@ const ReceptionCalendar = ({ bookings, rooms, units, canEdit, canManage }: Recep
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" />
-          <h2 className="font-display text-lg tracking-wider text-foreground">Booking Calendar</h2>
+          <h2 className="font-display text-lg tracking-wider text-foreground">{t('calendar.bookingCalendar')}</h2>
         </div>
 
         {canEdit && (
