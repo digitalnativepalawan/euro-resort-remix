@@ -1,57 +1,37 @@
 
 
-# Multi-Language Support Implementation Plan
+## Plan: Fix Schedule Delete & Enhance Task/Assignment Scheduling
 
-## Summary
-Add full i18n (EN/DE/IT/FR) using `react-i18next` across all ~60+ files. No hardcoded strings. Language persists via localStorage. Date/time uses `Intl.DateTimeFormat` with active locale.
+### Issues Found
 
-## Implementation Steps
+1. **Delete button bug**: The trash icon on shift blocks triggers `setDeleteId(s.id)`, but the parent div's `onClick={() => openEdit(s)}` fires simultaneously despite `stopPropagation`. On mobile, the tiny button (3x3 icon) is nearly impossible to tap. The AlertDialog `onOpenChange={() => setDeleteId(null)}` also races with the confirm action.
 
-### Step 1: Infrastructure
-- Install `react-i18next`, `i18next`, `i18next-browser-languagedetector`
-- Create `src/i18n/index.ts` — init with localStorage detector (`app_language` key), fallback `en`
-- Create `src/i18n/en.json`, `de.json`, `it.json`, `fr.json`
-- Import i18n in `main.tsx` before `createRoot`
+2. **Missing scheduling features**: The schedule only manages time shifts. There's no way to assign tasks like housecleaning, reception duty, or track completion from within the schedule view.
 
-### Step 2: LanguageSwitcher + Date Utility
-- Create `src/components/LanguageSwitcher.tsx` — compact EN/DE/IT/FR dropdown
-- Create `src/lib/dateFormat.ts` — helpers using `Intl.DateTimeFormat` with locale map from `i18n.language`
+### Changes
 
-### Step 3: Add LanguageSwitcher to all headers
-- `Index.tsx`, `ServiceHeader.tsx`, `StaffNavBar.tsx`, `AdminPage.tsx`, `GuestPortal.tsx`, `MenuPage.tsx`, `ServiceModePage.tsx`
+**1. Fix Delete Button** (`WeeklyScheduleManager.tsx`)
+- Make `confirmDelete` capture `deleteId` before the dialog closes by saving it in a ref or local variable
+- Increase touch target size for edit/delete buttons on shift blocks
+- Prevent edit modal from opening when clicking edit/delete icons (the `stopPropagation` exists but the parent click handler on the entire timeline area also fires)
 
-### Step 4–11: Replace hardcoded strings across all screens
-Work through every file listed in the prompt, replacing text with `t()` calls and building out `en.json` with namespaced keys (`common`, `kitchen`, `bar`, `cashier`, `reception`, `menu`, `guest`, `staff`, `admin`, `invoice`, etc.).
+**2. Add Task/Assignment Creation from Schedule** (`WeeklyScheduleManager.tsx`)
+- Add an "Assign Task" button alongside "Add Shift" 
+- New modal to create a task assignment: select employee, pick type (Housecleaning, Reception, Custom), set date/time, add notes
+- For housecleaning: select a room/unit to clean, auto-creates a `housekeeping_orders` entry assigned to the selected employee
+- For other tasks: creates an `employee_tasks` entry with due date and description
+- Tasks appear as colored pills on the timeline (already partially implemented)
 
-This covers:
-- **Core screens**: Login, Service Mode, Kitchen/Bar boards, Cashier, Reception
-- **Staff screens**: Dashboard, Clock In/Out (including toast messages), Tasks, Schedule, Timesheet, Payroll
-- **Admin screens**: All Setup configs, People, Audit, Archive, Reports, Inventory, Morning Briefing, Vibe Check
-- **Guest screens**: Menu (staff+guest), Guest Portal full flow, Cart
-- **Modals**: All ~15+ modal components
-- **Toasts/Alerts**: Every `toast()` call and AlertDialog across the app
-- **Print/PDF**: `generateInvoicePdf.ts` (uses `i18n.t()` directly), `PrintBill.tsx`, `TabInvoice.tsx`, `CashierReceipt.tsx`
-- **Date formatting**: Replace all `date-fns format()` and hardcoded `.toLocaleString('en-...')` with `dateFormat.ts` helpers
+**3. Show Completion Info on Task Detail** (`WeeklyScheduleManager.tsx`)
+- In the task detail dialog, show who completed the task and when (`completed_at`)
+- For housekeeping pills, show completion status (`cleaning_completed_at`, `completed_by_name`)
+- Make housekeeping pills clickable to show full details (room, status, who inspected/cleaned)
 
-### Step 12: Generate DE/IT/FR translations
-- Populate `de.json`, `it.json`, `fr.json` with all ~600+ keys translated
+**4. Enhance Task Detail Dialog** (`WeeklyScheduleManager.tsx`)
+- Add edit capability: change title, description, due date, reassign to different employee
+- Add delete capability for tasks
+- Show completion audit trail
 
-### Step 13: Admin default language
-- Add `default_language` column to `resort_profile` table (migration)
-- Add language selector in Resort Profile setup form
-- Use as fallback when no localStorage preference exists
-
-## Key Technical Notes
-- Menu item names/descriptions remain user-entered (not translated)
-- Toast: `toast({ title: t('common.saved') })`
-- PDF: `import i18n from '@/i18n'; i18n.t('invoice.thankYou')`
-- Currency formatting stays as-is (PHP); only date/time formatting changes locale
-- ~600+ translation keys, ~60+ files modified, 6 new files created
-
-## Due to the scale, implementation will proceed in batches:
-1. **Batch 1**: Infrastructure + LanguageSwitcher + Login + Service Mode + Kitchen/Bar + Cashier
-2. **Batch 2**: Reception + Menu + Guest Portal + Staff Dashboard + Clock/Tasks/Schedule
-3. **Batch 3**: Admin screens (Setup, People, Audit, Archive, Reports, Inventory)
-4. **Batch 4**: All modals + toasts/alerts + print/PDF + date formatting
-5. **Batch 5**: DE/IT/FR translation files + admin default language setting
+### Files to Edit
+- `src/components/admin/WeeklyScheduleManager.tsx` — all changes in this single file
 

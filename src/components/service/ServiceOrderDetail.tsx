@@ -2,7 +2,8 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { formatTime } from '@/lib/dateFormat';
 import { Flame, GlassWater, Truck, CreditCard, Clock, CheckCircle2, Home, Receipt, Info, FileText, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { canEdit, canManage } from '@/lib/permissions';
@@ -26,6 +27,7 @@ const STATUS_DOT: Record<string, string> = {
 };
 
 const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department, onAction, resortProfile }: ServiceOrderDetailProps) => {
+  const { t } = useTranslation();
   const [busy, setBusy] = useState<string | null>(null);
 
   if (!order) return null;
@@ -50,22 +52,21 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
   const isViewOnlyDepartment = department === 'cashier';
   const canServe = canEdit(permissions, 'reception') || canEdit(permissions, 'kitchen') || canEdit(permissions, 'bar');
 
-  // Build actions based on permissions + order state
   const actions: { label: string; action: string; icon: React.ReactNode; variant: 'default' | 'outline' }[] = [];
 
   if (!isViewOnlyDepartment && canEdit(permissions, 'kitchen') && foodItems.length > 0) {
     if (order.kitchen_status === 'pending') {
-      actions.push({ label: 'Start Preparing (Kitchen)', action: 'kitchen-start', icon: <Flame className="w-5 h-5" />, variant: 'default' });
+      actions.push({ label: t('kitchen.startPreparingKitchen'), action: 'kitchen-start', icon: <Flame className="w-5 h-5" />, variant: 'default' });
     } else if (order.kitchen_status === 'preparing') {
-      actions.push({ label: 'Mark Kitchen Ready', action: 'kitchen-ready', icon: <CheckCircle2 className="w-5 h-5" />, variant: 'default' });
+      actions.push({ label: t('kitchen.markKitchenReady'), action: 'kitchen-ready', icon: <CheckCircle2 className="w-5 h-5" />, variant: 'default' });
     }
   }
 
   if (!isViewOnlyDepartment && canEdit(permissions, 'bar') && barItems.length > 0) {
     if (order.bar_status === 'pending') {
-      actions.push({ label: 'Start Mixing (Bar)', action: 'bar-start', icon: <GlassWater className="w-5 h-5" />, variant: 'default' });
+      actions.push({ label: t('bar.startMixingBar'), action: 'bar-start', icon: <GlassWater className="w-5 h-5" />, variant: 'default' });
     } else if (order.bar_status === 'preparing') {
-      actions.push({ label: 'Mark Bar Ready', action: 'bar-ready', icon: <CheckCircle2 className="w-5 h-5" />, variant: 'default' });
+      actions.push({ label: t('bar.markBarReady'), action: 'bar-ready', icon: <CheckCircle2 className="w-5 h-5" />, variant: 'default' });
     }
   }
 
@@ -74,7 +75,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
   if (!isViewOnlyDepartment && canServe) {
     if (order.status === 'Ready') {
       actions.push({
-        label: isAutoPayable ? 'Serve & Close' : 'Mark Served',
+        label: isAutoPayable ? t('orderActions.serveAndClose') : t('orderActions.markServed'),
         action: 'mark-served',
         icon: <Truck className="w-5 h-5" />,
         variant: 'default',
@@ -82,7 +83,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
     }
   }
   if (!isViewOnlyDepartment && canMarkPaid && order.status === 'Served' && !isAutoPayable) {
-    actions.push({ label: 'Mark Paid', action: 'mark-paid', icon: <CreditCard className="w-5 h-5" />, variant: 'default' });
+    actions.push({ label: t('orderActions.markPaid'), action: 'mark-paid', icon: <CreditCard className="w-5 h-5" />, variant: 'default' });
   }
 
   const showInvoice = !isAutoPayable && (order.status === 'Served' || order.status === 'Paid');
@@ -102,58 +103,55 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             <span className="font-body text-xs text-muted-foreground flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
-              {format(new Date(order.created_at), 'h:mm a')}
+              {formatTime(order.created_at)}
             </span>
             <Badge variant="outline" className="font-body text-xs">{order.status}</Badge>
             {isRoomCharge && (
               <Badge variant="outline" className="font-body text-xs gap-1 bg-[hsl(210,70%,50%,0.15)] text-[hsl(210,70%,65%)] border-[hsl(210,70%,50%,0.3)]">
-                <Home className="w-3 h-3" /> Room Charge
+                <Home className="w-3 h-3" /> {t('reception.roomCharge')}
               </Badge>
             )}
             {isTab && !isRoomCharge && (
               <Badge variant="outline" className="font-body text-xs gap-1 bg-[hsl(270,60%,55%,0.15)] text-[hsl(270,60%,70%)] border-[hsl(270,60%,55%,0.3)]">
-                <Receipt className="w-3 h-3" /> Tab
+                <Receipt className="w-3 h-3" /> {t('reception.tab')}
               </Badge>
             )}
           </div>
         </DrawerHeader>
 
         <div className="px-4 pb-6 overflow-y-auto space-y-4">
-          {/* Billing info banner */}
           {isAutoPayable && (
             <div className="flex items-start gap-2 bg-[hsl(210,70%,50%,0.1)] border border-[hsl(210,70%,50%,0.2)] rounded-lg px-3 py-2">
               <Info className="w-4 h-4 text-[hsl(210,70%,65%)] flex-shrink-0 mt-0.5" />
               <p className="font-body text-xs text-[hsl(210,70%,65%)]">
                 {isRoomCharge
-                  ? `This order is charged to ${order.location_detail || 'the room'}. Payment is collected at checkout.`
-                  : 'This order is on a tab. Payment is collected when the tab is closed.'}
+                  ? t('orderDetail.chargedToRoomInfo', { room: order.location_detail || t('reception.room') })
+                  : t('orderDetail.onTabInfo')}
               </p>
             </div>
           )}
 
-          {/* Department statuses */}
           <div className="flex gap-3">
             {foodItems.length > 0 && (
               <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-2 flex-1">
                 <div className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[order.kitchen_status] || 'bg-muted-foreground'}`} />
                 <Flame className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="font-body text-sm">Kitchen: <span className="font-semibold capitalize">{order.kitchen_status}</span></span>
+                <span className="font-body text-sm">{t('orderDetail.kitchen')}: <span className="font-semibold capitalize">{order.kitchen_status}</span></span>
               </div>
             )}
             {barItems.length > 0 && (
               <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-2 flex-1">
                 <div className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[order.bar_status] || 'bg-muted-foreground'}`} />
                 <GlassWater className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="font-body text-sm">Bar: <span className="font-semibold capitalize">{order.bar_status}</span></span>
+                <span className="font-body text-sm">{t('orderDetail.bar')}: <span className="font-semibold capitalize">{order.bar_status}</span></span>
               </div>
             )}
           </div>
 
           <Separator />
 
-          {/* All items */}
           <div className="space-y-2">
-            <h4 className="font-display text-xs tracking-wider text-muted-foreground uppercase">Items</h4>
+            <h4 className="font-display text-xs tracking-wider text-muted-foreground uppercase">{t('common.items')}</h4>
             {items.map((item: any, idx: number) => {
               const dept = item.department || 'kitchen';
               return (
@@ -170,13 +168,11 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
 
           <Separator />
 
-          {/* Total */}
           <div className="flex items-center justify-between">
-            <span className="font-display text-sm tracking-wider text-muted-foreground">TOTAL</span>
+            <span className="font-display text-sm tracking-wider text-muted-foreground">{t('common.total').toUpperCase()}</span>
             <span className="font-display text-xl text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
           </div>
 
-          {/* Actions */}
           {actions.length > 0 && (
             <>
               <Separator />
@@ -190,7 +186,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
                     size="lg"
                     className="w-full font-display tracking-wider gap-2 min-h-[52px] rounded-xl"
                   >
-                    {busy === a.action ? 'Updating…' : <>{a.icon} {a.label}</>}
+                    {busy === a.action ? t('common.updating') : <>{a.icon} {a.label}</>}
                   </Button>
                 ))}
               </div>
@@ -200,14 +196,13 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
           {actions.length === 0 && !showInvoice && (
             <p className="font-body text-sm text-muted-foreground text-center py-2">
               {isViewOnlyDepartment
-                ? 'View only in cashier queue'
+                ? t('reception.viewOnlyCashier')
                 : isAutoPayable && order.status === 'Served'
-                  ? 'Order auto-closed — charged to room/tab'
-                  : 'No actions available'}
+                  ? t('reception.orderAutoClosedRoom')
+                  : t('common.noActionsAvailable')}
             </p>
           )}
 
-          {/* Invoice actions for walk-in/dine-in orders */}
           {showInvoice && (
             <>
               <Separator />
@@ -218,7 +213,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
                   className="flex-1 font-display tracking-wider gap-2 min-h-[52px] rounded-xl"
                   onClick={() => generateInvoicePdf(order, resortProfile || null)}
                 >
-                  <FileText className="w-5 h-5" /> Download Invoice
+                  <FileText className="w-5 h-5" /> {t('common.downloadInvoice')}
                 </Button>
                 <Button
                   variant="outline"
@@ -229,7 +224,7 @@ const ServiceOrderDetail = ({ order, open, onOpenChange, permissions, department
                     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                   }}
                 >
-                  <MessageCircle className="w-5 h-5" /> WhatsApp
+                  <MessageCircle className="w-5 h-5" /> {t('orderActions.whatsapp')}
                 </Button>
               </div>
             </>

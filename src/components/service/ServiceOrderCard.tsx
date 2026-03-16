@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { Flame, GlassWater, Truck, CreditCard, Clock, CheckCircle2, Home, Receipt, FileText } from 'lucide-react';
 import { useState } from 'react';
@@ -31,6 +32,7 @@ interface ServiceOrderCardProps {
 }
 
 const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDetail, compact, resortProfile }: ServiceOrderCardProps) => {
+  const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const items = (order.items as any[]) || [];
   const isNew = order.status === 'New';
@@ -57,41 +59,37 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
 
   const canServe = canEdit(permissions, 'reception') || canEdit(permissions, 'kitchen') || canEdit(permissions, 'bar') || canManage(permissions, 'orders');
 
-  // Primary action for current department
   let primaryAction: { label: string; action: string; icon: React.ReactNode } | null = null;
 
   if (department === 'kitchen' && canEdit(permissions, 'kitchen')) {
-    if (order.kitchen_status === 'pending' && foodItems.length > 0) primaryAction = { label: 'Start Preparing', action: 'kitchen-start', icon: <Flame className="w-5 h-5" /> };
-    else if (order.kitchen_status === 'preparing') primaryAction = { label: 'Mark Ready', action: 'kitchen-ready', icon: <CheckCircle2 className="w-5 h-5" /> };
+    if (order.kitchen_status === 'pending' && foodItems.length > 0) primaryAction = { label: t('kitchen.startPreparing'), action: 'kitchen-start', icon: <Flame className="w-5 h-5" /> };
+    else if (order.kitchen_status === 'preparing') primaryAction = { label: t('kitchen.markReady'), action: 'kitchen-ready', icon: <CheckCircle2 className="w-5 h-5" /> };
   } else if (department === 'bar' && canEdit(permissions, 'bar')) {
-    if (order.bar_status === 'pending' && barItems.length > 0) primaryAction = { label: 'Start Mixing', action: 'bar-start', icon: <GlassWater className="w-5 h-5" /> };
-    else if (order.bar_status === 'preparing') primaryAction = { label: 'Mark Ready', action: 'bar-ready', icon: <CheckCircle2 className="w-5 h-5" /> };
+    if (order.bar_status === 'pending' && barItems.length > 0) primaryAction = { label: t('bar.startMixing'), action: 'bar-start', icon: <GlassWater className="w-5 h-5" /> };
+    else if (order.bar_status === 'preparing') primaryAction = { label: t('bar.markReady'), action: 'bar-ready', icon: <CheckCircle2 className="w-5 h-5" /> };
   }
 
   const canMarkPaid = canEdit(permissions, 'reception') || canManage(permissions, 'orders');
 
-  // Serve/Pay actions — any department staff can serve, only reception/admin can mark paid
   if (!primaryAction && canServe) {
     if (order.status === 'Ready') {
-      primaryAction = { label: isAutoPayable ? 'Serve & Close' : 'Mark Served', action: 'mark-served', icon: <Truck className="w-5 h-5" /> };
+      primaryAction = { label: isAutoPayable ? t('orderActions.serveAndClose') : t('orderActions.markServed'), action: 'mark-served', icon: <Truck className="w-5 h-5" /> };
     }
   }
   if (!primaryAction && canMarkPaid && order.status === 'Served' && !isAutoPayable) {
-    primaryAction = { label: 'Mark Paid', action: 'mark-paid', icon: <CreditCard className="w-5 h-5" /> };
+    primaryAction = { label: t('orderActions.markPaid'), action: 'mark-paid', icon: <CreditCard className="w-5 h-5" /> };
   }
 
-  // Secondary cross-dept actions
   const secondaryActions: { label: string; action: string; icon: React.ReactNode }[] = [];
 
   if (department !== 'kitchen' && canEdit(permissions, 'kitchen') && foodItems.length > 0) {
-    if (order.kitchen_status === 'pending') secondaryActions.push({ label: 'Start', action: 'kitchen-start', icon: <Flame className="w-4 h-4" /> });
-    else if (order.kitchen_status === 'preparing') secondaryActions.push({ label: 'Ready', action: 'kitchen-ready', icon: <CheckCircle2 className="w-4 h-4" /> });
+    if (order.kitchen_status === 'pending') secondaryActions.push({ label: t('bar.start'), action: 'kitchen-start', icon: <Flame className="w-4 h-4" /> });
+    else if (order.kitchen_status === 'preparing') secondaryActions.push({ label: t('bar.ready'), action: 'kitchen-ready', icon: <CheckCircle2 className="w-4 h-4" /> });
   }
   if (department !== 'bar' && canEdit(permissions, 'bar') && barItems.length > 0) {
-    if (order.bar_status === 'pending') secondaryActions.push({ label: 'Start', action: 'bar-start', icon: <GlassWater className="w-4 h-4" /> });
-    else if (order.bar_status === 'preparing') secondaryActions.push({ label: 'Ready', action: 'bar-ready', icon: <CheckCircle2 className="w-4 h-4" /> });
+    if (order.bar_status === 'pending') secondaryActions.push({ label: t('bar.start'), action: 'bar-start', icon: <GlassWater className="w-4 h-4" /> });
+    else if (order.bar_status === 'preparing') secondaryActions.push({ label: t('bar.ready'), action: 'bar-ready', icon: <CheckCircle2 className="w-4 h-4" /> });
   }
-  // Show invoice button for non-room/tab served/paid orders
   const showInvoice = !isAutoPayable && (order.status === 'Served' || order.status === 'Paid');
 
   if (deptItems.length === 0 && department !== 'reception' && department !== 'cashier') return null;
@@ -107,7 +105,6 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
         isNew ? 'new-order-card' : ''
       } ${compact ? 'p-3' : 'p-4'}`}
     >
-      {/* Header row */}
       <div className="flex items-start justify-between mb-2">
         <div className="min-w-0 flex-1">
           <p className="font-display text-base text-foreground tracking-wider truncate">
@@ -125,7 +122,6 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
         </div>
       </div>
 
-      {/* Status dots + payment badge row */}
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         {foodItems.length > 0 && (
           <div className="flex items-center gap-1">
@@ -141,20 +137,18 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
             <span className="font-body text-[11px] text-muted-foreground">{barItems.length}</span>
           </div>
         )}
-        {/* Payment type badge */}
         {isRoomCharge && (
           <Badge variant="outline" className="font-body text-[10px] h-5 gap-1 bg-[hsl(210,70%,50%,0.15)] text-[hsl(210,70%,65%)] border-[hsl(210,70%,50%,0.3)]">
-            <Home className="w-3 h-3" /> Room
+            <Home className="w-3 h-3" /> {t('reception.room')}
           </Badge>
         )}
         {isTab && !isRoomCharge && (
           <Badge variant="outline" className="font-body text-[10px] h-5 gap-1 bg-[hsl(270,60%,55%,0.15)] text-[hsl(270,60%,70%)] border-[hsl(270,60%,55%,0.3)]">
-            <Receipt className="w-3 h-3" /> Tab
+            <Receipt className="w-3 h-3" /> {t('reception.tab')}
           </Badge>
         )}
       </div>
 
-      {/* Items list */}
       <div className="space-y-0.5 mb-3">
         {(department === 'reception' ? items : deptItems).slice(0, compact ? 3 : 6).map((item: any, idx: number) => (
           <div key={idx} className="flex justify-between font-body">
@@ -163,11 +157,10 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
           </div>
         ))}
         {(department === 'reception' ? items : deptItems).length > (compact ? 3 : 6) && (
-          <p className="font-body text-[11px] text-muted-foreground">+{(department === 'reception' ? items : deptItems).length - (compact ? 3 : 6)} more…</p>
+          <p className="font-body text-[11px] text-muted-foreground">{t('common.more', { count: (department === 'reception' ? items : deptItems).length - (compact ? 3 : 6) })}</p>
         )}
       </div>
 
-      {/* Total + Actions */}
       <div className="pt-2.5 border-t border-border/50 space-y-2">
         <div className="flex items-center justify-between">
           <span className="font-display text-lg text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
@@ -180,16 +173,14 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
                 isNew ? 'bg-gold text-primary-foreground hover:bg-gold/90 new-order-btn' : ''
               }`}
             >
-              {busy ? 'Updating…' : <>{primaryAction.icon} {primaryAction.label}</>}
+              {busy ? t('common.updating') : <>{primaryAction.icon} {primaryAction.label}</>}
             </Button>
           )}
-          {/* Auto-payable indicator when served */}
           {!primaryAction && isAutoPayable && order.status === 'Served' && (
             <span className="font-body text-xs text-muted-foreground italic">
-              {isRoomCharge ? 'Charged to room' : 'On tab'}
+              {isRoomCharge ? t('reception.chargedToRoom') : t('reception.onTab')}
             </span>
           )}
-          {/* Invoice button for walk-in/dine-in */}
           {showInvoice && (
             <Button
               variant="outline"
@@ -200,12 +191,11 @@ const ServiceOrderCard = ({ order, department, permissions, onAction, onOpenDeta
               }}
               className="font-body text-xs gap-1 min-h-[36px] rounded-lg border-border/60"
             >
-              <FileText className="w-4 h-4" /> Invoice
+              <FileText className="w-4 h-4" /> {t('common.invoice')}
             </Button>
           )}
         </div>
 
-        {/* Secondary cross-dept actions */}
         {secondaryActions.length > 0 && onAction && department !== 'cashier' && (
           <div className="flex gap-2 flex-wrap">
             {secondaryActions.map(a => (

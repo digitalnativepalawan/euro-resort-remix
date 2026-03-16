@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Clock, Flame, GlassWater, Home, ChevronDown, ChevronUp, CreditCard, Check, ArrowLeft, Printer, CalendarIcon } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
+import { formatDateTime, formatTime, formatDate } from '@/lib/dateFormat';
 import CashierReceipt from './CashierReceipt';
 
 const STATUS_DOT: Record<string, string> = {
@@ -21,6 +23,7 @@ const STATUS_DOT: Record<string, string> = {
 };
 
 const CashierBoard = () => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: resortProfile } = useResortProfile();
   const { data: paymentMethods = [] } = usePaymentMethods();
@@ -162,7 +165,7 @@ const CashierBoard = () => {
       setSelectedBooking(null);
 
       qc.invalidateQueries({ queryKey: ['cashier-orders'] });
-      toast.success('Payment confirmed');
+      toast.success(t('cashier.paymentConfirmed'));
     } finally {
       setBusy(false);
     }
@@ -208,7 +211,7 @@ const CashierBoard = () => {
 
     await supabase.from('orders').update(updateData).eq('id', orderId);
     qc.invalidateQueries({ queryKey: ['cashier-orders'] });
-    toast.success('Order updated');
+    toast.success(t('kitchen.orderUpdated'));
   };
 
   // Receipt view
@@ -237,11 +240,11 @@ const CashierBoard = () => {
         {/* Summary */}
         <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card/50 flex-shrink-0">
           <span className="font-display text-sm text-foreground tracking-wider">
-            {buckets.active.length + buckets.billOut.length} Active
+            {buckets.active.length + buckets.billOut.length} {t('common.active')}
           </span>
           {buckets.billOut.length > 0 && (
             <span className="font-body text-xs text-amber-400 font-bold">
-              {buckets.billOut.length} BILL OUT
+              {buckets.billOut.length} {t('cashier.billOut')}
             </span>
           )}
         </div>
@@ -250,7 +253,7 @@ const CashierBoard = () => {
           {/* Bill Out section — grouped by room */}
           {buckets.billOut.length > 0 && (
             <div className="p-3">
-              <h3 className="font-display text-xs tracking-wider text-amber-400 mb-2 px-1">💰 BILL OUT — Awaiting Payment</h3>
+              <h3 className="font-display text-xs tracking-wider text-amber-400 mb-2 px-1">💰 {t('cashier.billOut')} — {t('cashier.awaitingPayment')}</h3>
               <GroupedBillOut
                 orders={buckets.billOut}
                 selectedOrderId={selectedOrder?.id}
@@ -262,7 +265,7 @@ const CashierBoard = () => {
           {/* Active orders */}
           {buckets.active.length > 0 && (
             <div className="p-3">
-              <h3 className="font-display text-xs tracking-wider text-muted-foreground mb-2 px-1">ACTIVE ORDERS</h3>
+              <h3 className="font-display text-xs tracking-wider text-muted-foreground mb-2 px-1">{t('cashier.activeOrders')}</h3>
               <div className="space-y-2">
                 {buckets.active.map(order => (
                   <OrderRow
@@ -278,7 +281,7 @@ const CashierBoard = () => {
           )}
 
           {buckets.active.length === 0 && buckets.billOut.length === 0 && (
-            <p className="font-body text-sm text-muted-foreground text-center py-12">No active orders</p>
+            <p className="font-body text-sm text-muted-foreground text-center py-12">{t('cashier.noActiveOrders')}</p>
           )}
 
           {/* Completed — date picker + stacked cards */}
@@ -286,7 +289,7 @@ const CashierBoard = () => {
             <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
               <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
                 <span className="font-display text-xs tracking-wider text-muted-foreground">
-                  ✓ Completed ({completedOrders.length})
+                  ✓ {t('common.completed')} ({completedOrders.length})
                 </span>
                 {completedOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
               </CollapsibleTrigger>
@@ -301,7 +304,7 @@ const CashierBoard = () => {
                   />
                 </div>
                 {completedOrders.length === 0 && (
-                  <p className="font-body text-xs text-muted-foreground text-center py-4">No completed orders for this date</p>
+                  <p className="font-body text-xs text-muted-foreground text-center py-4">{t('cashier.noCompletedOrders')}</p>
                 )}
                 {completedOrders.map(order => (
                   <OrderRow
@@ -415,6 +418,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
   onSelect: () => void;
   onAction?: (orderId: string, action: string) => Promise<void>;
 }) => {
+  const { t } = useTranslation();
   const items = (order.items as any[]) || [];
   const elapsed = formatDistanceToNow(new Date(order.created_at), { addSuffix: false });
   const foodItems = items.filter((i: any) => { const d = i.department || 'kitchen'; return d === 'kitchen' || d === 'both'; });
@@ -445,7 +449,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
             <p className="font-body text-xs text-muted-foreground truncate">{order.guest_name}</p>
           )}
           {order.staff_name && (
-            <p className="font-body text-[11px] text-muted-foreground/70 truncate">by {order.staff_name}</p>
+            <p className="font-body text-[11px] text-muted-foreground/70 truncate">{t('common.by', { name: order.staff_name })}</p>
           )}
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground flex-shrink-0 ml-2">
@@ -479,7 +483,7 @@ const OrderRow = ({ order, selected, onSelect, onAction }: {
           isPendingPayment ? 'border-amber-400/50 text-amber-400' :
           isPaid ? 'border-emerald-400/50 text-emerald-400' : ''
         }`}>
-          {isRoomCharge && isPaid ? 'Room Charge' : isPendingPayment ? 'Pending Payment' : isPaid ? 'Paid' : order.status}
+          {isRoomCharge && isPaid ? t('reception.roomCharge') : isPendingPayment ? t('cashier.pendingPayment') : isPaid ? t('cashier.paid') : order.status}
         </Badge>
 
         <span className="font-display text-sm text-gold tabular-nums">₱{order.total.toLocaleString()}</span>
@@ -508,6 +512,7 @@ const BillOutPanel = ({
   onBack: () => void;
   onPreviewReceipt: () => void;
 }) => {
+  const { t } = useTranslation();
   const items = (order.items as any[]) || [];
   const subtotal = items.reduce((s: number, i: any) => s + i.price * (i.qty || i.quantity || 1), 0);
   const sc = Number(order.service_charge || 0);
@@ -531,7 +536,7 @@ const BillOutPanel = ({
           )}
         </div>
         <Button variant="outline" size="sm" onClick={onPreviewReceipt} className="gap-1.5 font-display text-xs tracking-wider">
-          <Printer className="w-3.5 h-3.5" /> Preview
+          <Printer className="w-3.5 h-3.5" /> {t('common.preview')}
         </Button>
         <Badge variant="outline" className="font-body text-xs">{order.status}</Badge>
       </div>
@@ -549,24 +554,24 @@ const BillOutPanel = ({
 
         <div className="border-t border-border/50 pt-3 space-y-1">
           <div className="flex justify-between font-body text-sm">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-muted-foreground">{t('common.subtotal')}</span>
             <span className="tabular-nums">₱{subtotal.toLocaleString()}</span>
           </div>
           {sc > 0 && (
             <div className="flex justify-between font-body text-sm">
-              <span className="text-muted-foreground">Service Charge</span>
+              <span className="text-muted-foreground">{t('receipt.serviceCharge')}</span>
               <span className="tabular-nums">₱{sc.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between font-display text-2xl text-gold pt-2">
-            <span>Total</span>
+            <span>{t('common.total')}</span>
             <span className="tabular-nums">₱{total.toLocaleString()}</span>
           </div>
         </div>
 
         {/* Payment Method Selection */}
         <div className="space-y-3">
-          <p className="font-display text-xs tracking-wider text-muted-foreground">SELECT PAYMENT METHOD</p>
+          <p className="font-display text-xs tracking-wider text-muted-foreground">{t('cashier.selectPaymentMethod')}</p>
           <div className="grid grid-cols-2 gap-2">
             {paymentMethods.map(m => (
               <button
@@ -595,10 +600,10 @@ const BillOutPanel = ({
           size="lg"
           className="w-full min-h-[56px] font-display text-base tracking-wider gap-2 bg-gold text-primary-foreground hover:bg-gold/90"
         >
-        {busy ? 'Processing…' : (
+        {busy ? t('common.processing') : (
             <>
               <Check className="w-5 h-5" />
-              {order.status === 'Ready' ? 'Serve & Confirm Payment' : 'Confirm Payment'} — ₱{total.toLocaleString()}
+              {order.status === 'Ready' ? t('cashier.serveAndConfirm') : t('cashier.confirmPayment')} — ₱{total.toLocaleString()}
             </>
           )}
         </Button>
@@ -609,6 +614,7 @@ const BillOutPanel = ({
 
 /** Daily cash reconciliation summary */
 const DailySummary = ({ completed }: { completed: any[] }) => {
+  const { t } = useTranslation();
   const summary = useMemo(() => {
     const methods: Record<string, { count: number; total: number }> = {};
     let totalRevenue = 0;
@@ -644,16 +650,16 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 border-b border-border">
         <p className="font-display text-xs tracking-wider text-muted-foreground">
-          DAILY SUMMARY — {format(new Date(), 'MMM d, yyyy')}
+          {t('cashier.dailySummary', { date: formatDate(new Date()) })}
         </p>
       </div>
 
       <div className="flex-1 px-4 py-4 space-y-5">
         {/* Register revenue (excluding room charges) */}
         <div className="text-center space-y-1">
-          <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">Register Revenue Today</p>
+          <p className="font-body text-xs text-muted-foreground uppercase tracking-wider">{t('cashier.registerRevenueToday')}</p>
           <p className="font-display text-3xl text-gold tabular-nums">₱{summary.registerRevenue.toLocaleString()}</p>
-          <p className="font-body text-xs text-muted-foreground">{summary.orderCount - summary.roomChargeCount} settled order{(summary.orderCount - summary.roomChargeCount) !== 1 ? 's' : ''}</p>
+          <p className="font-body text-xs text-muted-foreground">{t('cashier.settledOrders', { count: summary.orderCount - summary.roomChargeCount })}</p>
         </div>
 
         {/* Room charges info */}
@@ -662,12 +668,12 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Home className="w-4 h-4 text-blue-400" />
-                <span className="font-display text-xs tracking-wider text-blue-400">ROOM CHARGES</span>
+                <span className="font-display text-xs tracking-wider text-blue-400">{t('cashier.roomCharges')}</span>
               </div>
-              <span className="font-body text-xs text-blue-400">{summary.roomChargeCount} order{summary.roomChargeCount !== 1 ? 's' : ''}</span>
+              <span className="font-body text-xs text-blue-400">{summary.roomChargeCount} {t('common.orders')}</span>
             </div>
             <p className="font-display text-lg text-blue-400 tabular-nums">₱{summary.roomChargeTotal.toLocaleString()}</p>
-            <p className="font-body text-[10px] text-muted-foreground">Charged to guest rooms — settled at checkout</p>
+            <p className="font-body text-[10px] text-muted-foreground">{t('cashier.chargedToGuestRooms')}</p>
           </div>
         )}
 
@@ -677,19 +683,19 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-gold" />
-                <span className="font-display text-sm tracking-wider text-gold">CASH</span>
+                <span className="font-display text-sm tracking-wider text-gold">{t('cashier.cash')}</span>
               </div>
-              <Badge className="bg-gold/20 text-gold border-gold/30 font-body text-xs">{cashEntry.count} orders</Badge>
+              <Badge className="bg-gold/20 text-gold border-gold/30 font-body text-xs">{cashEntry.count} {t('common.orders')}</Badge>
             </div>
             <p className="font-display text-2xl text-gold tabular-nums">₱{cashEntry.total.toLocaleString()}</p>
-            <p className="font-body text-[11px] text-muted-foreground">Amount to reconcile with cash drawer</p>
+            <p className="font-body text-[11px] text-muted-foreground">{t('cashier.amountToReconcile')}</p>
           </div>
         )}
 
         {/* Breakdown by method */}
         {sortedMethods.length > 0 && (
           <div className="space-y-2">
-            <p className="font-display text-xs tracking-wider text-muted-foreground">BREAKDOWN BY METHOD</p>
+            <p className="font-display text-xs tracking-wider text-muted-foreground">{t('cashier.breakdownByMethod')}</p>
             <div className="space-y-1">
               {sortedMethods.filter(([m]) => m !== 'Charge to Room').map(([method, data]) => (
                 <div key={method} className={`flex items-center justify-between rounded-lg px-3 py-2 ${method === 'Cash' ? 'bg-gold/5' : 'bg-secondary/50'}`}>
@@ -708,7 +714,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         {cashEntry && cashEntry.count > 0 && (
           <Collapsible>
             <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
-              <span className="font-display text-xs tracking-wider text-muted-foreground">CASH TRANSACTIONS ({cashEntry.count})</span>
+              <span className="font-display text-xs tracking-wider text-muted-foreground">{t('cashier.cashTransactions', { count: cashEntry.count })}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-2 space-y-1">
@@ -716,7 +722,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
                 <div key={o.id} className="flex items-center justify-between rounded-lg bg-card/80 border border-border/50 px-3 py-2">
                   <div className="min-w-0">
                     <p className="font-body text-xs text-foreground truncate">{o.location_detail || o.order_type}</p>
-                    <p className="font-body text-[10px] text-muted-foreground">{o.closed_at ? format(new Date(o.closed_at), 'h:mm a') : '—'}</p>
+                    <p className="font-body text-[10px] text-muted-foreground">{o.closed_at ? formatTime(o.closed_at) : '—'}</p>
                   </div>
                   <span className="font-display text-sm text-gold tabular-nums">₱{Number(o.total).toLocaleString()}</span>
                 </div>
@@ -726,12 +732,12 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         )}
 
         {summary.orderCount === 0 && (
-          <p className="font-body text-sm text-muted-foreground text-center py-8">No paid orders yet today</p>
+          <p className="font-body text-sm text-muted-foreground text-center py-8">{t('cashier.noPaidOrders')}</p>
         )}
       </div>
 
       <div className="px-4 py-3 border-t border-border text-center">
-        <p className="font-body text-[10px] text-muted-foreground">Tap an order to open bill & payment · Tap completed orders to reprint</p>
+        <p className="font-body text-[10px] text-muted-foreground">{t('cashier.tapOrderHint')}</p>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Home, Briefcase, LogOut, Menu, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -8,8 +9,8 @@ import { getHomeRoute } from '@/lib/getHomeRoute';
 import { Badge } from '@/components/ui/badge';
 import { getStaffSession, clearStaffSession } from '@/lib/session';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-/** Color map for department badges — HSL values from design tokens where possible */
 const DEPT_COLORS: Record<string, string> = {
   reception:    'bg-[hsl(210,70%,50%)] text-white',
   kitchen:      'bg-[hsl(25,85%,55%)] text-white',
@@ -18,28 +19,26 @@ const DEPT_COLORS: Record<string, string> = {
   maintenance:  'bg-[hsl(220,15%,50%)] text-white',
   experiences:  'bg-[hsl(38,60%,55%)] text-white',
   orders:       'bg-[hsl(200,60%,50%)] text-white',
-  
 };
 
-const DEPT_LABELS: Record<string, string> = {
-  reception: 'Reception',
-  kitchen: 'Kitchen',
-  bar: 'Bar',
+const DEPT_LABEL_KEYS: Record<string, string> = {
+  reception: 'reception.label',
+  kitchen: 'kitchen.label',
+  bar: 'bar.label',
   housekeeping: 'Housekeeping',
   maintenance: 'Maintenance',
   experiences: 'Experiences',
   orders: 'Orders',
-  
 };
 
 interface StaffNavBarProps {
-  /** Current active department/role key — passed from StaffShell */
   activeDepartment?: string;
 }
 
 const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const session = getStaffSession();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -47,23 +46,21 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
 
   const perms: string[] = session.permissions || [];
   const isAdmin = perms.includes('admin');
-  const displayName = session.name || 'Staff';
+  const displayName = session.name || t('login.staff');
 
-  // Determine displayed department
   let currentDept = activeDepartment || '';
   if (!currentDept) {
-    // Infer from route when not explicitly passed
     if (location.pathname === '/kitchen') currentDept = 'kitchen';
     else if (location.pathname === '/bar') currentDept = 'bar';
     else if (location.pathname === '/housekeeper') currentDept = 'housekeeping';
     else if (location.pathname === '/reception') currentDept = 'reception';
     else if (location.pathname === '/experiences') currentDept = 'experiences';
-    else if (location.pathname === '/employee-portal') currentDept = ''; // no dept badge on My Work
+    else if (location.pathname === '/employee-portal') currentDept = '';
   }
 
-  const deptLabel = DEPT_LABELS[currentDept] || '';
+  const deptLabelKey = DEPT_LABEL_KEYS[currentDept] || '';
+  const deptLabel = deptLabelKey ? (deptLabelKey.includes('.') ? t(deptLabelKey) : deptLabelKey) : '';
   const deptColor = DEPT_COLORS[currentDept] || '';
-
 
   const handleLogout = () => {
     clearStaffSession();
@@ -81,7 +78,6 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
     setMenuOpen(false);
   };
 
-
   const isActive = (path: string) => location.pathname === path;
 
   const DeptBadge = () => {
@@ -98,7 +94,6 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
     setMenuOpen(false);
   };
 
-  // Shared nav items
   const NavItems = ({ mobile = false }: { mobile?: boolean }) => (
     <>
       <Button
@@ -108,7 +103,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
         className={`font-display text-xs tracking-wider gap-1.5 ${mobile ? 'w-full justify-start' : ''}`}
       >
         <Home className="w-4 h-4" />
-        Home
+        {t('common.home')}
       </Button>
       <Button
         variant={isActive('/employee-portal') ? 'default' : 'ghost'}
@@ -117,7 +112,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
         className={`font-display text-xs tracking-wider gap-1.5 ${mobile ? 'w-full justify-start' : ''}`}
       >
         <Briefcase className="w-4 h-4" />
-        My Work
+        {t('service.myWork')}
       </Button>
       <Button
         variant={location.pathname.startsWith('/service') ? 'default' : 'ghost'}
@@ -126,7 +121,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
         className={`font-display text-xs tracking-wider gap-1.5 ${mobile ? 'w-full justify-start' : ''}`}
       >
         <Monitor className="w-4 h-4" />
-        Service
+        {t('service.service')}
       </Button>
     </>
   );
@@ -134,7 +129,6 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
   return (
     <nav className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border mb-4">
       <div className="max-w-2xl mx-auto px-4 py-2 flex items-center justify-between">
-        {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-1">
           <NavItems />
           {deptLabel && (
@@ -145,7 +139,6 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
           )}
         </div>
 
-        {/* Mobile nav - Home + department badge */}
         <div className="flex sm:hidden items-center gap-1.5">
           <Button
             variant={isActive(getHomeRoute(perms)) ? 'default' : 'ghost'}
@@ -158,9 +151,9 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
           <DeptBadge />
         </div>
 
-        {/* Right side - staff name + toggle + logout (desktop) */}
         <div className="hidden sm:flex items-center gap-2">
           <span className="font-body text-xs text-muted-foreground">{displayName}</span>
+          <LanguageSwitcher />
           <ThemeToggle />
           <Button
             variant="ghost"
@@ -169,11 +162,10 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
             className="font-display text-xs tracking-wider gap-1 text-muted-foreground hover:text-foreground"
           >
             <LogOut className="w-3.5 h-3.5" />
-            Logout
+            {t('common.logout')}
           </Button>
         </div>
 
-        {/* Mobile hamburger menu */}
         <div className="flex sm:hidden items-center">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
@@ -189,8 +181,9 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
               <div className="flex flex-col gap-2">
                 <NavItems mobile />
               <div className="flex items-center gap-2 py-1">
+                <LanguageSwitcher />
                 <ThemeToggle />
-                <span className="font-body text-xs text-muted-foreground">Theme</span>
+                <span className="font-body text-xs text-muted-foreground">{t('common.theme')}</span>
               </div>
               <div className="border-t border-border my-2" />
                 <Button
@@ -200,7 +193,7 @@ const StaffNavBar = ({ activeDepartment }: StaffNavBarProps) => {
                   className="font-display text-xs tracking-wider gap-1.5 w-full justify-start text-destructive hover:text-destructive"
                 >
                   <LogOut className="w-4 h-4" />
-                  Logout
+                  {t('common.logout')}
                 </Button>
               </div>
             </SheetContent>

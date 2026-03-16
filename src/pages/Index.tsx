@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useResortProfile } from '@/hooks/useResortProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -9,9 +10,11 @@ import { DoorOpen, Users, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { getStaffSession, setStaffSession, isRemembered } from '@/lib/session';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: profile } = useResortProfile();
   const logoSize = profile?.logo_size || 128;
 
@@ -21,7 +24,6 @@ const Index = () => {
   const [remember, setRemember] = useState(() => isRemembered());
   const [loading, setLoading] = useState(false);
 
-  // Auto-redirect if already logged in
   useEffect(() => {
     const existing = getStaffSession();
     if (existing) {
@@ -43,7 +45,7 @@ const Index = () => {
         body: { action: 'verify', name: name.trim(), pin },
       });
       if (error || data?.error) {
-        toast.error(data?.error || 'Login failed');
+        toast.error(data?.error || t('login.loginFailed'));
         setLoading(false);
         return;
       }
@@ -59,27 +61,28 @@ const Index = () => {
       );
       localStorage.setItem('emp_id', data.employee.id);
       localStorage.setItem('emp_name', data.employee.name);
-      toast.success(`Welcome, ${data.employee.name}`);
+      toast.success(t('login.welcome', { name: data.employee.name }));
 
       if (mode === 'admin') {
         const perms = data.permissions || [];
         if (data.isAdmin || perms.includes('admin')) {
           navigate('/admin');
         } else {
-          toast.error('Admin access required');
+          toast.error(t('login.adminAccessRequired'));
         }
       } else {
         navigate('/staff');
       }
     } catch {
-      toast.error('Login failed');
+      toast.error(t('login.loginFailed'));
     }
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-navy-texture flex flex-col items-center justify-center px-6 relative">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex items-center gap-1">
+        <LanguageSwitcher />
         <ThemeToggle />
       </div>
       {profile?.logo_url && (
@@ -110,7 +113,7 @@ const Index = () => {
             className="flex items-center justify-center gap-3 font-display text-lg tracking-wider py-6 border border-accent/30 text-accent hover:bg-accent/5 transition-colors rounded-lg"
           >
             <DoorOpen className="w-5 h-5" />
-            I'm a Guest
+            {t('login.imAGuest')}
           </button>
 
           <button
@@ -118,7 +121,7 @@ const Index = () => {
             className="flex items-center justify-center gap-3 font-display text-lg tracking-wider py-6 border border-foreground/20 text-foreground hover:bg-foreground/5 transition-colors rounded-lg"
           >
             <Users className="w-5 h-5" />
-            Staff
+            {t('login.staff')}
           </button>
 
           <button
@@ -126,18 +129,18 @@ const Index = () => {
             className="flex items-center justify-center gap-2 font-body text-sm tracking-wider py-3 text-muted-foreground hover:text-foreground transition-colors"
           >
             <Shield className="w-4 h-4" />
-            Admin
+            {t('login.admin')}
           </button>
         </div>
       ) : (
         <div className="w-full max-w-xs space-y-3">
           <p className="font-display text-sm tracking-wider text-foreground text-center mb-2">
-            {mode === 'admin' ? 'Admin Login' : 'Staff Login'}
+            {mode === 'admin' ? t('login.adminLogin') : t('login.staffLogin')}
           </p>
           <Input
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="Your name"
+            placeholder={t('login.yourName')}
             className="bg-secondary border-border text-foreground font-body text-center text-lg h-12"
             onKeyDown={e => { if (e.key === 'Enter') document.getElementById('home-pin')?.focus(); }}
             autoFocus
@@ -150,7 +153,7 @@ const Index = () => {
             maxLength={6}
             value={pin}
             onChange={e => setPin(e.target.value.replace(/\D/g, ''))}
-            placeholder="PIN"
+            placeholder={t('login.pin')}
             className="bg-secondary border-border text-foreground font-body text-center text-2xl tracking-[0.5em] h-14"
             onKeyDown={e => { if (e.key === 'Enter') handleLogin(); }}
           />
@@ -161,7 +164,7 @@ const Index = () => {
               onCheckedChange={(v) => setRemember(v === true)}
             />
             <label htmlFor="remember-me" className="font-body text-sm text-muted-foreground cursor-pointer select-none">
-              Remember me on this device
+              {t('login.rememberMe')}
             </label>
           </div>
           <Button
@@ -169,13 +172,13 @@ const Index = () => {
             disabled={loading || !name.trim() || !pin}
             className="w-full font-display text-sm tracking-wider h-12"
           >
-            {loading ? 'Verifying...' : 'Sign In'}
+            {loading ? t('common.verifying') : t('common.signIn')}
           </Button>
           <button
             onClick={() => { setMode(null); setName(''); setPin(''); }}
             className="w-full font-body text-xs text-muted-foreground hover:text-foreground py-2 transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       )}
