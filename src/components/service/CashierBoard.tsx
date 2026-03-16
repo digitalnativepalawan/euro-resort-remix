@@ -732,7 +732,7 @@ const DailySummary = ({ completed }: { completed: any[] }) => {
         )}
 
         {summary.orderCount === 0 && (
-          <p className="font-body text-sm text-muted-foreground text-center py-8">No paid orders yet today</p>
+          <p className="font-body text-sm text-muted-foreground text-center py-8">{t('cashier.noPaidOrders')}</p>
         )}
       </div>
 
