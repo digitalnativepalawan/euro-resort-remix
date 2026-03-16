@@ -416,7 +416,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   setSelectedOrderType(''); setSelectedLocation(''); setPaymentType(''); setGuestName(''); setScheduleMode('asap');
                 }
               }} className="font-display tracking-wider py-6 w-full">
-                Place Another Order
+                {t('cart.placeAnotherOrder')}
               </Button>
               <Button variant="outline" onClick={() => {
                 handleClose(false);
