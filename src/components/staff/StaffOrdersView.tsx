@@ -17,6 +17,7 @@ const STATUSES = ['New', 'Preparing', 'Served', 'Paid'];
 
 const StaffOrdersView = () => {
   const qc = useQueryClient();
+  const { formatPrice } = useCurrency();
   const { data: resortProfile } = useResortProfile();
   const session = getStaffSession();
   const perms = session?.permissions || [];
