@@ -57,7 +57,7 @@ const TaskCommentThread = ({ taskId, authorName, readOnly = false, maxComments =
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (atImageLimit) { toast.error(`Max ${maxImages} images per task`); return; }
+    if (atImageLimit) { toast.error(t('tasks.commentLimitReached')); return; }
     setUploading(true);
     try {
       const compressed = await compressImage(file, 800);
