@@ -844,7 +844,7 @@ const OrdersView = ({ session }: { session: GuestPortalSession }) => {
                         <span className="font-body text-sm text-foreground">{item.qty || item.quantity || 1}× {item.name}</span>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="font-body text-xs text-muted-foreground">₱{((item.price || 0) * (item.qty || item.quantity || 1)).toLocaleString()}</span>
+                        <span className="font-body text-xs text-muted-foreground">{formatPrice((item.price || 0) * (item.qty || item.quantity || 1))}</span>
                         <span className={`font-body text-[10px] px-1.5 py-0.5 rounded ${
                           finalStatus === 'Served' || finalStatus === 'Ready' ? 'text-green-400' :
                           finalStatus === 'Preparing' ? 'text-amber-400' :
