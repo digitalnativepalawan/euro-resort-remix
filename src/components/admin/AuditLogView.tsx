@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface AuditEntry {
   id: string;
@@ -17,6 +18,7 @@ interface AuditEntry {
 }
 
 const AuditLogView = () => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [staffFilter, setStaffFilter] = useState('all');
@@ -33,7 +35,6 @@ const AuditLogView = () => {
     },
   });
 
-  // Realtime subscription
   useEffect(() => {
     const channel = supabase
       .channel('audit-log-realtime')
@@ -57,7 +58,6 @@ const AuditLogView = () => {
     return true;
   });
 
-  // Stats
   const today = new Date().toISOString().split('T')[0];
   const todayEntries = entries.filter(e => e.created_at.startsWith(today));
   const mostActive = todayEntries.reduce((acc, e) => {
@@ -75,28 +75,26 @@ const AuditLogView = () => {
 
   return (
     <div className="space-y-4">
-      <h3 className="font-display text-sm tracking-wider text-foreground">Audit Log</h3>
+      <h3 className="font-display text-sm tracking-wider text-foreground">{t('audit.title')}</h3>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-2">
         <div className="border border-border rounded-lg p-3 bg-secondary">
-          <p className="font-body text-xs text-muted-foreground">Today's Actions</p>
+          <p className="font-body text-xs text-muted-foreground">{t('audit.todaysActions')}</p>
           <p className="font-display text-lg text-foreground">{todayEntries.length}</p>
         </div>
         <div className="border border-border rounded-lg p-3 bg-secondary">
-          <p className="font-body text-xs text-muted-foreground">Most Active</p>
+          <p className="font-body text-xs text-muted-foreground">{t('audit.mostActive')}</p>
           <p className="font-display text-sm text-foreground">{topStaff ? `${topStaff[0]} (${topStaff[1]})` : '—'}</p>
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-2 flex-wrap">
         <Select onValueChange={setStaffFilter} value={staffFilter}>
           <SelectTrigger className="bg-secondary border-border text-foreground font-body w-36">
-            <SelectValue placeholder="All Staff" />
+            <SelectValue placeholder={t('audit.allStaff')} />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
-            <SelectItem value="all" className="text-foreground font-body">All Staff</SelectItem>
+            <SelectItem value="all" className="text-foreground font-body">{t('audit.allStaff')}</SelectItem>
             {staffNames.map(n => (
               <SelectItem key={n} value={n} className="text-foreground font-body">{n}</SelectItem>
             ))}
@@ -104,24 +102,23 @@ const AuditLogView = () => {
         </Select>
         <Select onValueChange={setActionFilter} value={actionFilter}>
           <SelectTrigger className="bg-secondary border-border text-foreground font-body w-32">
-            <SelectValue placeholder="All Actions" />
+            <SelectValue placeholder={t('audit.allActions')} />
           </SelectTrigger>
           <SelectContent className="bg-card border-border">
-            <SelectItem value="all" className="text-foreground font-body">All Actions</SelectItem>
+            <SelectItem value="all" className="text-foreground font-body">{t('audit.allActions')}</SelectItem>
             {actions.map(a => (
               <SelectItem key={a} value={a} className="text-foreground font-body">{a}</SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search..." className="bg-secondary border-border text-foreground font-body flex-1 min-w-[120px]" />
+          placeholder={t('common.search') + '...'} className="bg-secondary border-border text-foreground font-body flex-1 min-w-[120px]" />
       </div>
 
-      {/* Timeline */}
       {isLoading ? (
-        <p className="font-body text-sm text-muted-foreground text-center py-8">Loading...</p>
+        <p className="font-body text-sm text-muted-foreground text-center py-8">{t('common.loading')}</p>
       ) : filtered.length === 0 ? (
-        <p className="font-body text-sm text-muted-foreground text-center py-8">No audit entries found</p>
+        <p className="font-body text-sm text-muted-foreground text-center py-8">{t('audit.noEntries')}</p>
       ) : (
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           {filtered.map(e => (

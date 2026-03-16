@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, Search } from 'lucide-react';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 const PAGE_SIZE = 50;
 
 const OrderArchive = () => {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -53,22 +55,15 @@ const OrderArchive = () => {
     const headers = ['Date', 'Order Type', 'Guest', 'Staff', 'Location', 'Items', 'Total', 'Payment', 'Status'];
     const rows = filtered.map(o => [
       format(new Date(o.created_at), 'yyyy-MM-dd HH:mm'),
-      o.order_type,
-      o.guest_name,
-      o.staff_name,
-      o.location_detail || '',
+      o.order_type, o.guest_name, o.staff_name, o.location_detail || '',
       ((o.items as any[]) || []).map((i: any) => `${i.qty || 1}x ${i.name}`).join('; '),
-      o.total,
-      o.payment_type || '',
-      o.status,
+      o.total, o.payment_type || '', o.status,
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `orders-archive-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    a.click();
+    a.href = url; a.download = `orders-archive-${format(new Date(), 'yyyy-MM-dd')}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -89,42 +84,40 @@ const OrderArchive = () => {
     <Card className="bg-card border-border">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-sm tracking-wider text-foreground">Order Archive</CardTitle>
+          <CardTitle className="font-display text-sm tracking-wider text-foreground">{t('orderArchive.title')}</CardTitle>
           <Button size="sm" variant="outline" onClick={exportCsv} className="font-body text-xs">
-            <Download className="w-3.5 h-3.5 mr-1" /> Export CSV
+            <Download className="w-3.5 h-3.5 mr-1" /> {t('orderArchive.exportCsv')}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Filters */}
         <div className="flex items-center gap-2">
           <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-          <Input placeholder="Search guest, staff, items..." value={search} onChange={e => setSearch(e.target.value)} className={`${inputCls} flex-1`} />
+          <Input placeholder={t('orderArchive.searchHint')} value={search} onChange={e => setSearch(e.target.value)} className={`${inputCls} flex-1`} />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} placeholder="From" className={inputCls} />
-          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} placeholder="To" className={inputCls} />
+          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className={inputCls} />
+          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className={inputCls} />
         </div>
         <div className="grid grid-cols-2 gap-2">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className={inputCls}><SelectValue placeholder="Order Type" /></SelectTrigger>
+            <SelectTrigger className={inputCls}><SelectValue placeholder={t('orderArchive.allTypes')} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              {orderTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              <SelectItem value="all">{t('orderArchive.allTypes')}</SelectItem>
+              {orderTypes.map(tp => <SelectItem key={tp} value={tp}>{tp}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={paymentFilter} onValueChange={setPaymentFilter}>
-            <SelectTrigger className={inputCls}><SelectValue placeholder="Payment" /></SelectTrigger>
+            <SelectTrigger className={inputCls}><SelectValue placeholder={t('orderArchive.allPayments')} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Payments</SelectItem>
-              {paymentTypes.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              <SelectItem value="all">{t('orderArchive.allPayments')}</SelectItem>
+              {paymentTypes.map(tp => <SelectItem key={tp} value={tp}>{tp}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
 
-        <p className="font-body text-xs text-muted-foreground">{filtered.length} orders found</p>
+        <p className="font-body text-xs text-muted-foreground">{t('orderArchive.ordersFound', { count: filtered.length })}</p>
 
-        {/* Orders list */}
         <div className="space-y-2">
           {paged.map(o => {
             const items = (o.items as any[]) || [];
@@ -147,7 +140,7 @@ const OrderArchive = () => {
                 <div className="flex items-center justify-between">
                   <span className="font-display text-sm text-foreground">₱{Number(o.total).toLocaleString()}</span>
                   <span className="font-body text-xs text-muted-foreground">
-                    {o.payment_type && `${o.payment_type} · `}Staff: {o.staff_name || '—'}
+                    {o.payment_type && `${o.payment_type} · `}{t('common.staff')}: {o.staff_name || '—'}
                   </span>
                 </div>
               </div>
@@ -157,11 +150,11 @@ const OrderArchive = () => {
 
         {paged.length < filtered.length && (
           <Button variant="outline" className="w-full font-body text-xs" onClick={() => setPage(p => p + 1)}>
-            Load more ({filtered.length - paged.length} remaining)
+            {t('orderArchive.loadMore', { count: filtered.length - paged.length })}
           </Button>
         )}
 
-        {isLoading && <p className="font-body text-xs text-muted-foreground text-center py-4">Loading...</p>}
+        {isLoading && <p className="font-body text-xs text-muted-foreground text-center py-4">{t('common.loading')}</p>}
       </CardContent>
     </Card>
   );
