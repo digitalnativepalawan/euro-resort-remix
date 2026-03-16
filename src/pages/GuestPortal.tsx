@@ -734,6 +734,7 @@ const DEPT_STATUS_LABELS: Record<string, string> = {
 };
 
 const OrdersView = ({ session }: { session: GuestPortalSession }) => {
+  const { formatPrice } = useCurrency();
   const qc = useQueryClient();
 
   const { data: orders = [] } = useQuery({
