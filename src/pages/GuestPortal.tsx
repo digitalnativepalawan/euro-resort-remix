@@ -451,7 +451,7 @@ const TransportView = ({ session, qc }: { session: GuestPortalSession; qc: any }
               <p className="font-body text-sm text-foreground">{r.origin} → {r.destination}</p>
               {r.description && <p className="font-body text-xs text-muted-foreground">{r.description}</p>}
             </div>
-            <span className="font-body text-sm text-accent font-medium">₱{r.price}</span>
+            <span className="font-body text-sm text-accent font-medium">{formatPrice(r.price)}</span>
           </div>
         </div>
       ))}
