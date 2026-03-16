@@ -609,7 +609,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                               : 'border-border text-cream-dim'
                           }`}
                         >
-                          Schedule
+                          {t('cart.schedule')}
                         </button>
                       </div>
 
