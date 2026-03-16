@@ -376,7 +376,7 @@ const DepartmentOrdersView = ({ department, embedded = false }: DepartmentOrders
               variant="outline"
               className="font-body text-xs gap-1.5"
             >
-              <Truck className="w-4 h-4" /> Mark Ready
+              <Truck className="w-4 h-4" /> {t('kitchen.markReady')}
             </Button>
           )}
         </div>
