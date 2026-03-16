@@ -57,7 +57,7 @@ const TabPicker = ({ tabMode, setTabMode, selectedTabId, setSelectedTabId }: {
           <SelectContent className="bg-card border-border">
             {openTabs.map((tab: any) => (
               <SelectItem key={tab.id} value={tab.id} className="text-foreground font-body text-xs">
-                {tab.location_type} · {tab.location_detail} — ₱{Number(tab.running_total || 0).toLocaleString()}
+                {tab.location_type} · {tab.location_detail} — {formatPrice(Number(tab.running_total || 0))}
               </SelectItem>
             ))}
           </SelectContent>
