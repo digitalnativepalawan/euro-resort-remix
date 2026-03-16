@@ -570,7 +570,7 @@ const BillOutPanel = ({
 
         {/* Payment Method Selection */}
         <div className="space-y-3">
-          <p className="font-display text-xs tracking-wider text-muted-foreground">SELECT PAYMENT METHOD</p>
+          <p className="font-display text-xs tracking-wider text-muted-foreground">{t('cashier.selectPaymentMethod')}</p>
           <div className="grid grid-cols-2 gap-2">
             {paymentMethods.map(m => (
               <button
