@@ -338,11 +338,11 @@ const EmployeeTaskList = ({ employeeId, createdBy = 'admin', readOnly = false, e
             {editId === task.id ? (
               <div className="space-y-2">
                 <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="bg-secondary border-border text-foreground font-body text-sm" />
-                <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Description" className="bg-secondary border-border text-foreground font-body text-sm" />
+                <Input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder={t('tasks.descriptionOptional')} className="bg-secondary border-border text-foreground font-body text-sm" />
                 <Input type="datetime-local" value={editDue} onChange={e => setEditDue(e.target.value)} className="bg-secondary border-border text-foreground font-body text-sm" />
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={saveEdit} className="font-display text-xs tracking-wider flex-1">Save</Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditId(null)} className="font-display text-xs tracking-wider flex-1">Cancel</Button>
+                  <Button size="sm" onClick={saveEdit} className="font-display text-xs tracking-wider flex-1">{t('common.save')}</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditId(null)} className="font-display text-xs tracking-wider flex-1">{t('common.cancel')}</Button>
                 </div>
               </div>
             ) : isCompleting ? (
