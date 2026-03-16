@@ -78,6 +78,7 @@ interface CartDrawerProps {
 }
 
 const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, locationDetail: initialLocation, initialGuestName = '' }: CartDrawerProps) => {
+  const { t } = useTranslation();
   const cart = useCart();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
