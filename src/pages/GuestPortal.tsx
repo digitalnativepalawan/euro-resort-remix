@@ -1336,7 +1336,7 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
                 </div>
               </div>
               <div className="text-right">
-                <span className="font-body text-sm text-muted-foreground">₱{(t.price || 0).toLocaleString()}</span>
+                <span className="font-body text-sm text-muted-foreground">{formatPrice(t.price || 0)}</span>
                 <Badge variant="outline" className="ml-2 text-[10px]">Pending</Badge>
               </div>
             </div>
