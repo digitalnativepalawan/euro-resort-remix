@@ -487,7 +487,7 @@ const CartDrawer = ({ open, onOpenChange, mode, orderType: initialOrderType, loc
                   <div className="space-y-1.5">
                     <div className="flex justify-between font-body text-sm">
                       <span className="text-cream-dim">{t('common.subtotal')}</span>
-                      <span className="text-foreground">₱{subtotal.toLocaleString()}</span>
+                      <span className="text-foreground">{formatPrice(subtotal)}</span>
                     </div>
                     {scRate > 0 && (
                       <div className="flex justify-between font-body text-sm">
