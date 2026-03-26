@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { ArrowLeft, LogIn, LogOut, DollarSign, BedDouble, MapPin, Car, Bike, Palmtree, UtensilsCrossed, ClipboardList, Sparkles, Receipt, ChevronDown, ChevronUp, CheckCircle, Clock, ShieldCheck, Eye, AlertTriangle, MessageSquare } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, DollarSign, BedDouble, MapPin, Car, Bike, Palmtree, UtensilsCrossed, ClipboardList, Sparkles, Receipt, ChevronDown, ChevronUp, CheckCircle, Clock, ShieldCheck, Eye, AlertTriangle, MessageSquare, QrCode } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import RoomsDashboard from '@/components/admin/RoomsDashboard';
 import AddPaymentModal from '@/components/rooms/AddPaymentModal';
@@ -25,6 +25,7 @@ import { canEdit, canManage, hasAccess } from '@/lib/permissions';
 import { logAudit } from '@/lib/auditLog';
 import ReceptionCalendar from '@/components/reception/ReceptionCalendar';
 import RoomBillingTab from '@/components/rooms/RoomBillingTab';
+import { QRPaymentModal } from '@/components/payment/QRPaymentModal';
 import type { BookingWithGuest, ResortUnit } from '@/components/reception/calendarUtils';
 
 /** Get current Manila date string (YYYY-MM-DD) */
@@ -35,8 +36,6 @@ const getManilaHour = () => parseInt(new Date().toLocaleString('en-US', { timeZo
 const getManilaTimeStr = () => new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
 const from = (table: string) => supabase.from(table as any);
-
-/* InlineBill removed – billing is accessible via Details sheet */
 
 /** Compute balance for a unit from transactions */
 const useUnitBalance = (unitId: string | null) => {
@@ -83,6 +82,9 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [earlyCheckInFee, setEarlyCheckInFee] = useState('');
   const [lateCheckOutFee, setLateCheckOutFee] = useState('');
 
+  // QR Payment Modal state
+  const [showReceptionQR, setShowReceptionQR] = useState(false);
+
   // Override sell state
   const [overrideOpen, setOverrideOpen] = useState(false);
   const [overrideUnit, setOverrideUnit] = useState<any>(null);
@@ -108,7 +110,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [checkOutPayment, setCheckOutPayment] = useState('');
   const [checkOutAmount, setCheckOutAmount] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
-  // checkOutHousekeeper removed — broadcast mode
 
   // Add Payment modal state
   const [paymentUnit, setPaymentUnit] = useState<any>(null);
@@ -283,7 +284,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     const raw = (unit as any).status || 'ready';
     if (raw === 'occupied') return 'occupied';
     if (raw === 'to_clean') return 'to_clean';
-    // Fallback: check if there's an active booking for this unit
     const resortUnit = resolveResortUnit(unit.name);
     if (resortUnit) {
       const hasActiveBooking = bookings.some((b: any) =>
@@ -331,14 +331,12 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     return acc;
   }, {} as Record<string, any[]>);
 
-  // Helper: get upcoming booking for a Ready room
   const getUpcomingBooking = (unit: any) => {
     const resortUnit = resolveResortUnit(unit.name);
     if (!resortUnit) return null;
     return bookings.find((b: any) => b.unit_id === resortUnit.id && b.check_in > today && b.check_in <= weekEnd) || null;
   };
 
-  // Helper: get TODAY's arrival booking for a unit (for room protection)
   const getTodayArrivalBooking = (unit: any) => {
     const resortUnit = resolveResortUnit(unit.name);
     if (!resortUnit) return null;
@@ -350,7 +348,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
   const toCleanUnits = units.filter((u: any) => getUnitStatus(u) === 'to_clean');
   const readyUnits = units.filter((u: any) => getUnitStatus(u) === 'ready');
 
-  // Compute reserved unit IDs for today
   const todayReservedUnitIds = new Set(
     readyUnits.filter((u: any) => getTodayArrivalBooking(u)).map((u: any) => u.id)
   );
@@ -366,7 +363,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
   const pendingTourBookings = tourBookings.filter((b: any) => b.status === 'pending');
   const hasPendingAlerts = pendingRequests.length > 0 || pendingTourBookings.length > 0 || allDisputes.length > 0;
 
-  // ── AUDIO CHIME for pending requests/tours ──
+  // Audio chime
   const audioCtxRef = useRef<AudioContext | null>(null);
   const audioUnlockedRef = useRef(false);
 
@@ -387,7 +384,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     });
   }, []);
 
-  // Unlock AudioContext on first user interaction
   useEffect(() => {
     const unlock = async () => {
       if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
@@ -408,7 +404,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     };
   }, []);
 
-  // Chime only once when pending alerts first appear
   const prevHasPendingRef = useRef(false);
   useEffect(() => {
     if (hasPendingAlerts && !prevHasPendingRef.current && audioUnlockedRef.current) {
@@ -417,7 +412,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     prevHasPendingRef.current = hasPendingAlerts;
   }, [hasPendingAlerts, playChime]);
 
-  // Auto-heal: sync units.status when booking says occupied but status is ready
+  // Auto-heal
   useEffect(() => {
     units.forEach((unit: any) => {
       if (unit.status === 'ready') {
@@ -431,7 +426,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     });
   }, [units, bookings, resortUnits]);
 
-  // Realtime subscriptions for guest_requests and tour_bookings
+  // Realtime
   useEffect(() => {
     const channel = supabase
       .channel('reception-alerts-rt')
@@ -462,7 +457,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     }
   };
 
-  // ── TOUR/REQUEST ACTION HANDLERS ──
   const parsePriceFromDetails = (details: string): number => {
     const match = details.match(/₱([\d,]+)/);
     return match ? Number(match[1].replace(/,/g, '')) : 0;
@@ -476,10 +470,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
   const updateTourStatus = async (id: string, status: string, tour?: any) => {
     if (!canDoEdit) { toast.error('View-only access'); return; }
     await from('guest_tours').update({ status, confirmed_by: staffName }).eq('id', id);
-
-    // Insert room charge when confirming a guest_tour with a price
     if (status === 'confirmed' && tour && Number(tour.price) > 0 && tour.booking_id) {
-      // Look up unit by unit_name
       const { data: unit } = await supabase.from('units').select('id, unit_name').eq('unit_name', tour.unit_name).maybeSingle();
       await (supabase.from('room_transactions') as any).insert({
         unit_id: unit?.id || null,
@@ -496,7 +487,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         notes: `Tour: ${tour.tour_name} (${tour.pax} pax) on ${tour.tour_date}`,
       });
     }
-
     qc.invalidateQueries({ queryKey: ['reception-tours-today'] });
     toast.success(`Tour ${status}`);
   };
@@ -507,8 +497,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
       status: 'confirmed',
       confirmed_by: staffName,
     }).eq('id', b.id);
-
-    // Insert room charge
     if (Number(b.price) > 0 && b.room_id) {
       const room = await getRoomInfo(b.room_id);
       await (supabase.from('room_transactions') as any).insert({
@@ -526,7 +514,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         notes: `Tour: ${b.tour_name} (${b.pax} pax) on ${b.tour_date}${b.pickup_time ? ` pickup ${b.pickup_time}` : ''}`,
       });
     }
-
     qc.invalidateQueries({ queryKey: ['reception-tour-bookings'] });
     toast.success('Tour booking confirmed & charged to room');
   };
@@ -551,8 +538,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
   const updateRequestStatus = async (id: string, status: string, req?: any) => {
     if (!canDoEdit) { toast.error('View-only access'); return; }
     await from('guest_requests').update({ status, confirmed_by: staffName }).eq('id', id);
-
-    // Insert room charge when confirming a request with a price
     if (status === 'confirmed' && req) {
       const price = parsePriceFromDetails(req.details);
       if (price > 0 && req.room_id) {
@@ -573,18 +558,15 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         });
       }
     }
-
     qc.invalidateQueries({ queryKey: ['reception-guest-requests'] });
     toast.success(`Request ${status}`);
   };
 
-  // ── FORCE READY (manage only) ──
   const handleForceReady = async (unit: any) => {
     if (!canDoManage) { toast.error('Manage access required'); return; }
     setForcingReady(unit.id);
     try {
       await supabase.from('units').update({ status: 'ready' } as any).eq('id', unit.id);
-      // Complete any active housekeeping orders for this unit
       const hkOrder = activeHkOrders.find((o: any) => o.unit_name === unit.name);
       if (hkOrder) {
         await from('housekeeping_orders').update({
@@ -606,7 +588,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     }
   };
 
-  // ── HOUSEKEEPING ACCEPT (for multi-role staff) ──
   const handleHkAccept = async (employee: { id: string; name: string; display_name: string }) => {
     if (!acceptingHkOrderId) return;
     try {
@@ -625,7 +606,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     }
     setAcceptingHkOrderId(null);
   };
-
 
   const handleReservationCheckIn = async () => {
     if (!checkInBooking) return;
@@ -648,7 +628,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
 
       await supabase.from('units').update({ status: 'occupied' } as any).eq('id', unit.id);
 
-      // Early check-in fee
       const earlyFee = parseFloat(earlyCheckInFee) || 0;
       if (earlyFee > 0) {
         await (from('room_transactions') as any).insert({
@@ -668,7 +647,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         await logAudit('created', 'room_transactions', unit.id, `Early check-in fee: ₱${earlyFee.toLocaleString()} for ${guestFullName} in ${unitName}`);
       }
 
-      // ── Auto-post accommodation charge ──
       const roomRate = Number(checkInBooking.room_rate) || 0;
       const nights = Math.max(1, Math.ceil((new Date(checkInBooking.check_out).getTime() - new Date(checkInBooking.check_in).getTime()) / 86400000));
       if (roomRate > 0) {
@@ -688,7 +666,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
           notes: `${nights} night${nights !== 1 ? 's' : ''} × ₱${roomRate.toLocaleString()}/night`,
         });
 
-        // For OTA/pre-paid bookings, insert pre-payment
         const paidAmount = Number(checkInBooking.paid_amount) || 0;
         if (paidAmount > 0) {
           const platform = checkInBooking.platform || 'Pre-paid';
@@ -725,13 +702,11 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     }
   };
 
-  // ── WALK-IN CHECK-IN (edit level) ──
   const handleWalkIn = async () => {
     if (!walkInUnit || !walkInForm.guestName.trim() || !walkInForm.checkOut) {
       toast.error('Guest name and check-out date required');
       return;
     }
-    // Conflict check: ensure no overlapping booking for this unit
     const resortUnitForCheck = resolveResortUnit(walkInUnit.name);
     if (resortUnitForCheck) {
       const conflicting = (bookings as any[]).find((b: any) =>
@@ -791,7 +766,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
 
       await supabase.from('units').update({ status: 'occupied' } as any).eq('id', walkInUnit.id);
 
-      // ── Auto-post accommodation charge for walk-in ──
       const walkInRate = parseFloat(walkInForm.roomRate) || 0;
       const walkInNights = Math.max(1, Math.ceil((new Date(walkInForm.checkOut).getTime() - new Date(walkInForm.checkIn).getTime()) / 86400000));
       const { data: newBookings } = await from('resort_ops_bookings')
@@ -837,7 +811,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
     }
   };
 
-  // ── SEND TO CLEAN (broadcast to all housekeepers) ──
   const handleSendToClean = async (unit: any, assignedTo?: string, assignedName?: string) => {
     setSendingClean(unit.id);
     try {
@@ -861,7 +834,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
           accepted_at: new Date().toISOString(),
         }).eq('id', existing.id);
       }
-
       await logAudit('updated', 'units', unit.id, `Sent ${unit.name} to clean${assignedName ? ` (assigned: ${assignedName})` : ' (broadcast)'}`);
       qc.invalidateQueries({ queryKey: ['rooms-units'] });
       qc.invalidateQueries({ queryKey: ['housekeeping-orders'] });
@@ -873,8 +845,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
       setSendingClean(null);
     }
   };
-
-  // ── CHECK-OUT ──
 
   const handleCheckOut = async () => {
     if (!checkOutBooking || !checkOutUnit) return;
@@ -898,7 +868,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         });
       }
 
-      // Late check-out fee
       const lateFee = parseFloat(lateCheckOutFee) || 0;
       if (lateFee > 0) {
         await (from('room_transactions') as any).insert({
@@ -922,7 +891,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
       await supabase.from('units').update({ status: 'to_clean' } as any).eq('id', checkOutUnit.id);
 
       const existing = activeHkOrders.find((o: any) => o.unit_name === checkOutUnit.name);
-
       if (!existing) {
         await from('housekeeping_orders').insert({
           unit_name: checkOutUnit.name,
@@ -935,7 +903,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         });
       }
 
-      // Cancel any pending guest requests & tours for this booking
       if (checkOutBooking.id) {
         await (from('guest_requests') as any)
           .update({ status: 'cancelled' })
@@ -998,7 +965,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       )}
 
-      {/* ── Summary ── */}
+      {/* Summary */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="border border-red-500/30 bg-red-500/10 rounded-lg p-3 text-center">
           <p className="font-display text-2xl text-red-400">{occupiedUnits.length}</p>
@@ -1033,7 +1000,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       </div>
 
-      {/* ── Current Guests (all occupied rooms) ── */}
+      {/* Current Guests */}
       {occupiedUnits.length > 0 && (
         <div className="mb-6 space-y-2">
           <h2 className="font-display text-xs tracking-wider text-foreground uppercase">🏨 Current Guests ({occupiedUnits.length})</h2>
@@ -1087,7 +1054,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                     <LogOut className="w-4 h-4 mr-1" /> Check Out
                   </Button>
                 )}
-                 <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5">
                   {canDoEdit && booking && (
                     <Button size="sm" variant="outline" onClick={() => {
                       const params = new URLSearchParams({
@@ -1102,25 +1069,25 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                       <UtensilsCrossed className="w-3 h-3 mr-0.5" /> Order
                     </Button>
                   )}
-                   {canDoEdit && (
-                     <Button size="sm" variant="outline" onClick={() => handleSendToClean(unit)}
-                       disabled={sendingClean === unit.id}
-                       className="font-display text-[10px] tracking-wider min-h-[32px] border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
-                       <Sparkles className="w-3 h-3 mr-0.5" /> {sendingClean === unit.id ? '...' : '🧹 Clean'}
-                     </Button>
-                   )}
-                   <Button size="sm" variant="outline" onClick={() => { setDetailUnit(unit); setDetailSheetOpen(true); }}
-                     className="font-display text-[10px] tracking-wider min-h-[32px]">
-                     <Eye className="w-3 h-3 mr-0.5" /> Details
-                   </Button>
-                 </div>
+                  {canDoEdit && (
+                    <Button size="sm" variant="outline" onClick={() => handleSendToClean(unit)}
+                      disabled={sendingClean === unit.id}
+                      className="font-display text-[10px] tracking-wider min-h-[32px] border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
+                      <Sparkles className="w-3 h-3 mr-0.5" /> {sendingClean === unit.id ? '...' : '🧹 Clean'}
+                    </Button>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => { setDetailUnit(unit); setDetailSheetOpen(true); }}
+                    className="font-display text-[10px] tracking-wider min-h-[32px]">
+                    <Eye className="w-3 h-3 mr-0.5" /> Details
+                  </Button>
+                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* ── Arrivals Today ── */}
+      {/* Arrivals Today */}
       {todayArrivals.length > 0 && (
         <div className="mb-6 space-y-2">
           <h2 className="font-display text-xs tracking-wider text-emerald-400 uppercase">🟢 Arrivals Today ({todayArrivals.length})</h2>
@@ -1146,7 +1113,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       )}
 
-      {/* ── Upcoming This Week ── */}
+      {/* Upcoming This Week */}
       {weekArrivals.length > 0 && (
         <Collapsible defaultOpen={false} className="mb-6">
           <CollapsibleTrigger className="flex items-center gap-2 w-full">
@@ -1196,13 +1163,12 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </Collapsible>
       )}
 
+      {/* Walk-In / Sell Room */}
       {readyUnits.length > 0 && (
         <div className="mb-6 space-y-2">
           <div className="flex justify-between items-center">
             <h2 className="font-display text-xs tracking-wider text-foreground uppercase">Walk-In / Sell Room ({trulyAvailableUnits.length} available)</h2>
           </div>
-
-          {/* Reserved today — protected rooms */}
           {reservedTodayUnits.map((unit: any) => {
             const arrivalBooking = getTodayArrivalBooking(unit);
             const arrGuest = (arrivalBooking as any)?.resort_ops_guests;
@@ -1227,43 +1193,41 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
               </div>
             );
           })}
-
-          {/* Truly available rooms */}
           {trulyAvailableUnits.map((unit: any) => {
             const upcoming = getUpcomingBooking(unit);
             const upGuest = (upcoming as any)?.resort_ops_guests;
             return (
-            <div key={unit.id} className="border border-emerald-500/30 rounded-lg p-3 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <BedDouble className="w-4 h-4 text-emerald-400" />
-                <div>
-                  <p className="font-display text-sm text-foreground tracking-wider">{unit.name}</p>
-                  <Badge className="font-body text-xs bg-emerald-500/20 text-emerald-400 border-emerald-500/40">Ready</Badge>
-                  {upcoming && (
-                    <p className="font-body text-[10px] text-blue-400 mt-0.5">
-                      📅 {upGuest?.full_name || 'Guest'} · {format(new Date(upcoming.check_in + 'T00:00:00'), 'MMM d')}
-                    </p>
-                  )}
+              <div key={unit.id} className="border border-emerald-500/30 rounded-lg p-3 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <BedDouble className="w-4 h-4 text-emerald-400" />
+                  <div>
+                    <p className="font-display text-sm text-foreground tracking-wider">{unit.name}</p>
+                    <Badge className="font-body text-xs bg-emerald-500/20 text-emerald-400 border-emerald-500/40">Ready</Badge>
+                    {upcoming && (
+                      <p className="font-body text-[10px] text-blue-400 mt-0.5">
+                        📅 {upGuest?.full_name || 'Guest'} · {format(new Date(upcoming.check_in + 'T00:00:00'), 'MMM d')}
+                      </p>
+                    )}
+                  </div>
                 </div>
+                {canDoEdit && (
+                  <Button size="sm" variant="outline" onClick={() => {
+                    setWalkInUnit(unit);
+                    const rt = roomTypes.find((r: any) => r.id === unit.room_type_id);
+                    const defaultRate = rt?.base_rate ? String(rt.base_rate) : '0';
+                    setWalkInForm({ guestName: '', checkIn: today, checkOut: '', adults: '2', children: '0', platform: 'Direct', roomRate: defaultRate, notes: '' });
+                    setWalkInOpen(true);
+                  }} className="font-display text-xs tracking-wider min-h-[44px]">
+                    <DollarSign className="w-4 h-4 mr-1" /> Sell
+                  </Button>
+                )}
               </div>
-              {canDoEdit && (
-                <Button size="sm" variant="outline" onClick={() => {
-                  setWalkInUnit(unit);
-                  const rt = roomTypes.find((r: any) => r.id === unit.room_type_id);
-                  const defaultRate = rt?.base_rate ? String(rt.base_rate) : '0';
-                  setWalkInForm({ guestName: '', checkIn: today, checkOut: '', adults: '2', children: '0', platform: 'Direct', roomRate: defaultRate, notes: '' });
-                  setWalkInOpen(true);
-                }} className="font-display text-xs tracking-wider min-h-[44px]">
-                  <DollarSign className="w-4 h-4 mr-1" /> Sell
-                </Button>
-              )}
-            </div>
             );
           })}
         </div>
       )}
 
-      {/* ── Tours & Activities Today (with action buttons) ── */}
+      {/* Tours & Activities */}
       {(todayTours.length > 0 || tourBookings.length > 0) && (
         <div className="mb-6 space-y-2">
           <h2 className="font-display text-xs tracking-wider text-muted-foreground uppercase">🏝️ Tours & Activities ({todayTours.length + pendingTourBookings.length})</h2>
@@ -1321,7 +1285,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
               )}
             </div>
           ))}
-          {/* Show confirmed tour bookings with Complete button */}
           {tourBookings.filter((b: any) => b.status === 'confirmed').map((b: any) => (
             <div key={b.id} className="border border-emerald-500/30 bg-emerald-500/5 rounded-lg p-3 space-y-2">
               <div className="flex justify-between items-start">
@@ -1347,7 +1310,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       )}
 
-      {/* ── Guest Requests (with action buttons) ── */}
+      {/* Guest Requests */}
       {guestRequests.length > 0 && (
         <div className="mb-6 space-y-2">
           <h2 className="font-display text-xs tracking-wider text-muted-foreground uppercase">
@@ -1376,7 +1339,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       )}
 
-      {/* ── Recent Room Orders ── */}
+      {/* Recent Room Orders */}
       {recentOrders.length > 0 && (
         <div className="mb-6 space-y-2">
           <h2 className="font-display text-xs tracking-wider text-muted-foreground uppercase">
@@ -1446,10 +1409,8 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                     </div>
                   </div>
                 </button>
-
                 {isExpanded && (
                   <div className="border-t border-border px-3 pb-3 space-y-2">
-                    {/* Itemized contents */}
                     {items.length > 0 && (
                       <div className="pt-2 space-y-0.5">
                         {items.map((item: any, idx: number) => (
@@ -1460,8 +1421,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                         ))}
                       </div>
                     )}
-
-                    {/* SC breakdown */}
                     <div className="border-t border-border pt-1.5 space-y-0.5">
                       <div className="flex justify-between font-body text-xs text-muted-foreground">
                         <span>Subtotal</span>
@@ -1478,11 +1437,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                         <span>₱{grandTotal.toLocaleString()}</span>
                       </div>
                     </div>
-
-                    {/* Staff info */}
                     <p className="font-body text-[10px] text-muted-foreground">Staff: {order.staff_name || '—'} · Payment: {order.payment_type || 'Unpaid'}</p>
-
-                    {/* Corrective actions */}
                     {canDoEdit && order.status !== 'Paid' && order.status !== 'Cancelled' && (
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         <Button size="sm" variant="outline" onClick={handleMarkPaid}
@@ -1507,8 +1462,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       )}
 
-
-      {/* ── 🧹 Needs Cleaning — Live Housekeeping Progress ── */}
+      {/* Needs Cleaning */}
       {activeHkOrders.length > 0 && (
         <div className="mb-6 space-y-2">
           <h2 className="font-display text-xs tracking-wider text-amber-400 uppercase">
@@ -1603,7 +1557,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </div>
       )}
 
-
+      {/* ══════ CHECK-IN MODAL ══════ */}
       <Dialog open={checkInModalOpen} onOpenChange={setCheckInModalOpen}>
         <DialogContent className="bg-card border-border max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
@@ -1637,7 +1591,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                     <p className="font-body text-sm text-foreground">{checkInBooking.special_requests}</p>
                   </div>
                 )}
-                {/* Early check-in fee */}
                 {getManilaHour() < 14 && (
                   <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg p-3 space-y-2">
                     <p className="font-display text-xs tracking-wider text-amber-400 uppercase">⏰ Early Check-In (before 2:00 PM)</p>
@@ -1718,7 +1671,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         </DialogContent>
       </Dialog>
 
-      {/* ══════ CHECK-OUT MODAL (manage only) ══════ */}
+      {/* ══════ CHECK-OUT MODAL ══════ */}
       <Dialog open={checkOutOpen} onOpenChange={setCheckOutOpen}>
         <DialogContent className="bg-card border-border max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
@@ -1771,11 +1724,21 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
 
                 <Separator />
 
-                <div className="flex justify-between font-display text-lg tracking-wider">
+                <div className="flex justify-between items-center font-display text-lg tracking-wider">
                   <span className="text-foreground">Balance</span>
-                  <span className={balance > 0 ? 'text-destructive' : 'text-green-400'}>
-                    ₱{Math.abs(balance).toLocaleString()}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className={balance > 0 ? 'text-destructive' : 'text-green-400'}>
+                      ₱{Math.abs(balance).toLocaleString()}
+                    </span>
+                    {balance > 0 && (
+                      <button
+                        onClick={() => setShowReceptionQR(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-display tracking-wider hover:bg-blue-700 transition-colors"
+                      >
+                        <QrCode className="w-3.5 h-3.5" /> Show QR
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {balance > 0 && (
@@ -1796,7 +1759,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                       className="bg-secondary border-border text-foreground font-body" />
                   </div>
                 )}
-                {/* Late check-out fee */}
+
                 {getManilaHour() >= 12 && checkOutBooking.check_out === today && (
                   <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg p-3 space-y-2">
                     <p className="font-display text-xs tracking-wider text-amber-400 uppercase">⏰ Late Check-Out (after 12:00 PM)</p>
@@ -1810,7 +1773,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                     />
                   </div>
                 )}
-                {/* Housekeeping broadcast notice */}
+
                 <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg p-3">
                   <p className="font-display text-xs tracking-wider text-amber-400 uppercase">🧹 Housekeeping</p>
                   <p className="font-body text-xs text-muted-foreground mt-1">All on-duty housekeepers will be notified and can accept the assignment.</p>
@@ -1859,6 +1822,7 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
         title="Accept Assignment"
         description="Enter your name and PIN to accept this housekeeping assignment."
       />
+
       {/* ══════ ROOM DETAIL SHEET ══════ */}
       <Sheet open={detailSheetOpen} onOpenChange={(open) => { setDetailSheetOpen(open); if (!open) setDetailUnit(null); }}>
         <SheetContent side="bottom" className="h-[90vh] overflow-y-auto p-0">
@@ -1918,7 +1882,6 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
                 await logAudit('updated', 'units', overrideUnit.id, `Override sell: ${overrideReason} — reserved for ${arrGuest?.full_name || 'Guest'} in ${overrideUnit.name}`);
                 setOverrideOpen(false);
                 setOverrideReason('');
-                // Open walk-in modal
                 const rt = roomTypes.find((r: any) => r.id === overrideUnit.room_type_id);
                 const defaultRate = rt?.base_rate ? String(rt.base_rate) : '0';
                 setWalkInUnit(overrideUnit);
@@ -1934,6 +1897,14 @@ const ReceptionPage = ({ embedded = false }: { embedded?: boolean }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ══════ QR PAYMENT MODAL ══════ */}
+      <QRPaymentModal
+        isOpen={showReceptionQR}
+        onClose={() => setShowReceptionQR(false)}
+        amount={balance}
+        reference={checkOutBooking?.id || `RCP-${Date.now()}`}
+      />
 
       {/* ─── BOOKING CALENDAR ─── */}
       <Separator className="my-6" />
