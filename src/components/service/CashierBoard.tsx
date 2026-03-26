@@ -12,10 +12,11 @@ import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Clock, Flame, GlassWater, Home, ChevronDown, ChevronUp, CreditCard, Check, ArrowLeft, Printer, CalendarIcon } from 'lucide-react';
+import { Clock, Flame, GlassWater, Home, ChevronDown, ChevronUp, CreditCard, Check, ArrowLeft, Printer, CalendarIcon, QrCode } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { formatDateTime, formatTime, formatDate } from '@/lib/dateFormat';
 import CashierReceipt from './CashierReceipt';
+import { QRPaymentModal } from '@/components/payment/QRPaymentModal';
 
 const STATUS_DOT: Record<string, string> = {
   pending: 'bg-muted-foreground',
@@ -36,6 +37,11 @@ const CashierBoard = () => {
   const [receiptOrder, setReceiptOrder] = useState<any | null>(null);
   const [completedOpen, setCompletedOpen] = useState(false);
   const [completedDate, setCompletedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  
+  // QR Modal state
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedBillForQR, setSelectedBillForQR] = useState<any | null>(null);
+  
   const permissions = useMemo(() => {
     const s = getStaffSession();
     return s?.permissions || ['admin'];
@@ -235,123 +241,141 @@ const CashierBoard = () => {
   };
 
   return (
-    <div className="min-h-0 flex flex-col md:flex-row md:h-full md:overflow-hidden max-w-full">
-      {/* Left: Order list */}
-      <div className="flex-1 flex flex-col md:overflow-hidden border-r border-border/50 min-w-0">
-        {/* Summary */}
-        <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card/50 flex-shrink-0">
-          <span className="font-display text-sm text-foreground tracking-wider">
-            {buckets.active.length + buckets.billOut.length} {t('common.active')}
-          </span>
-          {buckets.billOut.length > 0 && (
-            <span className="font-body text-xs text-amber-400 font-bold">
-              {buckets.billOut.length} {t('cashier.billOut')}
+    <>
+      <div className="min-h-0 flex flex-col md:flex-row md:h-full md:overflow-hidden max-w-full">
+        {/* Left: Order list */}
+        <div className="flex-1 flex flex-col md:overflow-hidden border-r border-border/50 min-w-0">
+          {/* Summary */}
+          <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-card/50 flex-shrink-0">
+            <span className="font-display text-sm text-foreground tracking-wider">
+              {buckets.active.length + buckets.billOut.length} {t('common.active')}
             </span>
-          )}
-        </div>
+            {buckets.billOut.length > 0 && (
+              <span className="font-body text-xs text-amber-400 font-bold">
+                {buckets.billOut.length} {t('cashier.billOut')}
+              </span>
+            )}
+          </div>
 
-        <div className="flex-1 md:overflow-y-auto">
-          {/* Bill Out section — grouped by room */}
-          {buckets.billOut.length > 0 && (
-            <div className="p-3">
-              <h3 className="font-display text-xs tracking-wider text-amber-400 mb-2 px-1">💰 {t('cashier.billOut')} — {t('cashier.awaitingPayment')}</h3>
-              <GroupedBillOut
-                orders={buckets.billOut}
-                selectedOrderId={selectedOrder?.id}
-                onSelect={handleOrderSelect}
-              />
-            </div>
-          )}
-
-          {/* Active orders */}
-          {buckets.active.length > 0 && (
-            <div className="p-3">
-              <h3 className="font-display text-xs tracking-wider text-muted-foreground mb-2 px-1">{t('cashier.activeOrders')}</h3>
-              <div className="space-y-2">
-                {buckets.active.map(order => (
-                  <OrderRow
-                    key={order.id}
-                    order={order}
-                    selected={selectedOrder?.id === order.id}
-                    onSelect={() => handleOrderSelect(order)}
-                    onAction={handleAction}
-                  />
-                ))}
+          <div className="flex-1 md:overflow-y-auto">
+            {/* Bill Out section — grouped by room */}
+            {buckets.billOut.length > 0 && (
+              <div className="p-3">
+                <h3 className="font-display text-xs tracking-wider text-amber-400 mb-2 px-1">💰 {t('cashier.billOut')} — {t('cashier.awaitingPayment')}</h3>
+                <GroupedBillOut
+                  orders={buckets.billOut}
+                  selectedOrderId={selectedOrder?.id}
+                  onSelect={handleOrderSelect}
+                  onShowQR={(order) => {
+                    setSelectedBillForQR(order);
+                    setShowQRModal(true);
+                  }}
+                />
               </div>
-            </div>
-          )}
+            )}
 
-          {buckets.active.length === 0 && buckets.billOut.length === 0 && (
-            <p className="font-body text-sm text-muted-foreground text-center py-12">{t('cashier.noActiveOrders')}</p>
-          )}
-
-          {/* Completed — date picker + stacked cards */}
-          <div className="px-3 pb-4">
-            <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
-              <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
-                <span className="font-display text-xs tracking-wider text-muted-foreground">
-                  ✓ {t('common.completed')} ({completedOrders.length})
-                </span>
-                {completedOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-3 space-y-2">
-                <div className="flex items-center gap-2 px-1">
-                  <CalendarIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <Input
-                    type="date"
-                    value={completedDate}
-                    onChange={e => setCompletedDate(e.target.value || format(new Date(), 'yyyy-MM-dd'))}
-                    className="bg-secondary border-border text-foreground font-body text-sm h-9 w-auto"
-                  />
+            {/* Active orders */}
+            {buckets.active.length > 0 && (
+              <div className="p-3">
+                <h3 className="font-display text-xs tracking-wider text-muted-foreground mb-2 px-1">{t('cashier.activeOrders')}</h3>
+                <div className="space-y-2">
+                  {buckets.active.map(order => (
+                    <OrderRow
+                      key={order.id}
+                      order={order}
+                      selected={selectedOrder?.id === order.id}
+                      onSelect={() => handleOrderSelect(order)}
+                      onAction={handleAction}
+                    />
+                  ))}
                 </div>
-                {completedOrders.length === 0 && (
-                  <p className="font-body text-xs text-muted-foreground text-center py-4">{t('cashier.noCompletedOrders')}</p>
-                )}
-                {completedOrders.map(order => (
-                  <OrderRow
-                    key={order.id}
-                    order={order}
-                    selected={false}
-                    onSelect={() => handleOrderSelect(order)}
-                  />
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
+              </div>
+            )}
+
+            {buckets.active.length === 0 && buckets.billOut.length === 0 && (
+              <p className="font-body text-sm text-muted-foreground text-center py-12">{t('cashier.noActiveOrders')}</p>
+            )}
+
+            {/* Completed — date picker + stacked cards */}
+            <div className="px-3 pb-4">
+              <Collapsible open={completedOpen} onOpenChange={setCompletedOpen}>
+                <CollapsibleTrigger className="w-full flex items-center justify-between bg-secondary/50 border border-border rounded-lg px-4 py-3 hover:bg-secondary transition-colors">
+                  <span className="font-display text-xs tracking-wider text-muted-foreground">
+                    ✓ {t('common.completed')} ({completedOrders.length})
+                  </span>
+                  {completedOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-3 space-y-2">
+                  <div className="flex items-center gap-2 px-1">
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <Input
+                      type="date"
+                      value={completedDate}
+                      onChange={e => setCompletedDate(e.target.value || format(new Date(), 'yyyy-MM-dd'))}
+                      className="bg-secondary border-border text-foreground font-body text-sm h-9 w-auto"
+                    />
+                  </div>
+                  {completedOrders.length === 0 && (
+                    <p className="font-body text-xs text-muted-foreground text-center py-4">{t('cashier.noCompletedOrders')}</p>
+                  )}
+                  {completedOrders.map(order => (
+                    <OrderRow
+                      key={order.id}
+                      order={order}
+                      selected={false}
+                      onSelect={() => handleOrderSelect(order)}
+                    />
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
           </div>
         </div>
+
+        {/* Right: Bill Out / Payment Panel */}
+        <div className="w-full md:w-[400px] lg:w-[440px] flex-shrink-0 bg-card/50 flex flex-col md:overflow-y-auto">
+          {selectedOrder ? (
+            <BillOutPanel
+              order={selectedOrder}
+              paymentMethods={activePaymentMethods}
+              selectedPayment={selectedPayment}
+              onSelectPayment={(p) => { setSelectedPayment(p); setChargeToRoom(false); }}
+              chargeToRoom={chargeToRoom}
+              onChargeToRoom={() => { setChargeToRoom(true); setSelectedPayment(''); }}
+              activeBookings={activeBookings}
+              selectedBooking={selectedBooking}
+              onSelectBooking={setSelectedBooking}
+              onConfirm={handleConfirmPayment}
+              busy={busy}
+              onBack={() => setSelectedOrder(null)}
+              onPreviewReceipt={() => setReceiptOrder(selectedOrder)}
+            />
+          ) : (
+            <DailySummary completed={completedOrders} />
+          )}
+        </div>
       </div>
 
-      {/* Right: Bill Out / Payment Panel */}
-      <div className="w-full md:w-[400px] lg:w-[440px] flex-shrink-0 bg-card/50 flex flex-col md:overflow-y-auto">
-        {selectedOrder ? (
-          <BillOutPanel
-            order={selectedOrder}
-            paymentMethods={activePaymentMethods}
-            selectedPayment={selectedPayment}
-            onSelectPayment={(p) => { setSelectedPayment(p); setChargeToRoom(false); }}
-            chargeToRoom={chargeToRoom}
-            onChargeToRoom={() => { setChargeToRoom(true); setSelectedPayment(''); }}
-            activeBookings={activeBookings}
-            selectedBooking={selectedBooking}
-            onSelectBooking={setSelectedBooking}
-            onConfirm={handleConfirmPayment}
-            busy={busy}
-            onBack={() => setSelectedOrder(null)}
-            onPreviewReceipt={() => setReceiptOrder(selectedOrder)}
-          />
-        ) : (
-          <DailySummary completed={completedOrders} />
-        )}
-      </div>
-    </div>
+      {/* QR Payment Modal */}
+      <QRPaymentModal
+        isOpen={showQRModal}
+        onClose={() => {
+          setShowQRModal(false);
+          setSelectedBillForQR(null);
+        }}
+        amount={selectedBillForQR?.total || 0}
+        reference={selectedBillForQR?.id || selectedBillForQR?.location_detail || `BILL-${Date.now()}`}
+      />
+    </>
   );
 };
 
 /** Grouped Bill Out — rooms grouped, walk-ins individual */
-const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
+const GroupedBillOut = ({ orders, selectedOrderId, onSelect, onShowQR }: {
   orders: any[];
   selectedOrderId?: string;
   onSelect: (order: any) => void;
+  onShowQR?: (order: any) => void;
 }) => {
   const { formatPrice } = useCurrency();
   const { roomGroups, ungrouped } = useMemo(() => {
@@ -388,11 +412,12 @@ const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
             </CollapsibleTrigger>
             <CollapsibleContent className="pl-3 pt-1 space-y-1.5">
               {roomOrders.map(order => (
-                <OrderRow
+                <OrderRowWithQR
                   key={order.id}
                   order={order}
                   selected={selectedOrderId === order.id}
                   onSelect={() => onSelect(order)}
+                  onShowQR={() => onShowQR?.(order)}
                 />
               ))}
             </CollapsibleContent>
@@ -402,18 +427,115 @@ const GroupedBillOut = ({ orders, selectedOrderId, onSelect }: {
 
       {/* Ungrouped walk-ins */}
       {ungrouped.map(order => (
-        <OrderRow
+        <OrderRowWithQR
           key={order.id}
           order={order}
           selected={selectedOrderId === order.id}
           onSelect={() => onSelect(order)}
+          onShowQR={() => onShowQR?.(order)}
         />
       ))}
     </div>
   );
 };
 
-/** Compact order row for the list */
+/** Order row with QR button for Bill Out items */
+const OrderRowWithQR = ({ order, selected, onSelect, onShowQR }: {
+  order: any;
+  selected: boolean;
+  onSelect: () => void;
+  onShowQR?: () => void;
+}) => {
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
+  const items = (order.items as any[]) || [];
+  const elapsed = formatDistanceToNow(new Date(order.created_at), { addSuffix: false });
+  const foodItems = items.filter((i: any) => { const d = i.department || 'kitchen'; return d === 'kitchen' || d === 'both'; });
+  const barItems = items.filter((i: any) => i.department === 'bar' || i.department === 'both');
+  const isPaid = order.status === 'Paid';
+  const isRoomCharge = order.payment_type === 'Charge to Room';
+  const isPendingPayment = order.status === 'Served' || order.status === 'Ready';
+
+  const statusColor = order.status === 'New' ? 'border-l-gold'
+    : order.status === 'Preparing' ? 'border-l-orange-400'
+    : order.status === 'Ready' ? 'border-l-emerald-400'
+    : order.status === 'Served' ? 'border-l-amber-400'
+    : 'border-l-muted';
+
+  return (
+    <div
+      className={`rounded-xl border border-border/60 border-l-4 ${statusColor} p-3 transition-all cursor-pointer active:scale-[0.98] overflow-hidden min-w-0 ${
+        isPaid ? 'opacity-70 hover:opacity-90' : ''
+      } ${selected ? 'ring-2 ring-gold bg-gold/5' : 'bg-card/90'}`}
+    >
+      <div className="flex items-start justify-between mb-1">
+        <div className="min-w-0 flex-1" onClick={onSelect}>
+          <p className="font-display text-sm text-foreground tracking-wider truncate">
+            {order.location_detail || order.order_type}
+          </p>
+          {order.guest_name && (
+            <p className="font-body text-xs text-muted-foreground truncate">{order.guest_name}</p>
+          )}
+          {order.staff_name && (
+            <p className="font-body text-[11px] text-muted-foreground/70 truncate">{t('common.by', { name: order.staff_name })}</p>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 text-muted-foreground flex-shrink-0 ml-2">
+          {isPaid && <Printer className="w-3 h-3 text-gold" />}
+          <Clock className="w-3 h-3" />
+          <span className="font-body text-[11px] tabular-nums">{elapsed}</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {/* Status dots */}
+        <div className="flex items-center gap-2">
+          {foodItems.length > 0 && (
+            <div className="flex items-center gap-1">
+              <div className={`w-2 h-2 rounded-full ${STATUS_DOT[order.kitchen_status] || 'bg-muted-foreground'}`} />
+              <Flame className="w-3 h-3 text-muted-foreground" />
+            </div>
+          )}
+          {barItems.length > 0 && (
+            <div className="flex items-center gap-1">
+              <div className={`w-2 h-2 rounded-full ${STATUS_DOT[order.bar_status] || 'bg-muted-foreground'}`} />
+              <GlassWater className="w-3 h-3 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1" />
+
+        {/* QR Code button - only show for pending payment orders */}
+        {isPendingPayment && !isPaid && onShowQR && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onShowQR();
+            }}
+            className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded-md text-xs hover:bg-blue-700 transition-colors"
+            title={t('cashier.showQRCode')}
+          >
+            <QrCode className="w-3 h-3" />
+            QR
+          </button>
+        )}
+
+        <Badge variant="outline" className={`font-body text-[10px] h-5 ${
+          isRoomCharge && isPaid ? 'border-blue-400/50 text-blue-400' :
+          isPendingPayment ? 'border-amber-400/50 text-amber-400' :
+          isPaid ? 'border-emerald-400/50 text-emerald-400' : ''
+        }`}>
+          {isRoomCharge && isPaid ? t('reception.roomCharge') : isPendingPayment ? t('cashier.pendingPayment') : isPaid ? t('cashier.paid') : order.status}
+        </Badge>
+
+        <span className="font-display text-sm text-gold tabular-nums">{formatPrice(order.total)}</span>
+      </div>
+    </div>
+  );
+};
+
+/** Compact order row for the list (without QR button) */
 const OrderRow = ({ order, selected, onSelect, onAction }: {
   order: any;
   selected: boolean;
