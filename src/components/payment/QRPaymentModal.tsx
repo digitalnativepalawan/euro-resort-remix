@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { paymentService } from '@/services/paymentService';
+import { paymentService } from '@/paymentService';
 
 interface QRPaymentModalProps {
   isOpen: boolean;
