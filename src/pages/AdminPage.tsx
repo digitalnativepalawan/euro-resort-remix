@@ -39,6 +39,7 @@ import OrderArchive from '@/components/admin/OrderArchive';
 import GuestPortalConfig from '@/components/admin/GuestPortalConfig';
 import DepartmentOrdersView from '@/components/DepartmentOrdersView';
 import IntegrationReadinessDashboard from '@/components/integration/IntegrationReadinessDashboard';
+import PaymentSettingsPanel from '@/components/admin/PaymentSettingsPanel';
 
 import { deductInventoryForOrder } from '@/lib/inventoryDeduction';
 import { hasAccess, canEdit, canViewDocuments } from '@/lib/permissions';
@@ -58,7 +59,6 @@ const ALERT_KEY_MAP: Record<string, string> = {
   bar: 'bar',
   housekeeping: 'housekeeping',
 };
-
 
 // ── Tab / section definitions ────────────────────────────────────
 interface TabDef { value: string; label: string; perm: string | null }
@@ -84,6 +84,7 @@ const CONFIG: TabDef[] = [
   { value: 'reports', label: 'Reports', perm: 'reports' },
   { value: 'inventory', label: 'Inventory', perm: 'inventory' },
   { value: 'resort-ops', label: 'Resort Ops', perm: 'resort_ops' },
+  { value: 'payment', label: 'Payment', perm: null },
   { value: 'audit', label: 'Audit', perm: null },
   { value: 'archive', label: 'Archive', perm: null },
   { value: 'guest-portal', label: 'Guest Portal', perm: null },
@@ -101,7 +102,7 @@ const AdminPage = () => {
   const allowed = (t: TabDef) => isAdmin || (t.perm !== null && canView(t.perm));
   const opsTabs = OPERATIONS.filter(allowed);
   const peopleTabs = PEOPLE.filter(allowed);
-  const cfgTabs = CONFIG.filter(allowed);
+  const cfgTabs = CONFIG.filter(t => isAdmin || (t.perm !== null && canView(t.perm)));
   const allTabs = [...opsTabs, ...peopleTabs, ...cfgTabs];
   const defaultTab = allTabs[0]?.value || 'orders';
 
@@ -343,7 +344,6 @@ const AdminPage = () => {
 
   const deleteAllOrders = async () => {
     try {
-      // Delete in FK order: room_transactions → inventory_logs → orders → tabs
       await supabase.from('room_transactions' as any).delete().gte('created_at', '1970-01-01');
       await supabase.from('inventory_logs').delete().gte('created_at', '1970-01-01');
       const { error: ordErr } = await supabase.from('orders').delete().gte('created_at', '1970-01-01');
@@ -360,6 +360,7 @@ const AdminPage = () => {
       toast.error(e.message || 'Delete failed');
     }
   };
+
   const filteredOrders = useMemo(() => {
     let filtered = orders;
     const now = new Date();
@@ -398,9 +399,7 @@ const AdminPage = () => {
 
   const advanceOrder = async (orderId: string, nextStatus: string) => {
     const updateData: any = { status: nextStatus };
-    if (nextStatus === 'Closed') {
-      updateData.closed_at = new Date().toISOString();
-    }
+    if (nextStatus === 'Closed') updateData.closed_at = new Date().toISOString();
     await supabase.from('orders').update(updateData).eq('id', orderId);
     if (nextStatus === 'Preparing') {
       const order = orders.find(o => o.id === orderId);
@@ -418,14 +417,10 @@ const AdminPage = () => {
   };
 
   const deleteOrder = async (orderId: string) => {
-    // Delete dependent records first to avoid FK constraint errors
     await supabase.from('room_transactions').delete().eq('order_id', orderId);
     await supabase.from('inventory_logs').delete().eq('order_id', orderId);
     const { error } = await supabase.from('orders').delete().eq('id', orderId);
-    if (error) {
-      toast.error(`Delete failed: ${error.message}`);
-      return;
-    }
+    if (error) { toast.error(`Delete failed: ${error.message}`); return; }
     qc.invalidateQueries({ queryKey: ['orders-admin'] });
     toast.success('Order deleted');
   };
@@ -487,20 +482,17 @@ const AdminPage = () => {
     );
   }
 
-  // ── Section header helper ──────────────────────────────────────
   const SectionLabel = ({ label }: { label: string }) => (
     <p className="font-display text-[10px] tracking-widest text-muted-foreground uppercase pt-1">{label}</p>
   );
 
   return (
     <div className="min-h-screen bg-navy-texture overflow-x-hidden">
-      {/* Global navigation bar */}
       <StaffNavBar />
 
       <div className="max-w-2xl mx-auto px-4 pb-6">
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* ── Grouped tab triggers ─────────────────────────── */}
           <div className="space-y-2 mb-6">
             {opsTabs.length > 0 && (
               <div>
@@ -545,10 +537,6 @@ const AdminPage = () => {
             )}
           </div>
 
-          {/* ═══════════════════════════════════════════════════
-              OPERATIONS TAB CONTENTS
-              ═══════════════════════════════════════════════════ */}
-
           {/* ORDERS TAB */}
           {(isAdmin || hasAccess(perms, 'orders')) && (
             <TabsContent value="orders" className="space-y-4">
@@ -580,16 +568,12 @@ const AdminPage = () => {
                     </Button>
                     {isAdmin && (
                       confirmDeleteAll ? (
-                        <Button size="sm" variant="destructive" className="font-body text-xs"
-                          onClick={deleteAllOrders}>
+                        <Button size="sm" variant="destructive" className="font-body text-xs" onClick={deleteAllOrders}>
                           Confirm Delete All?
                         </Button>
                       ) : (
                         <Button size="sm" variant="outline" className="font-body text-xs text-destructive border-destructive"
-                          onClick={() => {
-                            setConfirmDeleteAll(true);
-                            setTimeout(() => setConfirmDeleteAll(false), 3000);
-                          }}>
+                          onClick={() => { setConfirmDeleteAll(true); setTimeout(() => setConfirmDeleteAll(false), 3000); }}>
                           <Trash2 className="w-3 h-3 mr-1" /> Delete All
                         </Button>
                       )
@@ -600,9 +584,7 @@ const AdminPage = () => {
                     {statuses.map(s => (
                       <button key={s} onClick={() => setActiveStatus(s)}
                         className={`px-3 py-1.5 font-body text-xs rounded-md whitespace-nowrap transition-colors ${
-                          activeStatus === s
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-secondary text-muted-foreground hover:text-foreground'
+                          activeStatus === s ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:text-foreground'
                         }`}>
                         {s} {statusCounts[s] > 0 && <span className="ml-1 font-display">({statusCounts[s]})</span>}
                       </button>
@@ -718,31 +700,26 @@ const AdminPage = () => {
             </TabsContent>
           )}
 
-          {/* ═══════════════════════════════════════════════════
-              PEOPLE TAB CONTENTS
-              ═══════════════════════════════════════════════════ */}
-
+          {/* HR TAB */}
           {(isAdmin || hasAccess(perms, 'payroll')) && (
             <TabsContent value="payroll">
               <PayrollDashboard readOnly={readOnly('payroll')} />
             </TabsContent>
           )}
 
+          {/* SCHEDULES TAB */}
           {(isAdmin || hasAccess(perms, 'schedules')) && (
             <TabsContent value="schedules">
               <WeeklyScheduleManager readOnly={readOnly('schedules')} />
             </TabsContent>
           )}
 
+          {/* TIMESHEET TAB */}
           {(isAdmin || hasAccess(perms, 'timesheet')) && (
             <TabsContent value="timesheet">
               <TimesheetDashboard readOnly={readOnly('timesheet')} />
             </TabsContent>
           )}
-
-          {/* ═══════════════════════════════════════════════════
-              CONFIG TAB CONTENTS
-              ═══════════════════════════════════════════════════ */}
 
           {/* SETUP TAB */}
           {(isAdmin || hasAccess(perms, 'setup')) && (
@@ -890,6 +867,7 @@ const AdminPage = () => {
                     </div>
                   </div>
                 </section>
+
                 <div className="mt-8"><DeviceManager /></div>
                 <div className="mt-8"><RoomSetup /></div>
                 <div className="mt-8"><HousekeepingConfig /></div>
@@ -904,12 +882,9 @@ const AdminPage = () => {
             <TabsContent value="menu" className="space-y-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  value={menuSearch}
-                  onChange={e => setMenuSearch(e.target.value)}
+                <Input value={menuSearch} onChange={e => setMenuSearch(e.target.value)}
                   placeholder="Search menu items..."
-                  className="bg-secondary border-border text-foreground font-body pl-9"
-                />
+                  className="bg-secondary border-border text-foreground font-body pl-9" />
               </div>
               {!readOnly('menu') && (
                 <div className="flex gap-2">
@@ -919,22 +894,19 @@ const AdminPage = () => {
                   <Button variant="outline" onClick={() => setBulkImportOpen(true)} title="Bulk Import">
                     <Upload className="w-4 h-4" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      let csv = 'Category,Name,Description,Price,Food Cost\n';
-                      menuItems.forEach(item => {
-                        csv += `\"${item.category}\",\"${item.name}\",\"${(item.description || '').replace(/"/g, '""')}\",${item.price},${item.food_cost || 0}\n`;
-                      });
-                      const blob = new Blob([csv], { type: 'text/csv' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `menu-items-${new Date().toISOString().slice(0, 10)}.csv`;
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                  >
+                  <Button variant="outline" onClick={() => {
+                    let csv = 'Category,Name,Description,Price,Food Cost\n';
+                    menuItems.forEach(item => {
+                      csv += `\"${item.category}\",\"${item.name}\",\"${(item.description || '').replace(/"/g, '""')}\",${item.price},${item.food_cost || 0}\n`;
+                    });
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `menu-items-${new Date().toISOString().slice(0, 10)}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}>
                     <Download className="w-4 h-4" />
                   </Button>
                 </div>
@@ -972,9 +944,7 @@ const AdminPage = () => {
                               {((item as any).department || 'kitchen')}
                             </span>
                             {foodCost > 0 ? (
-                              <span className="font-body text-xs text-muted-foreground">
-                                · Cost ₱{foodCost} · {margin}% margin
-                              </span>
+                              <span className="font-body text-xs text-muted-foreground">· Cost ₱{foodCost} · {margin}% margin</span>
                             ) : (
                               <span className="font-body text-xs text-amber-400">· No cost data</span>
                             )}
@@ -1016,6 +986,13 @@ const AdminPage = () => {
           {(isAdmin || hasAccess(perms, 'resort_ops')) && (
             <TabsContent value="resort-ops">
               <ResortOpsDashboard readOnly={readOnly('resort_ops')} />
+            </TabsContent>
+          )}
+
+          {/* PAYMENT TAB — admin only */}
+          {isAdmin && (
+            <TabsContent value="payment" className="space-y-4">
+              <PaymentSettingsPanel />
             </TabsContent>
           )}
 
@@ -1125,11 +1102,8 @@ const AdminPage = () => {
             )}
             <Button onClick={saveItem} className="font-display tracking-wider w-full">Save</Button>
             {editItem && editItem !== 'new' && (
-              <Button
-                variant="destructive"
-                onClick={deleteItem}
-                className={`font-display tracking-wider w-full ${confirmingDelete ? 'animate-pulse' : ''}`}
-              >
+              <Button variant="destructive" onClick={deleteItem}
+                className={`font-display tracking-wider w-full ${confirmingDelete ? 'animate-pulse' : ''}`}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 {confirmingDelete ? 'Confirm Delete?' : 'Delete Item'}
               </Button>
