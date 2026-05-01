@@ -545,17 +545,20 @@ const WeeklyScheduleManager = ({ readOnly = false }: { readOnly?: boolean }) => 
       openEdit(s);
     };
 
-    const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleEditClick = (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
       actionClickedRef.current = true;
+      setTimeout(() => { actionClickedRef.current = false; }, 300);
       openEdit(s);
     };
 
-    const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
       actionClickedRef.current = true;
+      // Reset after 300ms to not permanently suppress block clicks
+      setTimeout(() => { actionClickedRef.current = false; }, 300);
       setDeleteId(s.id);
     };
 
@@ -587,16 +590,18 @@ const WeeklyScheduleManager = ({ readOnly = false }: { readOnly?: boolean }) => 
               <button
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()}
+                onTouchEnd={handleEditClick as any}
                 onClick={handleEditClick}
-                className="p-1.5 rounded hover:bg-background/30 text-foreground/60 hover:text-accent min-w-[28px] min-h-[28px] flex items-center justify-center"
+                className="p-2 rounded hover:bg-background/30 text-foreground/60 hover:text-accent min-w-[32px] min-h-[32px] flex items-center justify-center touch-manipulation"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </button>
               <button
                 type="button"
                 onPointerDown={(e) => e.stopPropagation()}
+                onTouchEnd={handleDeleteClick as any}
                 onClick={handleDeleteClick}
-                className="p-1.5 rounded hover:bg-background/30 text-foreground/60 hover:text-destructive min-w-[28px] min-h-[28px] flex items-center justify-center"
+                className="p-2 rounded hover:bg-background/30 text-foreground/60 hover:text-destructive min-w-[32px] min-h-[32px] flex items-center justify-center touch-manipulation"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>

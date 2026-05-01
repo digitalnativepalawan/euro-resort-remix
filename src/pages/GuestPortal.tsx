@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HermesChatWidget from '@/components/HermesChatWidget';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -1529,6 +1530,8 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
           </div>
         </div>
       )}
+
+      <HermesChatWidget guestSession={session} />
     </div>
   );
 };
