@@ -1530,9 +1530,9 @@ const BillView = ({ session }: { session: GuestPortalSession }) => {
           </div>
         </div>
       )}
-    </div>
 
-    <HermesChatWidget guestSession={session} />
+      <HermesChatWidget guestSession={session} />
+    </div>
   );
 };
 export default GuestPortal;
