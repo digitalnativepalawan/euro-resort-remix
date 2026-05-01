@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Flame, GlassWater, BellRing, Banknote, ArrowLeft, LayoutGrid, UtensilsCrossed } from 'lucide-react';
+import { Flame, GlassWater, BellRing, Banknote, ArrowLeft, LayoutGrid, UtensilsCrossed, Palmtree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,6 +58,28 @@ const ServiceModePage = () => {
       route: '/service/cashier',
       statusField: null,
       permKeys: ['cashier'],
+    },
+    {
+      key: 'waitstaff',
+      label: 'Waitstaff',
+      subtitle: 'Order delivery & table service',
+      icon: <UtensilsCrossed className="w-7 h-7" />,
+      gradient: 'from-[hsl(150,60%,45%)] to-[hsl(160,55%,35%)]',
+      glow: 'shadow-[0_0_30px_-5px_hsl(150,60%,45%,0.3)]',
+      route: '/service/waitstaff',
+      statusField: null,
+      permKeys: ['waitstaff', 'orders'],
+    },
+    {
+      key: 'tours',
+      label: 'Tours & Experiences',
+      subtitle: 'Bookings & activity management',
+      icon: <Palmtree className="w-7 h-7" />,
+      gradient: 'from-[hsl(40,85%,55%)] to-[hsl(30,80%,45%)]',
+      glow: 'shadow-[0_0_30px_-5px_hsl(40,85%,55%,0.3)]',
+      route: '/service/tours',
+      statusField: null,
+      permKeys: ['experiences', 'reception'],
     },
   ], [t]);
 
