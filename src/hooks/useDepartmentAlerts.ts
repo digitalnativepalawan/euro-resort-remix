@@ -14,7 +14,7 @@ export interface DepartmentAlerts {
 export function useDepartmentAlerts(): DepartmentAlerts {
   const today = startOfDay(new Date()).toISOString();
 
-  // Active orders from today
+  // Single query for all order-based alerts
   const { data: activeOrders } = useQuery({
     queryKey: ['dept-alerts-orders'],
     queryFn: async () => {
@@ -28,47 +28,25 @@ export function useDepartmentAlerts(): DepartmentAlerts {
     refetchInterval: 10_000,
   });
 
-  // Pending guest requests
-  const { data: pendingRequests } = useQuery({
-    queryKey: ['dept-alerts-requests'],
+  // Single query for reception side-panel counts (requests + housekeeping + tours)
+  const { data: counts } = useQuery({
+    queryKey: ['dept-alerts-counts'],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('guest_requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      return count || 0;
+      const [requests, housekeeping, tours] = await Promise.all([
+        supabase.from('guest_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('housekeeping_orders').select('id', { count: 'exact', head: true }).in('status', ['pending_inspection', 'pending_cleaning']),
+        supabase.from('guest_tours').select('id', { count: 'exact', head: true }).eq('status', 'booked'),
+      ]);
+      return {
+        pendingRequests: requests.count ?? 0,
+        pendingHK: housekeeping.count ?? 0,
+        pendingTours: tours.count ?? 0,
+      };
     },
     refetchInterval: 10_000,
   });
 
-  // Pending housekeeping orders
-  const { data: pendingHK } = useQuery({
-    queryKey: ['dept-alerts-housekeeping'],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from('housekeeping_orders')
-        .select('id', { count: 'exact', head: true })
-        .in('status', ['pending_inspection', 'pending_cleaning']);
-      return count || 0;
-    },
-    refetchInterval: 10_000,
-  });
-
-  // Pending tours
-  const { data: pendingTours } = useQuery({
-    queryKey: ['dept-alerts-tours'],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from('guest_tours')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'booked');
-      return count || 0;
-    },
-    refetchInterval: 10_000,
-  });
-
-  const orders = activeOrders || [];
-
+  const orders = activeOrders ?? [];
   const hasNewOrders = orders.some(o => o.status === 'New');
 
   const hasPendingKitchen = orders.some(o => {
@@ -84,11 +62,11 @@ export function useDepartmentAlerts(): DepartmentAlerts {
   });
 
   return {
-    reception: hasNewOrders || (pendingRequests || 0) > 0,
+    reception: hasNewOrders || (counts?.pendingRequests ?? 0) > 0,
     kitchen: hasPendingKitchen,
     bar: hasPendingBar,
     orders: hasNewOrders,
-    housekeeping: (pendingHK || 0) > 0,
-    experiences: (pendingTours || 0) > 0,
+    housekeeping: (counts?.pendingHK ?? 0) > 0,
+    experiences: (counts?.pendingTours ?? 0) > 0,
   };
 }

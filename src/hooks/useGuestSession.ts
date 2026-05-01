@@ -5,6 +5,7 @@ export interface GuestSession {
   room_name: string;
   guest_name: string;
   booking_id: string;
+  check_out?: string;
   expires: number;
 }
 
@@ -24,10 +25,13 @@ export function getGuestSession(): GuestSession | null {
   }
 }
 
-export function setGuestSession(session: Omit<GuestSession, 'expires'>): void {
+export function setGuestSession(
+  session: Omit<GuestSession, 'expires'>,
+  expiresAt?: number,
+): void {
   const full: GuestSession = {
     ...session,
-    expires: Date.now() + 4 * 60 * 60 * 1000, // 4 hours
+    expires: expiresAt ?? Date.now() + 4 * 60 * 60 * 1000,
   };
   sessionStorage.setItem(GUEST_SESSION_KEY, JSON.stringify(full));
 }

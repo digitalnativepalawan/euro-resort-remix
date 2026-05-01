@@ -1,17 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
+import { getStaffSession } from '@/lib/session';
 
-/**
- * Log an audit entry for any staff modification made through the Manager dashboard.
- * Reads employee identity from localStorage.
- */
 export const logAudit = async (
   action: 'created' | 'updated' | 'deleted',
   tableName: string,
   recordId: string,
   details: string = ''
 ) => {
-  const employeeId = localStorage.getItem('emp_id') || null;
-  const employeeName = localStorage.getItem('emp_name') || 'Unknown';
+  const session = getStaffSession();
+  const employeeId = session?.employeeId ?? null;
+  const employeeName = session?.name ?? 'Unknown';
 
   await (supabase.from('audit_log' as any) as any).insert({
     employee_id: employeeId,

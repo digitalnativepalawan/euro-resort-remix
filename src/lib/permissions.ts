@@ -1,22 +1,30 @@
-/**
- * Permission resolution helpers for the granular staff access system.
- *
- * Stored permission values:
- *   - 'admin'           → full access to everything
- *   - 'rooms:view'      → view-only access to rooms
- *   - 'rooms:edit'      → full access to rooms
- *   - 'rooms:manage'    → can override rates, modify bookings
- *   - 'rooms'           → legacy, treated as 'rooms:edit' for backward compat
- *   - 'documents:view'  → can see passport/docs tab
- *   - 'documents:edit'  → can see and modify passport/docs tab
- */
+export type Permission =
+  | 'admin'
+  | 'orders'
+  | 'kitchen'
+  | 'bar'
+  | 'reception'
+  | 'reception_display'
+  | 'housekeeping'
+  | 'experiences'
+  | 'cashier'
+  | 'rooms'
+  | 'rooms:view'
+  | 'rooms:edit'
+  | 'rooms:manage'
+  | 'documents'
+  | 'documents:view'
+  | 'documents:edit'
+  | 'hr'
+  | 'reports'
+  | 'inventory'
+  | 'payroll';
 
 export type PermissionLevel = 'off' | 'view' | 'edit' | 'manage';
 
 /** Check if employee has any access (view or edit or manage) to a section */
 export const hasAccess = (permissions: string[], section: string): boolean => {
   if (permissions.includes('admin')) return true;
-  // Legacy bare permission (e.g. 'rooms') treated as edit
   if (permissions.includes(section)) return true;
   if (permissions.includes(`${section}:view`)) return true;
   if (permissions.includes(`${section}:edit`)) return true;
@@ -27,7 +35,6 @@ export const hasAccess = (permissions: string[], section: string): boolean => {
 /** Check if employee can edit (not just view) a section */
 export const canEdit = (permissions: string[], section: string): boolean => {
   if (permissions.includes('admin')) return true;
-  // Legacy bare permission treated as edit
   if (permissions.includes(section)) return true;
   if (permissions.includes(`${section}:edit`)) return true;
   if (permissions.includes(`${section}:manage`)) return true;

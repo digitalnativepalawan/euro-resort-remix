@@ -17,6 +17,7 @@ const RequireAuth = ({ children, requiredPermission, adminOnly }: RequireAuthPro
   const [session, setSession] = useState(getStaffSession);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Redirect if not authenticated or not authorised
   useEffect(() => {
     if (!session) {
       navigate('/', { replace: true });
@@ -61,7 +62,13 @@ const RequireAuth = ({ children, requiredPermission, adminOnly }: RequireAuthPro
     };
   }, [session]);
 
-  if (!session) return null;
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-navy-texture flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const perms: string[] = session.permissions || [];
   const isAdmin = perms.includes('admin');

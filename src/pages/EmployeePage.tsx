@@ -1,10 +1,5 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const EmployeePage = () => {
-  const navigate = useNavigate();
-  useEffect(() => { navigate('/employee-portal', { replace: true }); }, [navigate]);
-  return null;
-};
+const EmployeePage = () => <Navigate to="/employee-portal" replace />;
 
 export default EmployeePage;

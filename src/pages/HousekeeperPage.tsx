@@ -19,6 +19,7 @@ const HousekeeperPage = ({ embedded = false }: { embedded?: boolean }) => {
   const qc = useQueryClient();
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [acceptingOrderId, setAcceptingOrderId] = useState<string | null>(null);
+  const acceptInFlightRef = useRef(false);
   const [activeOrder, setActiveOrder] = useState<any>(null);
 
   // Unlock AudioContext on first interaction (mobile)
@@ -132,7 +133,8 @@ const HousekeeperPage = ({ embedded = false }: { embedded?: boolean }) => {
     : 0;
 
   const handleAccept = async (employee: { id: string; name: string; display_name: string }) => {
-    if (!acceptingOrderId) return;
+    if (!acceptingOrderId || acceptInFlightRef.current) return;
+    acceptInFlightRef.current = true;
     try {
       // Race condition guard: re-check if already accepted
       const { data: current } = await from('housekeeping_orders')
@@ -159,8 +161,10 @@ const HousekeeperPage = ({ embedded = false }: { embedded?: boolean }) => {
       toast.success(`Accepted — ${employee.display_name || employee.name}`);
     } catch (err: any) {
       toast.error(err.message || 'Failed to accept');
+    } finally {
+      acceptInFlightRef.current = false;
+      setAcceptingOrderId(null);
     }
-    setAcceptingOrderId(null);
   };
 
   const priorityColor = (p: string) => {

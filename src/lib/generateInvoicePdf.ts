@@ -13,7 +13,7 @@ interface InvoiceOrder {
   created_at: string;
 }
 
-function formatCurrency(amount: number): string {
+function defaultFormatCurrency(amount: number): string {
   return `P${amount.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
@@ -37,6 +37,7 @@ export async function generateInvoicePdf(
   order: InvoiceOrder,
   profile: ResortProfile | null,
   invoiceSettings?: InvoiceSettings | null,
+  formatCurrency: (amount: number) => string = defaultFormatCurrency,
 ): Promise<void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a5' });
   const pw = doc.internal.pageSize.getWidth();
@@ -265,6 +266,7 @@ export function buildInvoiceWhatsAppText(
   order: InvoiceOrder,
   profile: ResortProfile | null,
   invoiceSettings?: InvoiceSettings | null,
+  formatCurrency: (amount: number) => string = defaultFormatCurrency,
 ): string {
   const typeLabels: Record<string, string> = {
     Room: 'Room Delivery', DineIn: 'Dine In', Beach: 'Beach Delivery', WalkIn: 'Walk-In',
@@ -280,11 +282,11 @@ export function buildInvoiceWhatsAppText(
     `Type: ${typeLabels[order.order_type] || order.order_type}${order.location_detail ? ` - ${order.location_detail}` : ''}`,
     '',
     '*Items:*',
-    ...items.map((i: any) => `${i.qty || i.quantity}x ${i.name} - P${((i.price) * (i.qty || i.quantity)).toLocaleString()}`),
+    ...items.map((i: any) => `${i.qty || i.quantity}x ${i.name} - ${formatCurrency(i.price * (i.qty || i.quantity))}`),
     '',
-    `Subtotal: P${subtotal.toLocaleString()}`,
-    `Service Charge (${scPct}%): P${order.service_charge.toLocaleString()}`,
-    `*Total: P${(subtotal + order.service_charge).toLocaleString()}*`,
+    `Subtotal: ${formatCurrency(subtotal)}`,
+    `Service Charge (${scPct}%): ${formatCurrency(order.service_charge)}`,
+    `*Total: ${formatCurrency(subtotal + order.service_charge)}*`,
   ];
 
   if (order.payment_type) lines.push(`Payment: ${order.payment_type}`);

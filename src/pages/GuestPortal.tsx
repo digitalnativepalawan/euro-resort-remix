@@ -14,35 +14,16 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { LogOut, UtensilsCrossed, MapPin, Car, Bike, MessageSquare, Star, Receipt, ArrowLeft, ChevronRight, ClipboardList, Calendar, Clock, Users, StickyNote, CheckCircle2, Utensils, Palmtree, Truck, CreditCard, FileText, Loader2, ConciergeBell, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { setGuestSession } from '@/hooks/useGuestSession';
+import { GuestSession, getGuestSession, setGuestSession, clearGuestSession } from '@/hooks/useGuestSession';
 
-const GUEST_PORTAL_KEY = 'guest_portal_session';
-
-interface GuestPortalSession {
-  booking_id: string;
-  room_id: string;
-  room_name: string;
-  guest_name: string;
-  check_out: string;
-  expires: number;
-}
-
-const getPortalSession = (): GuestPortalSession | null => {
-  try {
-    const s = sessionStorage.getItem(GUEST_PORTAL_KEY);
-    if (!s) return null;
-    const parsed: GuestPortalSession = JSON.parse(s);
-    if (parsed.expires < Date.now()) { sessionStorage.removeItem(GUEST_PORTAL_KEY); return null; }
-    return parsed;
-  } catch { sessionStorage.removeItem(GUEST_PORTAL_KEY); return null; }
-};
+type GuestPortalSession = GuestSession;
 
 const GuestPortal = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: profile } = useResortProfile();
   const qc = useQueryClient();
-  const [session, setSession] = useState<GuestPortalSession | null>(getPortalSession);
+  const [session, setSession] = useState<GuestPortalSession | null>(getGuestSession);
   const [view, setView] = useState<'dashboard' | 'menu-food' | 'menu-drinks' | 'experiences' | 'request' | 'message' | 'tours' | 'transport' | 'rentals' | 'review' | 'bill' | 'orders' | 'requests'>('dashboard');
 
   // Login state
@@ -95,15 +76,12 @@ const GuestPortal = () => {
         guest_login_count: (booking as any).guest_login_count ? (booking as any).guest_login_count + 1 : 1,
       }).eq('id', booking.id);
 
-      const portalSession: GuestPortalSession = {
-        booking_id: booking.id,
-        room_id: unit.id,
-        room_name: unit.unit_name,
-        guest_name: guestName,
-        check_out: booking.check_out,
-        expires: new Date(booking.check_out + 'T23:59:59').getTime(),
-      };
-      sessionStorage.setItem(GUEST_PORTAL_KEY, JSON.stringify(portalSession));
+      const checkOutExpiry = new Date(booking.check_out + 'T23:59:59').getTime();
+      setGuestSession(
+        { booking_id: booking.id, room_id: unit.id, room_name: unit.unit_name, guest_name: guestName, check_out: booking.check_out },
+        checkOutExpiry,
+      );
+      const portalSession = getGuestSession()!;
       setSession(portalSession);
       toast.success(t('guest.welcome', { name: guestName.split(' ')[0] }));
     } catch { toast.error(t('guest.loginFailed')); }
@@ -111,7 +89,7 @@ const GuestPortal = () => {
   };
 
   const logout = () => {
-    sessionStorage.removeItem(GUEST_PORTAL_KEY);
+    clearGuestSession();
     setSession(null);
     setView('dashboard');
   };
@@ -164,19 +142,13 @@ const GuestPortal = () => {
                 icon={<UtensilsCrossed className="w-6 h-6" />}
                 label={t('guest.orderFood')}
                 subtitle={t('guest.orderFoodSub')}
-                onClick={() => {
-                  setGuestSession({ room_id: session.room_id, room_name: session.room_name, guest_name: session.guest_name, booking_id: session.booking_id });
-                  navigate('/menu?mode=guest-order&dept=kitchen');
-                }}
+                onClick={() => navigate('/menu?mode=guest-order&dept=kitchen')}
               />
               <GuestTile
                 icon={<span className="text-2xl">🍹</span>}
                 label={t('guest.orderDrinks')}
                 subtitle={t('guest.orderDrinksSub')}
-                onClick={() => {
-                  setGuestSession({ room_id: session.room_id, room_name: session.room_name, guest_name: session.guest_name, booking_id: session.booking_id });
-                  navigate('/menu?mode=guest-order&dept=bar');
-                }}
+                onClick={() => navigate('/menu?mode=guest-order&dept=bar')}
               />
               <GuestTile
                 icon={<Palmtree className="w-6 h-6" />}
